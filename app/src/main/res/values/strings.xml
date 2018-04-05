@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">表情宝宝</string>
+    <string name="title_activity_base">BaseActivity</string>
 </resources>

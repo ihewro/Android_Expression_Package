@@ -20,7 +20,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "com.android.support:support-annotations:27.1.0"
+    implementation "com.android.support:design:26.1.0"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
@@ -28,18 +31,33 @@ dependencies {
 
     //bilibili 多主题框架
     compile 'com.bilibili:magicasakura:0.1.8@aar'
-    compile 'com.github.florent37:materialviewpager:1.2.3'
 
-
+    //侧边栏
     implementation("com.mikepenz:materialdrawer:6.0.7@aar") {
         transitive = true
     }
 
-    //required support lib modules
-    implementation "com.android.support:appcompat-v7:26.1.0"
+    //recyclerView
     implementation "com.android.support:recyclerview-v7:26.1.0"
-    implementation "com.android.support:support-annotations:26.1.0"
-    implementation "com.android.support:design:26.1.0"
+
+    //搜索
+    compile 'com.github.arimorty:floatingsearchview:2.1.1'
+
+    //简单修改状态栏，使其沉浸
+    compile 'com.jaeger.statusbarutil:library:1.5.0'
+
+    //butterknife开源库，用于简化代码
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    //更方便的RecyclerView库
+    compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
+
+    //更好的日志打印工具
+    compile 'com.blankj:alog:1.5.0'
+
+    compile 'com.mikepenz:google-material-typeface:3.0.1.2.original@aar' //Google Material Icons
+    compile 'com.mikepenz:fontawesome-typeface:5.0.6.0@aar'     //FontAwesome
 
 
 }
