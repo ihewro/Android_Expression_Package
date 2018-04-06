@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         initTabLayout();
 
         StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
-        //StatusBarUtil.setTransparent(this); //透明
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
         layoutParams.setMargins(layoutParams.leftMargin, -(getStatusBarHeight(this)),
                 layoutParams.rightMargin, layoutParams.bottomMargin);

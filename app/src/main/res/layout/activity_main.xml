@@ -11,8 +11,7 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff">
+        android:layout_height="wrap_content">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -24,7 +23,7 @@
 
             <ImageView
                 android:layout_width="fill_parent"
-                android:layout_height="300dp"
+                android:layout_height="240dp"
                 android:src="@drawable/bg"
                 android:scaleType="fitXY"/>
 
@@ -34,7 +33,7 @@
                 android:layout_height="30dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:layout_marginBottom="100dp"
+                android:layout_marginBottom="30dp"
                 android:layout_gravity="bottom"
                 android:background="@drawable/search_selector"
                 android:queryHint="请输入物品名称">
@@ -53,8 +52,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="1dp"
-            app:tabSelectedTextColor="#000"
-            app:tabTextColor="#666"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/text_secondary_light"
+            app:tabIndicatorColor="@color/white"
             app:textAllCaps="false" />
     </android.support.design.widget.AppBarLayout>
 

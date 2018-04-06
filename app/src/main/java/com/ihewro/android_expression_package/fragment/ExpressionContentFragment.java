@@ -2,12 +2,25 @@ package com.ihewro.android_expression_package.fragment;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
+import com.ihewro.android_expression_package.bean.Expression;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,16 +28,41 @@ import com.ihewro.android_expression_package.R;
 public class ExpressionContentFragment extends Fragment {
 
 
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    Unbinder unbinder;
+
+    ExpressionListAdapter adapter;
+    List<Expression> expressionList = new ArrayList<>();
+
     public ExpressionContentFragment() {
-        // Required empty public constructor
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_expression_content, container, false);
+        View view = inflater.inflate(R.layout.fragment_expression_content, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),5);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        for (int i =0; i< 10;i++){
+            expressionList.add(new Expression());
+        }
+        adapter = new ExpressionListAdapter(expressionList);
+        recyclerView.setAdapter(adapter);
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 }
