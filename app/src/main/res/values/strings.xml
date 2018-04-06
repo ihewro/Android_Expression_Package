@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">表情宝宝</string>
     <string name="title_activity_base">BaseActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
