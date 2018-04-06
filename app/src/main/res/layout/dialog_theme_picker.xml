@@ -45,14 +45,14 @@
         android:paddingRight="?attr/dialogPreferredPadding"
         android:paddingTop="?attr/dialogPreferredPadding">
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_pink"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/pink" />
+            android:backgroundTint="@color/pink" />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -60,14 +60,15 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_purple"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/purple" />
+            android:backgroundTint="@color/purple"
+             />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -75,14 +76,16 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_blue"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
+            
+            android:backgroundTint="@color/blue"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/blue" />
+            />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -90,14 +93,15 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_green"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/green" />
+            android:backgroundTint="@color/green"
+             />
     </LinearLayout>
 
     <LinearLayout
@@ -108,14 +112,15 @@
         android:paddingRight="?attr/dialogPreferredPadding"
         android:paddingTop="?attr/dialogPreferredPadding">
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_green_light"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/green_light" />
+            android:backgroundTint="@color/green_light"
+             />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -123,14 +128,15 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_yellow"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/yellow" />
+            android:backgroundTint="@color/yellow"
+             />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -138,14 +144,15 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_orange"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/orange" />
+            android:backgroundTint="@color/orange"
+             />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"
@@ -153,14 +160,15 @@
             android:layout_weight="1"
             android:visibility="invisible" />
 
-        <com.bilibili.magicasakura.widgets.TintImageView
+        <ImageView
             android:id="@+id/theme_red"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/ic_card_48dp"
             android:scaleType="centerInside"
             android:src="@drawable/selector_pick_item"
-            app:backgroundTint="@color/red" />
+            android:backgroundTint="@color/red"
+             />
     </LinearLayout>
 
     <LinearLayout

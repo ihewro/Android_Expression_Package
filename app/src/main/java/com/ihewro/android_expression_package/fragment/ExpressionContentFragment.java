@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -57,6 +59,17 @@ public class ExpressionContentFragment extends Fragment {
         }
         adapter = new ExpressionListAdapter(expressionList);
         recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                boolean wrapInScrollView = true;
+                new MaterialDialog.Builder(getActivity())
+                        .customView(R.layout.item_show_expression, wrapInScrollView)
+                        .show();
+
+            }
+        });
 
     }
 
