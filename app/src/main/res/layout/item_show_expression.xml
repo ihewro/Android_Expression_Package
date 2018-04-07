@@ -16,10 +16,12 @@
         android:id="@+id/expression_image"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="150dp"
+        android:minHeight="150dp"
         android:layout_gravity="center"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:src="@drawable/bg"/>
 
     <RelativeLayout
