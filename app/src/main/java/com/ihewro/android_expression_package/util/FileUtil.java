@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -81,7 +82,10 @@ public class FileUtil {
         }
     }
 
-    public static void saveImageToGallery(Context context, Drawable drawable, String dirName, String fileName) {
+    public static File saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName) {
+
+        String filePath = null;
+
         // 首先保存图片
         File appDir = new File(Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName);
         if (!appDir.exists()) {
@@ -90,25 +94,32 @@ public class FileUtil {
         File file = new File(appDir, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(file);
-            Bitmap bmp = UIUtil.drawable2Bitmap(drawable);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            InputStream is = UIUtil.getContext().getAssets().open(imageUrl);
+            byte[] bytes = UIUtil.InputStreamTOByte(is);
+            //bmp.compress(Bitmap.CompressFormat.WEBP, 100, fos);
+            fos.write(bytes);
             fos.flush();
             fos.close();
             Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
+
+            filePath = file.getAbsolutePath();
+
+            // 其次把文件插入到系统图库
+            try {
+                MediaStore.Images.Media.insertImage(context.getContentResolver(),
+                        file.getAbsolutePath(), fileName, null);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            // 最后通知图库更新
+            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + file.getAbsolutePath())));
+
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(UIUtil.getContext(),"保存失败，请重试",Toast.LENGTH_SHORT).show();
         }
 
-        // 其次把文件插入到系统图库
-        try {
-            MediaStore.Images.Media.insertImage(context.getContentResolver(),
-                    file.getAbsolutePath(), fileName, null);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        // 最后通知图库更新
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + file.getAbsolutePath())));
+        return file;
     }
 
 

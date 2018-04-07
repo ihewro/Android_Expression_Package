@@ -1,14 +1,20 @@
 package com.ihewro.android_expression_package.fragment;
 
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +33,9 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +43,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import pl.droidsonroids.gif.GifImageView;
+import retrofit2.http.Url;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -108,15 +118,44 @@ public class ExpressionContentFragment extends Fragment {
      * 初始化表情弹出框监听器
      */
     private void initExpressionDialogListener(){
+
+        //保存图片到本地
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //保存图片到sd卡
                 if (currentPosition != -1){
-                    FileUtil.saveImageToGallery(UIUtil.getContext(), ivExpression.getDrawable(),tabName,expressionList.get(currentPosition).getName());
+                    FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName());
                 }
             }
         });
+
+        //调用系统分享
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File filePath;
+                if (currentPosition != -1){
+                    filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName());
+                    Log.e("filepath",filePath.getAbsolutePath());
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    Uri imageUri = FileProvider.getUriForFile(
+                            getActivity(),
+                            UIUtil.getContext().getPackageName() + ".fileprovider",
+                            filePath);
+
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    shareIntent.setType("image/*");
+                    startActivity(Intent.createChooser(shareIntent, "分享到"));
+
+                    //删除保存的图片
+                    
+                }
+
+            }
+        });
+
 
     }
 
@@ -144,8 +183,6 @@ public class ExpressionContentFragment extends Fragment {
         timShare = view.findViewById(R.id.tim_share);
         weChatShare = view.findViewById(R.id.weChat_share);
         qqShare = view.findViewById(R.id.qq_share);
-
-
 
     }
 
