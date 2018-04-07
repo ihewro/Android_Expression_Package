@@ -16,6 +16,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,8 +78,9 @@ public class ExpressionContentFragment extends Fragment {
 
     private String[] loves = new String[]{
             "每次看到你的时候 我都觉得 呀我要流鼻血啦 可是 我从来没留过鼻血 我只会流眼泪",
+            "给喜欢的人发撩人表情包吧✨",
+            "你可知 你是我青春年少时义无反顾的梦",
             "给喜欢的人发撩人表情包吧✨"
-
     };
 
 
@@ -148,7 +150,8 @@ public class ExpressionContentFragment extends Fragment {
             public void onClick(View v) {
                 File filePath;
                 if (currentPosition != -1){
-                    filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                    Pair<File,Integer> results = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                    filePath = results.first;
                     Log.e("filepath",filePath.getAbsolutePath());
                     Intent shareIntent = new Intent();
                     shareIntent.setAction(Intent.ACTION_SEND);
@@ -160,6 +163,11 @@ public class ExpressionContentFragment extends Fragment {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
                     shareIntent.setType("image/*");
                     startActivity(Intent.createChooser(shareIntent, "分享到"));
+
+                    int status = results.second;
+                    if (status == -1){
+                        //FileUtil.deleteImageFromGallery(filePath);
+                    }
                 }
 
             }
@@ -169,14 +177,19 @@ public class ExpressionContentFragment extends Fragment {
         qqShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                Pair<File,Integer> results = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                File filePath = results.first;
                 Uri imageUri = FileProvider.getUriForFile(
                         getActivity(),
                         UIUtil.getContext().getPackageName() + ".fileprovider",
                         filePath);
 
-
                 ShareUtil.shareQQFriend("title","content",ShareUtil.DRAWABLE,imageUri);
+
+                int status = results.second;
+                if (status == -1){
+                    //FileUtil.deleteImageFromGallery(filePath);
+                }
             }
         });
 
@@ -184,7 +197,8 @@ public class ExpressionContentFragment extends Fragment {
         weChatShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                Pair<File,Integer> results = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                File filePath = results.first;
                 Uri imageUri = FileProvider.getUriForFile(
                         getActivity(),
                         UIUtil.getContext().getPackageName() + ".fileprovider",
@@ -192,6 +206,11 @@ public class ExpressionContentFragment extends Fragment {
 
 
                 ShareUtil.shareWeChatFriend("title","content",ShareUtil.DRAWABLE,imageUri);
+
+                int status = results.second;
+                if (status == -1){
+                    //FileUtil.deleteImageFromGallery(filePath);
+                }
             }
         });
 

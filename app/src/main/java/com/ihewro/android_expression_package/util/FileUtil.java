@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -50,8 +52,10 @@ public class FileUtil {
      * @param origin 保存来源，1表示直接保存，2表示保存后需要删除
      * @return
      */
-    public static File saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName, int origin) {
-        //保存文件前是否已经保存。-1表示未保存
+    public static Pair<File,Integer> saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName, int origin) {
+
+        Pair<File,Integer> results = null;
+        //保存文件前是否已经保存。-1表示未保存,如果是请求分享的过程中保存图片，并且是-1，就需要把临时生成的文件删除掉
         int status = -1;
 
         // 首先保存图片
@@ -71,19 +75,18 @@ public class FileUtil {
             fos.flush();
             fos.close();
             if (origin == 1){
-                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
+                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
             }
             updateMediaStore(UIUtil.getContext(),file.getAbsolutePath());
+
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(UIUtil.getContext(),"保存失败，请重试",Toast.LENGTH_SHORT).show();
         }
 
-        if (status == -1 && origin == 2){//如果直接图片没有保存，则需要分享图片后删除掉
-            deleteImageFromGallery(file);
-        }
+        results = new Pair<>(file,status);
 
-        return file;
+        return results;
     }
 
     /**
