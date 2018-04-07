@@ -80,5 +80,7 @@ dependencies {
     //简化运行时申请权限的代码
     compile 'pub.devrel:easypermissions:1.0.1'
 
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
+
 
 }

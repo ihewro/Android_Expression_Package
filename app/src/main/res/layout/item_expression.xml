@@ -7,7 +7,7 @@
     android:clickable="true"
     android:background="?attr/selectableItemBackground">
 
-<ImageView
+<pl.droidsonroids.gif.GifImageView
     android:id="@+id/iv_expression"
     android:layout_width="match_parent"
     android:layout_height="70dp"

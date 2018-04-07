@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import pl.droidsonroids.gif.GifImageView;
+
 /**
  * <pre>
  *     author : hewro
@@ -38,18 +40,22 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
     @Override
     protected void convert(ExpressionListAdapter.IViewHolder helper, Expression item) {
         //if (helper.IvExpression != null){
-            UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (ImageView) helper.getView(R.id.iv_expression));
+            //if (helper.getLayoutPosition() == 0){
+              //  Glide.with(UIUtil.getContext()).load("https://raw.githubusercontent.com/ihewro/Expression-Package/master/hh211.gif").into((ImageView) helper.getView(R.id.iv_expression));
+            //}else {
+                UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (GifImageView) helper.getView(R.id.iv_expression));
+            //}
         //}
     }
 
 
     public static class IViewHolder extends BaseViewHolder{
 
-        ImageView IvExpression;
+        GifImageView IvExpression;
 
         public IViewHolder(View itemView) {
             super(itemView);
-            IvExpression = itemView.findViewById(R.id.expression_image);
+            IvExpression = itemView.findViewById(R.id.iv_expression);
         }
     }
 

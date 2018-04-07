@@ -31,6 +31,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import pl.droidsonroids.gif.GifImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,7 +48,7 @@ public class ExpressionContentFragment extends Fragment {
     MaterialDialog expressionDialog;
 
     //自定义布局
-    ImageView ivExpression;
+    GifImageView ivExpression;
     View save;
     View share;
     View timShare;

@@ -1,17 +1,26 @@
 package com.ihewro.android_expression_package.util;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 /**
  * <pre>
@@ -23,6 +32,8 @@ import java.io.InputStream;
  * </pre>
  */
 public class UIUtil {
+
+    final static int BUFFER_SIZE = 4096;
 
 
     /**
@@ -85,17 +96,31 @@ public class UIUtil {
     }
 
 
-    public static void setImageToImageView(int status, String url, ImageView imageView){
+    public static void setImageToImageView(int status, String url, GifImageView imageView){
         switch (status){
             case -1://apk内置图片
-                InputStream is= null;
+                AssetFileDescriptor fd = null;
                 try {
-                    is = UIUtil.getContext().getAssets().open(url);
+                    fd = UIUtil.getContext().getAssets().openFd(url);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Bitmap bitmap= BitmapFactory.decodeStream(is);
-                Glide.with(UIUtil.getContext()).load(bitmap).into(imageView);
+                try {
+                    GifDrawable gifFromAfd = new GifDrawable(fd);
+                    imageView.setImageDrawable(gifFromAfd);
+
+                } catch (IOException e) {//不是gif图片
+                    //e.printStackTrace();
+                    Bitmap bitmap= null;
+                    try {
+                        InputStream is = UIUtil.getContext().getAssets().open(url);
+                        bitmap = BitmapFactory.decodeStream(is);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    imageView.setImageBitmap(bitmap);
+                }
+
                 break;
 
             case 1://存储在sd卡中
@@ -108,5 +133,40 @@ public class UIUtil {
                 break;
         }
 
+    }
+
+    // InputStream转换成Drawable
+    public static Drawable InputStream2Drawable(InputStream is) {
+        Bitmap bitmap = InputStream2Bitmap(is);
+        return bitmap2Drawable(bitmap);
+    }
+
+    // 将InputStream转换成Bitmap
+    public static Bitmap InputStream2Bitmap(InputStream is) {
+        return BitmapFactory.decodeStream(is);
+    }
+
+    // Bitmap转换成Drawable
+    public static Drawable bitmap2Drawable(Bitmap bitmap) {
+        BitmapDrawable bd = new BitmapDrawable(bitmap);
+        Drawable d = (Drawable) bd;
+        return d;
+    }
+
+    /**
+     * 将InputStream转换成byte数组
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    public static byte[] InputStreamTOByte(InputStream in) throws IOException{
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] data = new byte[BUFFER_SIZE];
+        int count = -1;
+        while((count = in.read(data,0,BUFFER_SIZE)) != -1)
+            outStream.write(data, 0, count);
+
+        data = null;
+        return outStream.toByteArray();
     }
 }

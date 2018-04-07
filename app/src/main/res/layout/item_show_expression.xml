@@ -12,7 +12,7 @@
         android:textColor="@color/black"
         android:text="标题而已"/>
 
-    <ImageView
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/expression_image"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
