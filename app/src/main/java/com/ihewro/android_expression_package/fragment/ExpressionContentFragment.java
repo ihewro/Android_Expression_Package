@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -34,6 +35,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsLayoutInflater2;
+import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,9 +70,16 @@ public class ExpressionContentFragment extends Fragment {
     TextView tvExpression;
     View save;
     View share;
-    View timShare;
+    //View timShare;
     View weChatShare;
     View qqShare;
+    View love;
+
+    private String[] loves = new String[]{
+            "每次看到你的时候 我都觉得 呀我要流鼻血啦 可是 我从来没留过鼻血 我只会流眼泪",
+            "给喜欢的人发撩人表情包吧✨"
+
+    };
 
 
     public ExpressionContentFragment() {
@@ -86,6 +95,7 @@ public class ExpressionContentFragment extends Fragment {
         //初始化弹出层相关信息
         initView();
 
+        //初始化弹出层的相关点击事件
         initExpressionDialogListener();
 
         return view;
@@ -155,13 +165,11 @@ public class ExpressionContentFragment extends Fragment {
             }
         });
 
+        //调用QQ分享
         qqShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 File filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
-                Log.e("filepath",filePath.getAbsolutePath());
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
                 Uri imageUri = FileProvider.getUriForFile(
                         getActivity(),
                         UIUtil.getContext().getPackageName() + ".fileprovider",
@@ -169,6 +177,34 @@ public class ExpressionContentFragment extends Fragment {
 
 
                 ShareUtil.shareQQFriend("title","content",ShareUtil.DRAWABLE,imageUri);
+            }
+        });
+
+        //调用微信分享
+        weChatShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                Uri imageUri = FileProvider.getUriForFile(
+                        getActivity(),
+                        UIUtil.getContext().getPackageName() + ".fileprovider",
+                        filePath);
+
+
+                ShareUtil.shareWeChatFriend("title","content",ShareUtil.DRAWABLE,imageUri);
+            }
+        });
+
+        //点击爱心
+        love.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ImageView)love).setImageDrawable(new IconicsDrawable(getActivity())
+                        .icon(GoogleMaterial.Icon.gmd_favorite)
+                        .color(Color.RED)
+                        .sizeDp(24));
+                int position = (int)(Math.random()*(loves.length - 1));
+                Toast.makeText(UIUtil.getContext(),loves[position],Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -196,9 +232,10 @@ public class ExpressionContentFragment extends Fragment {
         tvExpression = view.findViewById(R.id.expression_name);
         save = view.findViewById(R.id.save_image);
         share = view.findViewById(R.id.share);
-        timShare = view.findViewById(R.id.tim_share);
+        //timShare = view.findViewById(R.id.tim_share);
         weChatShare = view.findViewById(R.id.weChat_share);
         qqShare = view.findViewById(R.id.qq_share);
+        love = view.findViewById(R.id.love);
 
     }
 

@@ -64,7 +64,8 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 app:iiv_color="@color/text_secondary_dark"
-                app:iiv_icon="faw_weixin"/>
+                app:iiv_icon="faw_weixin"
+                android:visibility="gone"/>
 
             <com.mikepenz.iconics.view.IconicsImageView
                 android:id="@+id/weChat_share"
@@ -87,6 +88,7 @@
                 app:iiv_icon="faw_qq"/>
 
             <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/love"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:padding="10dp"

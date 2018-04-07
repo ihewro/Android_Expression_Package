@@ -39,51 +39,6 @@ import java.util.Vector;
  */
 public class FileUtil {
 
-    // 获取当前目录下所有的mp4文件
-    public static List<String> GetImageFileNameList(String fileAbsolutePath) {
-        List<String> vecFile = new Vector<String>();
-        File file = new File(fileAbsolutePath);
-        File[] subFile = file.listFiles();
-
-        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
-            // 判断是否为文件夹
-            if (!subFile[iFileLength].isDirectory()) {
-                String filename = subFile[iFileLength].getName();
-                // 判断是否为结尾
-                //if (filename.trim().toLowerCase().endsWith(".mp4")) {
-                    vecFile.add(filename);
-                //}
-            }
-        }
-        return vecFile;
-    }
-
-    /**
-     * 保存到SD卡
-     * @param filename
-     * @param filecontent
-     * @throws Exception
-     */
-    public static void saveToSDCard(String filename, String filecontent)throws Exception{
-        try {
-            //判断SDcard是否存在并且可读写
-            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-                Toast.makeText(UIUtil.getContext(), "", Toast.LENGTH_SHORT).show();
-
-                File file = new File(Environment.getExternalStorageDirectory(),filename);
-                FileOutputStream outStream = new FileOutputStream(file);
-                outStream.write(filecontent.getBytes());
-                outStream.close();
-
-            }else{
-                Toast.makeText(UIUtil.getContext(), "", Toast.LENGTH_SHORT).show();
-            }
-
-        } catch (Exception e) {
-            Toast.makeText(UIUtil.getContext(), "", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-    }
 
     /**
      *
@@ -200,51 +155,6 @@ public class FileUtil {
         }
     }
 
-    /**
-     * 拷贝assets文件下文件到指定路径
-     *
-     * @param context
-     * @param assetDir  源文件/文件夹
-     */
-    public static void copyAssets(Context context, String assetDir, String targetDir) {
 
-        Method getSystem = null;
-        try {
-            getSystem = AssetManager.class.getDeclaredMethod("getSystem");
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
-            AssetManager am = (AssetManager) getSystem.invoke(null);
-           // am.get
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-
-
-        if (TextUtils.isEmpty(assetDir) || TextUtils.isEmpty(targetDir)) {
-            return;
-        }
-        String separator = File.separator;
-        try {
-            // 获取assets目录assetDir下一级所有文件以及文件夹
-            String[] fileNames = context.getResources().getAssets().list(assetDir);
-            // 如果是文件夹(目录),则继续递归遍历
-            if (fileNames.length > 0) {
-                File targetFile = new File(targetDir);
-                if (!targetFile.exists() && !targetFile.mkdirs()) {
-                    return;
-                }
-                for (String fileName : fileNames) {
-                    copyAssets(context, assetDir + separator + fileName, targetDir + separator + fileName);
-                }
-            } else { // 文件,则执行拷贝
-                copy(context, assetDir, targetDir);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }
