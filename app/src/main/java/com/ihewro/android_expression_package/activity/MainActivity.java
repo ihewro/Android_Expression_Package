@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
@@ -26,6 +28,7 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
+import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
@@ -51,8 +54,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener  {
+public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks  {
 
     @BindView(R.id.searchEdit)
     SearchView searchEdit;
@@ -88,7 +92,35 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //初始化布局
         initView(savedInstanceState);
 
+        //初始化权限申请
+        initPermission();
 
+    }
+
+
+    private void initPermission(){
+        String[] notPermission = CheckPermissionUtils.checkPermission(UIUtil.getContext());
+        if (notPermission.length!=0){//需要的权限没有全部被运行
+            ActivityCompat.requestPermissions(this, notPermission, 100);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+        //权限被申请成功
+        Toast.makeText(UIUtil.getContext(),"权限申请成功，愉快使用表情宝宝吧😁",Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+        // 权限被拒绝
+        Toast.makeText(UIUtil.getContext(),"权限没有被通过，该软件运行过程中可能会闪退，请留意",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -199,11 +231,12 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //碎片列表
         List<Fragment> fragmentList = new ArrayList<>();
 
-        for (List<Expression> expressionList:expressionListList) {
+        for (int i =0;i<expressionListList.size();i++) {
 
             ExpressionContentFragment fragment = new ExpressionContentFragment();
             Bundle bundle = new Bundle();
-            bundle.putSerializable("data", (Serializable) expressionList);
+            bundle.putSerializable("data", (Serializable) expressionListList.get(i));
+            bundle.putString("name",pageTitleList.get(i));
             fragment.setArguments(bundle);
             fragmentList.add(fragment);
         }

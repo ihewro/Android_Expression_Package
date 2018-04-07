@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -80,21 +81,23 @@ public class FileUtil {
         }
     }
 
-    public static void saveImageToGallery(Context context, Bitmap bmp) {
+    public static void saveImageToGallery(Context context, Drawable drawable, String dirName, String fileName) {
         // 首先保存图片
-        File appDir = new File(Environment.getExternalStorageDirectory(), "Boohee");
+        File appDir = new File(Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName);
         if (!appDir.exists()) {
             appDir.mkdir();
         }
-        String fileName = System.currentTimeMillis() + ".jpg";
         File file = new File(appDir, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(file);
+            Bitmap bmp = UIUtil.drawable2Bitmap(drawable);
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
+            Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(UIUtil.getContext(),"保存失败，请重试",Toast.LENGTH_SHORT).show();
         }
 
         // 其次把文件插入到系统图库

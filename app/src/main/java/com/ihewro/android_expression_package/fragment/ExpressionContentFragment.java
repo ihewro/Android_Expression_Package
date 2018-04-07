@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -43,12 +45,15 @@ public class ExpressionContentFragment extends Fragment {
     RecyclerView recyclerView;
     Unbinder unbinder;
 
-    ExpressionListAdapter adapter;
-    List<Expression> expressionList = new ArrayList<>();
-    MaterialDialog expressionDialog;
+    private ExpressionListAdapter adapter;
+    private List<Expression> expressionList = new ArrayList<>();
+    private String tabName;
+    private MaterialDialog expressionDialog;
+    private int currentPosition = -1;
 
     //自定义布局
     GifImageView ivExpression;
+    TextView tvExpression;
     View save;
     View share;
     View timShare;
@@ -69,6 +74,8 @@ public class ExpressionContentFragment extends Fragment {
         //初始化弹出层相关信息
         initView();
 
+        initExpressionDialogListener();
+
         return view;
     }
 
@@ -86,8 +93,10 @@ public class ExpressionContentFragment extends Fragment {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                currentPosition = position;
                 Expression expression = expressionList.get(position);
                 UIUtil.setImageToImageView(expression.getStatus(),expression.getUrl(),ivExpression);
+                tvExpression.setText(expression.getName());
                 expressionDialog.show();
 
             }
@@ -99,7 +108,15 @@ public class ExpressionContentFragment extends Fragment {
      * 初始化表情弹出框监听器
      */
     private void initExpressionDialogListener(){
-
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //保存图片到sd卡
+                if (currentPosition != -1){
+                    FileUtil.saveImageToGallery(UIUtil.getContext(), ivExpression.getDrawable(),tabName,expressionList.get(currentPosition).getName());
+                }
+            }
+        });
 
     }
 
@@ -109,6 +126,7 @@ public class ExpressionContentFragment extends Fragment {
     private void initExpressionData(){
         Bundle bundle = getArguments();
         expressionList = (List<Expression>) bundle.getSerializable("data");
+        tabName = bundle.getString("name");
     }
 
 
@@ -120,6 +138,7 @@ public class ExpressionContentFragment extends Fragment {
 
         View view = expressionDialog.getCustomView();
         ivExpression = view.findViewById(R.id.expression_image);
+        tvExpression = view.findViewById(R.id.expression_name);
         save = view.findViewById(R.id.save_image);
         share = view.findViewById(R.id.share);
         timShare = view.findViewById(R.id.tim_share);

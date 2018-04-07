@@ -39,13 +39,7 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
     @Override
     protected void convert(ExpressionListAdapter.IViewHolder helper, Expression item) {
-        //if (helper.IvExpression != null){
-            //if (helper.getLayoutPosition() == 0){
-              //  Glide.with(UIUtil.getContext()).load("https://raw.githubusercontent.com/ihewro/Expression-Package/master/hh211.gif").into((ImageView) helper.getView(R.id.iv_expression));
-            //}else {
-                UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (GifImageView) helper.getView(R.id.iv_expression));
-            //}
-        //}
+        UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (GifImageView) helper.getView(R.id.iv_expression));
     }
 
 
