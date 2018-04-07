@@ -4,9 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.v4.view.LayoutInflaterCompat;
 
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.ihewro.android_expression_package.util.ThemeHelper;
+import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 
 
 /**
@@ -19,9 +21,17 @@ import com.ihewro.android_expression_package.util.ThemeHelper;
  * </pre>
  */
 public class MyApplication extends Application implements ThemeUtils.switchColor{
+
+    private static Context mContext;
+
+
+    public static Context getContext() {
+        return mContext;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
         ThemeUtils.setSwitchColor(this);
     }
 

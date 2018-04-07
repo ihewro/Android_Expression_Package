@@ -3,16 +3,19 @@ package com.ihewro.android_expression_package.activity;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -21,12 +24,15 @@ import android.widget.Toast;
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
+import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.util.ThemeHelper;
+import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
 import com.jaeger.library.StatusBarUtil;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -37,6 +43,9 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialize.color.Material;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     private Drawer result;
     private AccountHeader headerResult;
+    private List<List<Expression>> expressionListList = new ArrayList<>();
+    private List<String> pageTitleList = new ArrayList<>();
 
 
     @Override
@@ -67,9 +78,27 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
         setSupportActionBar(toolbar);
 
+
+        //初始化数据
+        initData();
+
+
+        //初始化布局
+        initView(savedInstanceState);
+
+
+    }
+
+
+    /**
+     * 初始化布局
+     * @param savedInstanceState
+     */
+    private void initView(Bundle savedInstanceState){
+
+        //初始化侧边栏
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withCompactStyle(false)
@@ -109,28 +138,49 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withSavedInstance(savedInstanceState)
                 .build();
 
-
+        //初始化TabLayout
         initTabLayout();
 
+        //设置沉浸式状态栏
         StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
-        layoutParams.setMargins(layoutParams.leftMargin, -(getStatusBarHeight(this)),
+        layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
                 layoutParams.rightMargin, layoutParams.bottomMargin);
-
     }
 
 
     /**
-     * 获取状态栏高度
-     *
-     * @param context context
-     * @return 状态栏高度
+     * 初始化表情包数据
+     * 这个表情包是内置在apk中，用户无需下载即可直接使用
      */
-    private static int getStatusBarHeight(Context context) {
-        // 获得状态栏高度
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        return context.getResources().getDimensionPixelSize(resourceId);
+    private void initData(){
+        AssetManager assetManager = getAssets();
+        String[] files =null;
+        try{
+            files = assetManager.list("imagehuyi");
+        }catch(IOException e){
+            Log.e("tag", e.getMessage());
+        }
+
+        for (int i =0;i<files.length;i++){
+            Log.e("filelist",files[i]);
+            String []tempFiles = null;
+            List<Expression> expressionList = new ArrayList<>();
+            pageTitleList.add(files[i]);
+            try {
+                tempFiles = assetManager.list("imagehuyi/" + files[i]);
+                for (String tempFile : tempFiles) {
+                    Log.d("filename",tempFile);
+                    expressionList.add(new Expression(-1, tempFile, "imagehuyi/" + files[i] + "/" + tempFile));
+                }
+                expressionListList.add(expressionList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
+
 
     /**
      * 初始化TabLayout 数据
@@ -148,19 +198,23 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     private void setViewPager(ViewPager viewPager) {
         //碎片列表
         List<Fragment> fragmentList = new ArrayList<>();
-        ExpressionContentFragment currentAudioIntroFragment = new ExpressionContentFragment();
-        Bundle bundle = new Bundle();
+
+        for (List<Expression> expressionList:expressionListList) {
+
+            ExpressionContentFragment fragment = new ExpressionContentFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("data", (Serializable) expressionList);
+            fragment.setArguments(bundle);
+            fragmentList.add(fragment);
+        }
 
 
-        currentAudioIntroFragment.setArguments(bundle);
-        fragmentList.add(currentAudioIntroFragment);
-        fragmentList.add(new ExpressionContentFragment());
 
 
         //标题列表
-        List<String> pageTitleList = new ArrayList<>();
-        pageTitleList.add("坏坏");
-        pageTitleList.add("猥琐萌");
+        //pageTitleList.clear();
+        //pageTitleList.add("坏坏");
+        //pageTitleList.add("猥琐萌");
 
 
         //新建适配器
