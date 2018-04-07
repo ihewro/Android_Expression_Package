@@ -1,6 +1,7 @@
 package com.ihewro.android_expression_package.fragment;
 
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,6 +28,7 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.util.ShareUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -125,7 +127,7 @@ public class ExpressionContentFragment extends Fragment {
             public void onClick(View v) {
                 //保存图片到sd卡
                 if (currentPosition != -1){
-                    FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName());
+                    FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),1);
                 }
             }
         });
@@ -136,7 +138,7 @@ public class ExpressionContentFragment extends Fragment {
             public void onClick(View v) {
                 File filePath;
                 if (currentPosition != -1){
-                    filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName());
+                    filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
                     Log.e("filepath",filePath.getAbsolutePath());
                     Intent shareIntent = new Intent();
                     shareIntent.setAction(Intent.ACTION_SEND);
@@ -148,11 +150,25 @@ public class ExpressionContentFragment extends Fragment {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
                     shareIntent.setType("image/*");
                     startActivity(Intent.createChooser(shareIntent, "分享到"));
-
-                    //删除保存的图片
-                    
                 }
 
+            }
+        });
+
+        qqShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File filePath = FileUtil.saveImageToGallery(UIUtil.getContext(), null,expressionList.get(currentPosition).getUrl(),tabName,expressionList.get(currentPosition).getName(),2);
+                Log.e("filepath",filePath.getAbsolutePath());
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                Uri imageUri = FileProvider.getUriForFile(
+                        getActivity(),
+                        UIUtil.getContext().getPackageName() + ".fileprovider",
+                        filePath);
+
+
+                ShareUtil.shareQQFriend("title","content",ShareUtil.DRAWABLE,imageUri);
             }
         });
 

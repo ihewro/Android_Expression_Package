@@ -6,7 +6,9 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -23,6 +25,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -82,9 +85,19 @@ public class FileUtil {
         }
     }
 
-    public static File saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName) {
-
-        String filePath = null;
+    /**
+     *
+     * @param context
+     * @param drawable
+     * @param imageUrl
+     * @param dirName
+     * @param fileName
+     * @param origin 保存来源，1表示直接保存，2表示保存后需要删除
+     * @return
+     */
+    public static File saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName, int origin) {
+        //保存文件前是否已经保存。-1表示未保存
+        int status = -1;
 
         // 首先保存图片
         File appDir = new File(Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName);
@@ -92,34 +105,63 @@ public class FileUtil {
             appDir.mkdir();
         }
         File file = new File(appDir, fileName);
+        if (file.exists()){
+            status = 1;
+        }
         try {
             FileOutputStream fos = new FileOutputStream(file);
             InputStream is = UIUtil.getContext().getAssets().open(imageUrl);
             byte[] bytes = UIUtil.InputStreamTOByte(is);
-            //bmp.compress(Bitmap.CompressFormat.WEBP, 100, fos);
             fos.write(bytes);
             fos.flush();
             fos.close();
-            Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
-
-            filePath = file.getAbsolutePath();
-
-            // 其次把文件插入到系统图库
-            try {
-                MediaStore.Images.Media.insertImage(context.getContentResolver(),
-                        file.getAbsolutePath(), fileName, null);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            if (origin == 1){
+                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
             }
-            // 最后通知图库更新
-            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + file.getAbsolutePath())));
-
+            updateMediaStore(UIUtil.getContext(),file.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(UIUtil.getContext(),"保存失败，请重试",Toast.LENGTH_SHORT).show();
         }
 
+        if (status == -1 && origin == 2){//如果直接图片没有保存，则需要分享图片后删除掉
+            deleteImageFromGallery(file);
+        }
+
         return file;
+    }
+
+    /**
+     * 从图片库中删除图片
+     */
+    public static void deleteImageFromGallery(File file){
+        String filePath =file.getAbsolutePath();
+        file.delete();
+        updateMediaStore(UIUtil.getContext(),filePath);
+    }
+
+    /**
+     * 更新图片库
+     * @param context
+     * @param path
+     */
+    public static void updateMediaStore(final  Context context, final String path) {
+        //版本号的判断  4.4为分水岭，发送广播更新媒体库
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String path, Uri uri) {
+                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    mediaScanIntent.setData(uri);
+                    context.sendBroadcast(mediaScanIntent);
+                }
+            });
+        } else {
+            File file = new File(path);
+            String relationDir = file.getParent();
+            File file1 = new File(relationDir);
+            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.fromFile(file1.getAbsoluteFile())));
+        }
+        //Toast.makeText(UIUtil.getContext(),"图库更新成功",Toast.LENGTH_SHORT).show();
     }
 
 
