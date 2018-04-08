@@ -2,7 +2,6 @@ package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -20,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bilibili.magicasakura.utils.ThemeUtils;
@@ -30,12 +27,12 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.ThemeHelper;
+import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
 import com.jaeger.library.StatusBarUtil;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -44,9 +41,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialize.color.Material;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -75,8 +71,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     private AccountHeader headerResult;
     private List<List<Expression>> expressionListList = new ArrayList<>();
     private List<String> pageTitleList = new ArrayList<>();
-
-
+    //毫秒
+    private long lastClickTime = -1;
+    private long thisClickTime = -1;
+    private int clickTimes = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,13 +128,97 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
      */
     private void initView(Bundle savedInstanceState){
 
+
+
         //初始化侧边栏
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withCompactStyle(false)
                 .withHeaderBackground(R.drawable.bg)
                 .withSavedInstance(savedInstanceState)
+                .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
+                    @Override
+                    public boolean onClick(View view, IProfile profile) {
+                        if (lastClickTime == -1){
+                            lastClickTime = System.currentTimeMillis();
+                            thisClickTime = System.currentTimeMillis();
+                            ToastUtil.showMessageShort("你戳我？很痛哎");
+                        }else {//不是第一次点击的
+                            thisClickTime = System.currentTimeMillis();
+                            if (thisClickTime - lastClickTime < 500){//是在0.8秒内点击的
+                                lastClickTime = thisClickTime;
+                                clickTimes ++;
+                                switch (clickTimes){
+                                    case 3:
+                                        ToastUtil.showMessageShort("还戳！！！");
+                                        break;
+
+                                    case 10:
+                                        ToastUtil.showMessageShort("好玩吗");
+                                        break;
+
+                                    case 20:
+                                        ToastUtil.showMessageShort("很无聊？");
+                                        break;
+
+                                    case 40:
+                                        ToastUtil.showMessageShort("。。。");
+                                        break;
+
+                                    case 50:
+                                        ToastUtil.showMessageShort("其实我是一个炸弹💣");
+                                        break;
+
+                                    case 60:
+                                        ToastUtil.showMessageShort("是不是吓坏了哈哈，骗你的");
+                                        break;
+
+                                    case 70:
+                                        ToastUtil.showMessageShort("看你还能坚持多久");
+                                        break;
+
+                                    case 90:
+                                        ToastUtil.showMessageShort("哇！！！就问你手指痛吗");
+                                        break;
+
+                                    case 110:
+                                        ToastUtil.showMessageShort("其实，生活还有很多有意义的事情做，比如。。。。");
+                                        break;
+
+                                    case 120:
+                                        ToastUtil.showMessageShort("比如找我聊天啊，别戳了喂");
+                                        break;
+
+                                    case 130:
+                                        ToastUtil.showMessageShort("去找你心中那个人聊天吧，用我的表情包，hahahah");
+                                        break;
+
+                                    case 140:
+                                        ToastUtil.showMessageShort("我走了，祝你玩得开心");
+                                        break;
+
+                                    case 150:
+                                        ToastUtil.showMessageShort("哈哈哈，其实我没走哦，看你这么努力，告诉你一个秘密");
+                                        break;
+
+                                    case 160:
+                                        ToastUtil.showMessageShort("我喜欢你( *︾▽︾)，这次真的要再见了哦👋，再见");
+                                        break;
+
+                                }
+                            }else{//已经超过连续点击的时间，将变量初始化
+                                lastClickTime = -1;
+                                thisClickTime = -1;
+                                clickTimes = 0;
+                            }
+
+                        }
+                        //ToastUtil.showMessageShort("点击了");
+                        return false;
+                    }
+                })
                 .build();
+
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -144,13 +226,19 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withToolbar(toolbar)
                 .withFullscreen(true)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("主页").withIcon(FontAwesome.Icon.faw_home).withIdentifier(1),
-                        new PrimaryDrawerItem().withName("表情商店").withIcon(FontAwesome.Icon.faw_gamepad),
-                        new PrimaryDrawerItem().withName("我的").withIcon(FontAwesome.Icon.faw_eye),
-                        new PrimaryDrawerItem().withName("换肤").withIcon(GoogleMaterial.Icon.gmd_color_lens),
+                        new PrimaryDrawerItem().withName("主页").withIcon(FontAwesome.Icon.faw_home).withIdentifier(1).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                result.closeDrawer();
+                                return false;
+                            }
+                        }),
+                        new PrimaryDrawerItem().withName("表情商店").withIcon(FontAwesome.Icon.faw_gamepad).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withEnabled(false),
+                        new PrimaryDrawerItem().withName("我的").withIcon(FontAwesome.Icon.faw_user).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withEnabled(false),
+                        new PrimaryDrawerItem().withName("换肤").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(GoogleMaterial.Icon.gmd_color_lens),
                         new SectionDrawerItem().withName("其他"),
-                        new SecondaryDrawerItem().withName("设置").withIcon(FontAwesome.Icon.faw_cog),
-                        new SecondaryDrawerItem().withName("五星好评").withIcon(FontAwesome.Icon.faw_question).withEnabled(false)
+                        new SecondaryDrawerItem().withName("设置").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(FontAwesome.Icon.faw_cog).withEnabled(false),
+                        new SecondaryDrawerItem().withName("五星好评").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(FontAwesome.Icon.faw_question).withEnabled(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -163,12 +251,13 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 break;
                         }
 
-                        Toast.makeText(getApplicationContext(),position + "位置",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),position + "位置",Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 })
                 .withSavedInstance(savedInstanceState)
                 .build();
+
 
         //初始化TabLayout
         initTabLayout();
@@ -286,7 +375,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 PrimaryDrawerItem item = (PrimaryDrawerItem)iDrawerItems.get(i);
                                 item.withSelectedColor(android.R.attr.colorPrimary);
                             }*/
+                            result.closeDrawer();
                         }
+
+
                     }
             );
         }

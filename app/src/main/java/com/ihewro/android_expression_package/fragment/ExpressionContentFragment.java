@@ -31,6 +31,7 @@ import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.ShareUtil;
+import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -80,7 +81,12 @@ public class ExpressionContentFragment extends Fragment {
             "每次看到你的时候 我都觉得 呀我要流鼻血啦 可是 我从来没留过鼻血 我只会流眼泪",
             "给喜欢的人发撩人表情包吧✨",
             "你可知 你是我青春年少时义无反顾的梦",
-            "给喜欢的人发撩人表情包吧✨"
+            "给喜欢的人发撩人表情包吧✨",
+            "请记住我",
+            "时间将它磨得退色，又被岁月添上新的柔光，以至于如今的我再已无法辨别当时的心情。那就当是一见钟情吧。",
+            "晚来天欲雪，能饮一杯无。",
+            "当时明月在，曾照彩云归",
+            "都崭新，都暗淡，都独立，都有明天。"
     };
 
 
@@ -214,6 +220,7 @@ public class ExpressionContentFragment extends Fragment {
             }
         });
 
+
         //点击爱心
         love.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,7 +230,7 @@ public class ExpressionContentFragment extends Fragment {
                         .color(Color.RED)
                         .sizeDp(24));
                 int position = (int)(Math.random()*(loves.length - 1));
-                Toast.makeText(UIUtil.getContext(),loves[position],Toast.LENGTH_SHORT).show();
+                ToastUtil.showMessageShort(loves[position]);
             }
         });
 
