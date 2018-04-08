@@ -26,8 +26,6 @@
 
 <img style="width:40%" src="https://www.ihewro.com/usr/uploads/2018/04/931349469.png" style="border:none">
 
-<img style="width:40%" src="https://www.ihewro.com/usr/uploads/2018/04/3806994320.png" style="border:none">
-
 
 
 ## 应用下载
