@@ -16,6 +16,7 @@ public class Expression implements Serializable {
     private int status;//标志位，图片来源：-1 apk内置图片 1 sd卡图片 2 网络图片
     private String name;//图片名称
     private String url;//图片路径或者图片地址（本地/网络）
+    private String folderName;//目录的名称
 
     public Expression(int status,String name, String url) {
         this.status = status;
@@ -23,7 +24,7 @@ public class Expression implements Serializable {
         this.url = url;
     }
 
-    public Expression() {
+    Expression() {
     }
 
     public int getStatus() {
@@ -48,5 +49,13 @@ public class Expression implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getFolderName() {
+        return folderName;
+    }
+
+    public void setFolderName(String folderName) {
+        this.folderName = folderName;
     }
 }

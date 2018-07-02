@@ -26,6 +26,7 @@ import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
+import com.ihewro.android_expression_package.util.GlobalConfig;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                         break;
 
                                     case 130:
-                                        ToastUtil.showMessageShort("去找你心中那个人聊天吧，用我的表情包，hahahah");
+                                        ToastUtil.showMessageShort("去找你我聊天吧，用我的表情包，哈哈哈哈哈");
                                         break;
 
                                     case 140:
@@ -203,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
                                     case 160:
                                         ToastUtil.showMessageShort("我喜欢你( *︾▽︾)，这次真的要再见了哦👋，再见");
+                                        result.closeDrawer();//关闭侧边栏
                                         break;
 
                                 }
@@ -289,10 +291,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
             List<Expression> expressionList = new ArrayList<>();
             pageTitleList.add(files[i]);
             try {
-                tempFiles = assetManager.list("imagehuyi/" + files[i]);
+                tempFiles = assetManager.list(GlobalConfig.assetsFolderName + "/" + files[i]);
                 for (String tempFile : tempFiles) {
                     Log.d("filename",tempFile);
-                    expressionList.add(new Expression(-1, tempFile, "imagehuyi/" + files[i] + "/" + tempFile));
+                    expressionList.add(new Expression(-1, tempFile, GlobalConfig.assetsFolderName +  "/" + files[i] + "/" + tempFile));
                 }
                 expressionListList.add(expressionList);
             } catch (IOException e) {
