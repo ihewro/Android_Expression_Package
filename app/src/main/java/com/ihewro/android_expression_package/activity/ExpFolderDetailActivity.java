@@ -1,6 +1,7 @@
 package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -49,10 +50,10 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
     private List<Expression> expressionList = new ArrayList<>();
     private ExpressionListAdapter adapter;
 
-    public static void actionStart(Activity activity,int dir){
+    public static void actionStart(Context activity, int dir){
         Intent intent = new Intent(activity,ExpFolderDetailActivity.class);
         intent.putExtra("dir",dir);
-        activity.startActivityForResult(intent,1);
+        activity.startActivity(intent);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        GridLayoutManager gridLayoutManager =  new GridLayoutManager(this,5);
+        GridLayoutManager gridLayoutManager =  new GridLayoutManager(this,4);
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
         recyclerView.setAdapter(adapter);
@@ -100,7 +101,7 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<List<Expression>>() {
             @Override
-            public void onResponse(Call<List<Expression>> call, Response<List<Expression>> response) {
+            public void onResponse(@NonNull Call<List<Expression>> call, @NonNull Response<List<Expression>> response) {
                 if (response.isSuccessful()){
                     Toasty.success(UIUtil.getContext(),"请求成功", Toast.LENGTH_SHORT).show();
                     adapter.setNewData(response.body());
@@ -112,7 +113,7 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Expression>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Expression>> call, @NonNull Throwable t) {
                 Toasty.success(UIUtil.getContext(),"请求失败", Toast.LENGTH_SHORT).show();
                 refreshLayout.finishRefresh();
             }

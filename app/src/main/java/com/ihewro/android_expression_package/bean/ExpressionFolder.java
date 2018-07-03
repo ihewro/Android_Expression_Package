@@ -13,9 +13,11 @@ import java.util.List;
  */
 public class ExpressionFolder {
 
+    private int dir;
     private int count;//表情数目
     private String name;//表情包目录名称
-    private String owner;//上传作者
+    private String owner;//上传作者的名称
+    private String ownerAvatar;//上传作者的头像
     private String createTime;//创建时间,时间戳
     private String updateTime;//更新时间，时间戳
     private List<Expression> expressionList;//表情列表，只需要5张即可，更多的表情包信息点击详情请求更多
@@ -66,5 +68,21 @@ public class ExpressionFolder {
 
     public void setExpressionList(List<Expression> expressionList) {
         this.expressionList = expressionList;
+    }
+
+    public int getDir() {
+        return dir;
+    }
+
+    public void setDir(int dir) {
+        this.dir = dir;
+    }
+
+    public String getOwnerAvatar() {
+        return ownerAvatar;
+    }
+
+    public void setOwnerAvatar(String ownerAvatar) {
+        this.ownerAvatar = ownerAvatar;
     }
 }

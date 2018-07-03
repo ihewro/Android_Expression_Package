@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.widget.Toast;
 
+import com.ihewro.android_expression_package.GlobalConfig;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -59,7 +61,7 @@ public class FileUtil {
         int status = -1;
 
         // 首先保存图片
-        File appDir = new File(Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName);
+        File appDir = new File(Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName +"/" + dirName);
         if (!appDir.exists()) {
             appDir.mkdir();
         }
@@ -75,7 +77,7 @@ public class FileUtil {
             fos.flush();
             fos.close();
             if (origin == 1){
-                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "/expressionBaby/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
+                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName + "/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
             }
             updateMediaStore(UIUtil.getContext(),file.getAbsolutePath());
 

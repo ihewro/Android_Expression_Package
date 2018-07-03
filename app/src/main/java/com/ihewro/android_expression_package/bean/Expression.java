@@ -18,10 +18,12 @@ public class Expression implements Serializable {
     private String url;//图片路径或者图片地址（本地/网络）
     private String folderName;//目录的名称
 
-    public Expression(int status,String name, String url) {
+
+    public Expression(int status, String name, String url, String folderName) {
         this.status = status;
         this.name = name;
         this.url = url;
+        this.folderName = folderName;
     }
 
     public Expression() {

@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.activity.ExpFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 
@@ -50,7 +51,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, ExpressionFolder item) {
+    protected void convert(BaseViewHolder helper, final ExpressionFolder item) {
         helper.setText(R.id.exp_name,item.getName());
         helper.setText(R.id.exp_num,item.getCount() + "+");
         helper.setText(R.id.owner_name,item.getOwner());
@@ -71,6 +72,13 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             helper.getView(imageViewArray[j]).setVisibility(View.GONE);
             helper.getView(R.id.fl_image_5).setVisibility(View.GONE);
         }
+
+        helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExpFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir());
+            }
+        });
 
     }
 }

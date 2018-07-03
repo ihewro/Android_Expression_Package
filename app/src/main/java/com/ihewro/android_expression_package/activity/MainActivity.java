@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 break;
                         }
 
-                        //Toast.makeText(getApplicationContext(),position + "位置",Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 })
@@ -297,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 tempFiles = assetManager.list(GlobalConfig.assetsFolderName + "/" + files[i]);
                 for (String tempFile : tempFiles) {
                     Log.d("filename",tempFile);
-                    expressionList.add(new Expression(-1, tempFile, GlobalConfig.assetsFolderName +  "/" + files[i] + "/" + tempFile));
+                    expressionList.add(new Expression(-1, tempFile, GlobalConfig.assetsFolderName +  "/" + files[i] + "/" + tempFile,files[i]));
                 }
                 expressionListList.add(expressionList);
             } catch (IOException e) {
