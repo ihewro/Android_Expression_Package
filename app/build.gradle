@@ -92,15 +92,25 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
     compile 'io.reactivex:rxandroid:1.2.1'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'//打印请求信息
+    compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
 
     //toast
     implementation 'com.github.GrenderG:Toasty:1.3.0'
 
+    //圆形头像
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+
     //简化运行时申请权限的代码
     compile 'pub.devrel:easypermissions:1.0.1'
 
+    //显示gif的框架
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
+
+    //滚动布局的第三方框架
+    compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.36'
+    //下拉刷新
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-3'
 
 
 }

@@ -7,7 +7,7 @@ import java.io.Serializable;
  *     author : hewro
  *     e-mail : ihewro@163.com
  *     time   : 2018/04/06
- *     desc   :
+ *     desc   : 单个表情信息类
  *     version: 1.0
  * </pre>
  */
@@ -24,7 +24,7 @@ public class Expression implements Serializable {
         this.url = url;
     }
 
-    Expression() {
+    public Expression() {
     }
 
     public int getStatus() {

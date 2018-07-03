@@ -24,8 +24,8 @@
             <ImageView
                 android:layout_width="fill_parent"
                 android:layout_height="240dp"
-                android:src="@drawable/bg"
-                android:scaleType="fitXY"/>
+                android:src="@drawable/header"
+                android:scaleType="centerCrop"/>
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/searchEdit"
@@ -47,15 +47,35 @@
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="1dp"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/text_secondary_light"
-            app:tabIndicatorColor="@color/white"
-            app:textAllCaps="false" />
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:elevation="1dp"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="@color/text_secondary_light"
+                app:tabIndicatorColor="@color/white"
+                app:textAllCaps="false"
+                android:layout_width="0dp" />
+
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="@color/theme_color_primary">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_add_white_24dp"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
     </android.support.design.widget.AppBarLayout>
 
 

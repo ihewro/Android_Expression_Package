@@ -1,4 +1,6 @@
-package com.ihewro.android_expression_package.bean;
+package com.ihewro.android_expression_package.bean.apk;
+
+import com.ihewro.android_expression_package.bean.Expression;
 
 /**
  * <pre>

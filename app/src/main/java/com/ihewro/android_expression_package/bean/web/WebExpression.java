@@ -1,4 +1,6 @@
-package com.ihewro.android_expression_package.bean;
+package com.ihewro.android_expression_package.bean.web;
+
+import com.ihewro.android_expression_package.bean.Expression;
 
 /**
  * <pre>
@@ -10,5 +12,6 @@ package com.ihewro.android_expression_package.bean;
  * </pre>
  */
 public class WebExpression extends Expression {
+
 
 }

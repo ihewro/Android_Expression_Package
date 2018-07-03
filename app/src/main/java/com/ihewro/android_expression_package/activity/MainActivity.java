@@ -26,7 +26,7 @@ import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
-import com.ihewro.android_expression_package.util.GlobalConfig;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 return false;
                             }
                         }),
-                        new PrimaryDrawerItem().withName("表情商店").withIcon(FontAwesome.Icon.faw_gamepad).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withEnabled(false),
+                        new PrimaryDrawerItem().withName("表情商店").withIcon(FontAwesome.Icon.faw_gamepad).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)),
                         new PrimaryDrawerItem().withName("我的").withIcon(FontAwesome.Icon.faw_user).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withEnabled(false),
                         new PrimaryDrawerItem().withName("换肤").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(GoogleMaterial.Icon.gmd_color_lens),
                         new SectionDrawerItem().withName("其他"),
@@ -246,7 +246,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch (position){
-                            case 4:
+                            case 2://进入表情商店
+                                ShopActivity.actionStart(MainActivity.this);
+                                break;
+                            case 4://切换主题
                                 CardPickerDialog dialog = new CardPickerDialog();
                                 dialog.setClickListener(MainActivity.this);
                                 dialog.show(getSupportFragmentManager(), CardPickerDialog.TAG);

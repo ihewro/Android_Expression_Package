@@ -51,7 +51,9 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".activity.ShopActivity"></activity>
+        <activity android:name=".activity.ShopActivity" />
+        <activity android:name=".activity.MyActivity" />
+        <activity android:name=".activity.ExpFolderDetailActivity"></activity>
     </application>
 
 </manifest>
