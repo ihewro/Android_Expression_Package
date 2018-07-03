@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.http;
 
+import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.bean.web.WebExpressionFolderList;
 
@@ -23,6 +24,6 @@ public interface WebImageInterface {
     public Call<WebExpressionFolderList> getDirList();
 
     @GET("expFolderDetail.php")
-    public Call<List<WebExpressionFolder>> getDirDetail(@Query("dir") int dir, @Query("page") int page, @Query("pageSize") int pageSize);
+    public Call<List<Expression>> getDirDetail(@Query("dir") int dir, @Query("page") int page, @Query("pageSize") int pageSize);
 
 }

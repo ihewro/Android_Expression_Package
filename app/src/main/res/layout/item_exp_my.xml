@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:layout_alignParentLeft="true"
+                android:id="@+id/exp_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="小熊猫表情包"
+                android:textColor="#666"
+                />
+
+            <TextView
+                android:id="@+id/delete_exp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/red"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/image_1"
+                android:layout_weight="1"
+                android:layout_height="70dp"
+                android:src="@drawable/header"
+                android:layout_marginRight="10dp"
+                android:scaleType="centerCrop"
+                android:layout_width="0dp" />
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/image_2"
+                android:layout_weight="1"
+                android:layout_height="70dp"
+                android:src="@drawable/header"
+                android:layout_marginRight="10dp"
+                android:scaleType="centerCrop"
+                android:layout_width="0dp" />
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/image_3"
+                android:layout_weight="1"
+                android:layout_height="70dp"
+                android:src="@drawable/header"
+                android:layout_marginRight="10dp"
+                android:scaleType="centerCrop"
+                android:layout_width="0dp" />
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/image_4"
+                android:layout_weight="1"
+                android:layout_height="70dp"
+                android:src="@drawable/header"
+                android:layout_marginRight="10dp"
+                android:scaleType="centerCrop"
+                android:layout_width="0dp" />
+
+            <FrameLayout
+                android:id="@+id/fl_image_5"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/image_5"
+                    android:layout_height="70dp"
+                    android:src="@drawable/header"
+                    android:scaleType="centerCrop"
+                    android:layout_width="match_parent" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#5c000000"/>
+                <TextView
+                    android:id="@+id/exp_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25+"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentLeft="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="上传时间"/>
+
+                <TextView
+                    android:id="@+id/add_time"
+                    android:paddingLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="2018-07-02"
+                    android:textColor="#a4a1a1"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
