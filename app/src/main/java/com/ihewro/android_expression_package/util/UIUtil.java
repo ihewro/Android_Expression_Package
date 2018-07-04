@@ -188,4 +188,13 @@ public class UIUtil {
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
         return baos.toByteArray();
     }
+
+
+    public static int getMinInt(int var1,int var2){
+        if (var1 < var2){
+            return var1;
+        }else {
+            return var2;
+        }
+    }
 }

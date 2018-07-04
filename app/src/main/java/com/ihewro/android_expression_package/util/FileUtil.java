@@ -20,6 +20,7 @@ import com.ihewro.android_expression_package.GlobalConfig;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -123,43 +124,5 @@ public class FileUtil {
         }
         //Toast.makeText(UIUtil.getContext(),"图库更新成功",Toast.LENGTH_SHORT).show();
     }
-
-
-    /**
-     * 复制文件
-     *
-     * @param context 上下文对象
-     */
-    public static void copy(Context context, String zipPath, String targetPath) {
-        if (TextUtils.isEmpty(zipPath) || TextUtils.isEmpty(targetPath)) {
-            return;
-        }
-        File dest = new File(targetPath);
-        dest.getParentFile().mkdirs();
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = new BufferedInputStream(context.getAssets().open(zipPath));
-            out = new BufferedOutputStream(new FileOutputStream(dest));
-            byte[] buffer = new byte[1024];
-            int length = 0;
-            while ((length = in.read(buffer)) != -1) {
-                out.write(buffer, 0, length);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
 
 }

@@ -1,6 +1,9 @@
 package com.ihewro.android_expression_package.bean.web;
 
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.ExpressionFolderList;
+
+import java.util.List;
 
 /**
  * <pre>
@@ -12,5 +15,13 @@ import com.ihewro.android_expression_package.bean.ExpressionFolderList;
  * </pre>
  */
 public class WebExpressionFolderList extends ExpressionFolderList {
+    private List<WebExpressionFolder> webExpressionFolderList;//表情包目录列表
 
+    public List<WebExpressionFolder> getWebExpressionFolderList() {
+        return webExpressionFolderList;
+    }
+
+    public void setWebExpressionFolderList(List<WebExpressionFolder> webExpressionFolderList) {
+        this.webExpressionFolderList = webExpressionFolderList;
+    }
 }

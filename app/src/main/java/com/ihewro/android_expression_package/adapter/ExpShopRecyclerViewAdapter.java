@@ -12,6 +12,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.activity.ExpFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import pl.droidsonroids.gif.GifImageView;
  *     version: 1.0
  * </pre>
  */
-public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder, BaseViewHolder> {
+public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFolder, BaseViewHolder> {
     @BindView(R.id.exp_name)
     TextView expName;
     @BindView(R.id.image_1)
@@ -46,12 +47,12 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
     @BindView(R.id.owner_name)
     TextView ownerName;
 
-    public ExpShopRecyclerViewAdapter(@Nullable List<ExpressionFolder> data) {
+    public ExpShopRecyclerViewAdapter(@Nullable List<WebExpressionFolder> data) {
         super(R.layout.item_exp_shop, data);
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, final ExpressionFolder item) {
+    protected void convert(BaseViewHolder helper, final WebExpressionFolder item) {
         helper.setText(R.id.exp_name,item.getName());
         helper.setText(R.id.exp_num,item.getCount() + "+");
         helper.setText(R.id.owner_name,item.getOwner());

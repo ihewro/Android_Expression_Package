@@ -12,4 +12,13 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
  * </pre>
  */
 public class WebExpressionFolder extends ExpressionFolder {
+    private int dir;//唯一标识id
+
+    public int getDir() {
+        return dir;
+    }
+
+    public void setDir(int dir) {
+        this.dir = dir;
+    }
 }

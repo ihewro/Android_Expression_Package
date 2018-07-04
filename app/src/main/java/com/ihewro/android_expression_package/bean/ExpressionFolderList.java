@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class ExpressionFolderList {
     private int count;//表情包目录数目
-    private List<ExpressionFolder> expressionFolderList;//表情包目录列表
 
     public int getCount() {
         return count;
@@ -23,11 +22,4 @@ public class ExpressionFolderList {
         this.count = count;
     }
 
-    public List<ExpressionFolder> getExpressionFolderList() {
-        return expressionFolderList;
-    }
-
-    public void setExpressionFolderList(List<ExpressionFolder> expressionFolderList) {
-        this.expressionFolderList = expressionFolderList;
-    }
 }

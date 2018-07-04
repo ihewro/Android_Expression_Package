@@ -10,10 +10,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpShopRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.bean.web.WebExpressionFolderList;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
@@ -46,7 +48,7 @@ public class ShopActivity extends AppCompatActivity {
     //适配器
     private ExpShopRecyclerViewAdapter adapter;
 
-    private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
+    private List<WebExpressionFolder> expressionFolderList = new ArrayList<>();
 
     public static void actionStart(Activity context) {
         Intent intent = new Intent(context, ShopActivity.class);
@@ -103,7 +105,7 @@ public class ShopActivity extends AppCompatActivity {
             public void onResponse(Call<WebExpressionFolderList> call, Response<WebExpressionFolderList> response) {
                 if (response.isSuccessful()){
                     Toasty.success(UIUtil.getContext(), "请求成功", Toast.LENGTH_SHORT, true).show();
-                    adapter.setNewData(response.body().getExpressionFolderList());
+                    adapter.setNewData(response.body().getWebExpressionFolderList());
                     refreshLayout.finishRefresh();
                 }else {
                     Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
@@ -115,6 +117,7 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<WebExpressionFolderList> call, Throwable t) {
                 Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
+                ALog.d(t.toString());
                 refreshLayout.finishRefresh();
             }
         });

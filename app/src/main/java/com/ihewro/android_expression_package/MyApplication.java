@@ -22,6 +22,8 @@ import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.footer.FalsifyFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 
+import org.litepal.LitePalApplication;
+
 
 /**
  * <pre>
@@ -32,7 +34,7 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader;
  *     version: 1.0
  * </pre>
  */
-public class MyApplication extends Application implements ThemeUtils.switchColor{
+public class MyApplication extends LitePalApplication implements ThemeUtils.switchColor{
 
     private static Context mContext;
 
