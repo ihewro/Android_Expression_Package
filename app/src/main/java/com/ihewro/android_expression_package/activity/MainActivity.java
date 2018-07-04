@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,6 +77,15 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     private long lastClickTime = -1;
     private long thisClickTime = -1;
     private int clickTimes = 0;
+
+    /**
+     * 由启动页面启动主活动
+     * @param activity
+     */
+    public void actionStart(Activity activity){
+        Intent intent = new Intent(activity,MainActivity.class);
+        activity.startActivity(intent);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

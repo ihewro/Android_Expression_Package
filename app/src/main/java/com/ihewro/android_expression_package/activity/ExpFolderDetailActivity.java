@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -18,12 +20,14 @@ import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.UIUtil;
+import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,11 +48,13 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.owner_name)
     CircleImageView ownerName;
+    private ExpImageDialog expressionDialog;
 
 
     private int dirId = 0;
     private List<Expression> expressionList = new ArrayList<>();
     private ExpressionListAdapter adapter;
+    int currentPosition = 0;
 
     public static void actionStart(Context activity, int dir){
         Intent intent = new Intent(activity,ExpFolderDetailActivity.class);
@@ -90,6 +96,9 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
         adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
         recyclerView.setAdapter(adapter);
 
+        expressionDialog  = new ExpImageDialog.Builder(Objects.requireNonNull(this))
+                .setContext(this,null)
+                .build();
     }
 
 
@@ -104,6 +113,7 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<List<Expression>> call, @NonNull Response<List<Expression>> response) {
                 if (response.isSuccessful()){
                     Toasty.success(UIUtil.getContext(),"请求成功", Toast.LENGTH_SHORT).show();
+                    expressionList = response.body();
                     adapter.setNewData(response.body());
                     refreshLayout.finishRefresh();
                 }else {
@@ -127,6 +137,14 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
                 requestData();
             }
         });
-
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                currentPosition = position;
+                Expression expression = expressionList.get(position);
+                expressionDialog.setImageData(expression);
+                expressionDialog.show();
+            }
+        });
     }
 }

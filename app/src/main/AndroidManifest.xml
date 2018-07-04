@@ -53,7 +53,8 @@
 
         <activity android:name=".activity.ShopActivity" />
         <activity android:name=".activity.MyActivity" />
-        <activity android:name=".activity.ExpFolderDetailActivity"></activity>
+        <activity android:name=".activity.ExpFolderDetailActivity" />
+        <activity android:name=".activity.WelcomActivity"></activity>
     </application>
 
 </manifest>
