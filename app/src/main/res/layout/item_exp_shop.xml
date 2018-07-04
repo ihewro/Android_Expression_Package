@@ -120,17 +120,20 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/download_exp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:background="@drawable/bg_download"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:orientation="horizontal">
                 <ImageView
+                    android:background="@drawable/bg_download"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_file_download_black_24dp"/>

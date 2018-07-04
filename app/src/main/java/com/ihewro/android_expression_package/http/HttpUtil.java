@@ -6,12 +6,17 @@ import android.net.NetworkInfo;
 
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import me.jessyan.progressmanager.ProgressManager;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -38,17 +43,17 @@ public class HttpUtil {
             @Override
             public void log(String message) {
                 //打印retrofit日志
-                ALog.dTag("RetrofitLog","retrofitBack = "+message);
+                //ALog.dTag("RetrofitLog","retrofitBack = "+message);
             }
         });
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        OkHttpClient client = ProgressManager.getInstance().with(new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
                 .readTimeout(readTimeout, TimeUnit.SECONDS)//设置读取超时时间
                 .writeTimeout(writeTimeout,TimeUnit.SECONDS)//设置写的超时时间
                 .connectTimeout(connectTimeout,TimeUnit.SECONDS)//设置连接超时时间
-                .build();
+        ).build();
 
         return client;
     }
@@ -83,5 +88,18 @@ public class HttpUtil {
         }
         return false;
     }
+
+
+    public static void getExpressionList(int dirId, int page, int pageSize, Callback<List<Expression>> callback){
+
+        Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
+        WebImageInterface request = retrofit.create(WebImageInterface.class);
+        Call<List<Expression>> call = request.getDirDetail(dirId,1,pageSize);
+
+        call.enqueue(callback);
+    }
+
+
+
 
 }

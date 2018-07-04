@@ -1,6 +1,5 @@
 package com.ihewro.android_expression_package.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +15,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
-import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -36,7 +33,6 @@ import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class ExpFolderDetailActivity extends AppCompatActivity {
 
@@ -103,12 +99,8 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
 
 
     private void requestData(){
-        Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
-        WebImageInterface request = retrofit.create(WebImageInterface.class);
 
-        Call<List<Expression>> call = request.getDirDetail(dirId,1,10);
-
-        call.enqueue(new Callback<List<Expression>>() {
+        HttpUtil.getExpressionList(dirId,1,50, new Callback<List<Expression>>() {
             @Override
             public void onResponse(@NonNull Call<List<Expression>> call, @NonNull Response<List<Expression>> response) {
                 if (response.isSuccessful()){

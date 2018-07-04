@@ -81,7 +81,7 @@ public class ShopActivity extends AppCompatActivity {
             expressionFolderList.add(new Expression());
         }*/
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
-        adapter = new ExpShopRecyclerViewAdapter(expressionFolderList);
+        adapter = new ExpShopRecyclerViewAdapter(expressionFolderList,this);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT);
         recyclerView.setAdapter(adapter);
     }
