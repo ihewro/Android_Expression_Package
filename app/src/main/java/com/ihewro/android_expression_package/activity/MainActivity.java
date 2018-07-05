@@ -17,11 +17,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bilibili.magicasakura.utils.ThemeUtils;
+import com.bumptech.glide.Glide;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,12 +58,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks  {
 
-    @BindView(R.id.searchEdit)
-    SearchView searchEdit;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.tab_layout)
@@ -287,10 +293,15 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         initTabLayout();
 
         //设置沉浸式状态栏
-        StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
+        //StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
         layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
                 layoutParams.rightMargin, layoutParams.bottomMargin);
+
+        Glide.with(this).load(R.drawable.header)
+                .apply(bitmapTransform(new RoundedCornersTransformation(40, 3)))
+                .into((ImageView) findViewById(R.id.top_image));
+
     }
 
 
@@ -409,5 +420,23 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                     }
             );
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh){
+            //刷新头图信息
+
+
+        }else if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:id="@+id/main_item"
     tools:context="com.ihewro.android_expression_package.activity.MainActivity">
 
@@ -20,48 +19,55 @@
             app:titleEnabled="false"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-            <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="240dp"
-                android:src="@drawable/header"
-                android:scaleType="centerCrop"/>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="我心中已经听到来自远方的呼唤，再不需要回过头去关心身后的种种是非。"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="20dp"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:layout_gravity="bottom"
-                android:textColor="@color/white"
-                android:background="#23ffffff"/>
-            <android.support.v7.widget.SearchView
-                android:id="@+id/searchEdit"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="30dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/search_selector"
-                android:queryHint="请输入物品名称"
-                android:visibility="gone">
-            </android.support.v7.widget.SearchView>
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                app:titleTextColor="#bdbdbd"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                android:orientation="vertical">
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white">
+
+                    <ImageView
+                        android:id="@+id/top_image"
+                        android:paddingLeft="30dp"
+                        android:paddingRight="30dp"
+                        android:paddingTop="60dp"
+                        android:paddingBottom="120dp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="240dp"
+                        android:src="@drawable/header"
+                        android:scaleType="centerCrop"
+                        />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:paddingBottom="20dp"
+                        android:paddingLeft="30dp"
+                        android:paddingRight="30dp"
+                        android:paddingTop="10dp"
+                        android:text="我心中已经听到来自远方的呼唤，再不需要回过头去关心身后的种种是非。"
+                        android:textColor="#5a5e59" />
+
+                </RelativeLayout>
+            </LinearLayout>
 
         </android.support.design.widget.CollapsingToolbarLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +80,6 @@
                 android:id="@+id/tab_layout"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:elevation="4dp"
                 app:textAllCaps="false"
                 android:background="@drawable/layer_list"
                 android:layout_width="0dp" />

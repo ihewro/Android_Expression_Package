@@ -124,7 +124,9 @@ dependencies {
 
     //捐赠
     compile 'com.canking.minipay:minipay:1.0.2'
+    compile 'cn.gavinliu.android.lib:ShapedImageView:0.8.5'
 
+    implementation 'jp.wasabeef:glide-transformations:3.3.0'
 
 
 
