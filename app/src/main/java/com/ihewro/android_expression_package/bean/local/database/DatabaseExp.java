@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.bean.local.database;
 
+import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
 /**
@@ -17,6 +18,7 @@ public class DatabaseExp extends LitePalSupport{
     private String name;//图片名称
     private String url;//图片路径或者图片地址
     private String folderName;//目录的名称
+    private DatabaseExpFolder databaseExpFolder;
 
     public DatabaseExp() {
     }
@@ -57,5 +59,13 @@ public class DatabaseExp extends LitePalSupport{
 
     public void setFolderName(String folderName) {
         this.folderName = folderName;
+    }
+
+    public DatabaseExpFolder getDatabaseExpFolder() {
+        return databaseExpFolder;
+    }
+
+    public void setDatabaseExpFolder(DatabaseExpFolder databaseExpFolder) {
+        this.databaseExpFolder = databaseExpFolder;
     }
 }

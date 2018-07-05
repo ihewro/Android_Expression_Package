@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.bean.local.database;
 
+import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class DatabaseExpFolder extends LitePalSupport {
     private int exist;
     private int count;//表情数目
     private int id;//主键
+    @Column(unique = true, defaultValue = "")
     private String name;//表情包目录名称
     private String owner;//上传作者的名称
     private String ownerAvatar;//上传作者的头像
@@ -133,5 +135,13 @@ public class DatabaseExpFolder extends LitePalSupport {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public String toString() {
+
+        return "id = " +id + '\n'
+                +"count" + count + '\n'
+                + "name" + name;
     }
 }

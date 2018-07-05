@@ -32,6 +32,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="删除"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_alignParentRight="true"
                 android:textColor="@color/red"/>
 
@@ -121,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="上传时间"/>
+                    android:text="添加事件"/>
 
                 <TextView
                     android:id="@+id/add_time"

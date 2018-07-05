@@ -34,7 +34,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ExpFolderDetailActivity extends AppCompatActivity {
+
+/**
+ * 显示网络的一个表情包合集
+ */
+public class ExpWebFolderDetailActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -53,7 +57,7 @@ public class ExpFolderDetailActivity extends AppCompatActivity {
     int currentPosition = 0;
 
     public static void actionStart(Context activity, int dir){
-        Intent intent = new Intent(activity,ExpFolderDetailActivity.class);
+        Intent intent = new Intent(activity,ExpWebFolderDetailActivity.class);
         intent.putExtra("dir",dir);
         activity.startActivity(intent);
     }

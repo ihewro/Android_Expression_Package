@@ -4,9 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="theme_color_primary">#819ca9</color>
-    <color name="theme_color_primary_dark">#29434e</color>
-    <color name="theme_color_primary_trans">#546e7a</color>
+    <color name="theme_color_primary">#fafafa</color>
+    <color name="theme_color_primary_dark">#c7c7c7</color>
+    <color name="theme_color_primary_trans">#000000</color>
 
 
     <color name="primaryColor">#546e7a</color>

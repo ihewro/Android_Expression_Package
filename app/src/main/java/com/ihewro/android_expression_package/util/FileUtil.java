@@ -111,7 +111,7 @@ public class FileUtil {
      * @param context
      * @param path
      */
-    private static void updateMediaStore(final Context context, final String path) {
+    public static void updateMediaStore(final Context context, final String path) {
         //版本号的判断  4.4为分水岭，发送广播更新媒体库
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.OnScanCompletedListener() {

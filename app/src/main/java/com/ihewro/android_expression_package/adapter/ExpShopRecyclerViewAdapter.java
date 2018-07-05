@@ -16,16 +16,23 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
-import com.ihewro.android_expression_package.activity.ExpFolderDetailActivity;
+import com.ihewro.android_expression_package.activity.ExpWebFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.local.database.DatabaseExp;
+import com.ihewro.android_expression_package.bean.local.database.DatabaseExpFolder;
 import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
+import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
+
+import org.litepal.LitePal;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -76,6 +83,9 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
     private int downloadCount = 0;//合集已经下载的数目
     private int downloadAllCount;//要下载的合集数目
 
+    List<DatabaseExpFolder> databaseExpFolderList = new ArrayList<>();
+    private DatabaseExpFolder databaseExpFolder;
+
     @Override
     protected void convert(BaseViewHolder helper, final WebExpressionFolder item) {
         helper.setText(R.id.exp_name,item.getName());
@@ -113,7 +123,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExpFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir());
+                    ExpWebFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir());
                 }
             });
 
@@ -134,7 +144,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                         .progress(false, item.getCount(), true)
                         .show();
 
-                HttpUtil.getExpressionList(item.getDir(), 1, 9999, new Callback<List<Expression>>() {
+                HttpUtil.getExpressionList(item.getDir(), 1, 99999999, new Callback<List<Expression>>() {//获取该目录下的所有表情包，不分页
                     @Override
                     public void onResponse(Call<List<Expression>> call, Response<List<Expression>> response) {
                         if (response.isSuccessful()){
@@ -142,10 +152,41 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                             downloadAllCount = expFolderAllExpList.size();
                             Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
                             WebImageInterface request = retrofit.create(WebImageInterface.class);
-                            ALog.d("epxAll",expFolderAllExpList.size());
                             if (expFolderAllExpList.size()<=0){
                                 downloadAllDialog.dismiss();
                             }else {
+                                final File dirFile = new File(Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName + "/" +item.getName());
+                                if (!dirFile.exists()){
+                                    dirFile.mkdir();
+                                }
+                                //数据库中添加目录信息,添加之前需要查询数据库中是否已经存在该表情包，如果存在的话，需要更新
+
+                                //当前目录的持久化对象，这里更新数据不能适用update,否则表情的表的外键无法更新的。url:https://github.com/LitePalFramework/LitePal/issues/282
+                                databaseExpFolder = null;
+
+                                databaseExpFolderList.clear();;
+                                databaseExpFolderList = LitePal.where("name = ? and exist = ?",item.getName(),"1").find(DatabaseExpFolder.class);
+
+                                if (databaseExpFolderList.size()>0){//这里按照我的逻辑，大小肯定是1的，如果不是，就抛出错误提示吧，因为表情包的文件名称肯定是唯一的。
+
+                                    //如果存在的话，需要更新
+                                    databaseExpFolder = databaseExpFolderList.get(0);
+                                    ALog.d(databaseExpFolder);
+                                    databaseExpFolder.setCount(0);
+                                    databaseExpFolder.setUpdateTime(DateUtil.getNowDateStr());
+                                    databaseExpFolder.save();
+
+                                    //需要删除该目录对应的表情列表，然后再更新，否则就重复了
+                                    LitePal.deleteAll(DatabaseExp.class,"name = ?",databaseExpFolder.getName());
+
+                                }else {
+                                    databaseExpFolder = new DatabaseExpFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<DatabaseExp>());
+                                    databaseExpFolder.save();
+                                }
+
+
+                                downloadCount = 0;
+
                                 for (int i = 0;i<expFolderAllExpList.size();i++){
                                     //对每个下载地址都进行进度条的监听
                                     ProgressManager.getInstance().addResponseListener(expFolderAllExpList.get(i).getUrl(), getDownloadListener());
@@ -155,18 +196,28 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                                         @Override
                                         public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
 
-                                            //下载成功的话，将下载的图片信息存到数据库中
                                             try {
-                                                File dirFile = new File(Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName + "/" +item.getName());
-                                                if (!dirFile.exists()){
-                                                    dirFile.mkdir();
-                                                }
+
                                                 File file = new File( dirFile.getAbsoluteFile()  + "/" + expFolderAllExpList.get(finalI).getName());
-                                                ALog.d(file.getAbsoluteFile());
+                                                ALog.d(file.getAbsolutePath());
                                                 downloadCount++;
+
+                                                //下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
+                                                DatabaseExp databaseExp = new DatabaseExp(expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),item.getName());
+                                                databaseExp.save();
+
+                                                //更新数据中该目录的关联数据
+                                                ALog.d("folder",databaseExpFolder.isSaved() + "" + databaseExpFolder.getId());
+                                                databaseExpFolder.setCount(downloadCount);
+                                                databaseExpFolder.getDatabaseExpList().add(databaseExp);
+                                                databaseExpFolder.save();
+
+                                                //更新图片库
+                                                FileUtil.updateMediaStore(activity,file.getAbsolutePath());
+
+                                                //如果全部下载完成，进度条框提示下载完成。
                                                 if (downloadCount >= downloadAllCount){
                                                     downloadAllDialog.setProgress(downloadAllCount);
-
                                                     downloadAllDialog.setContent("下载完成");
                                                 }
                                                 assert response.body() != null;
@@ -189,6 +240,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                                     });
 
                                 }
+
                             }
 
                         }

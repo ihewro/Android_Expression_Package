@@ -27,6 +27,20 @@
                 android:src="@drawable/header"
                 android:scaleType="centerCrop"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我心中已经听到来自远方的呼唤，再不需要回过头去关心身后的种种是非。"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:layout_gravity="bottom"
+                android:textColor="@color/white"
+                android:background="#23ffffff"/>
             <android.support.v7.widget.SearchView
                 android:id="@+id/searchEdit"
                 android:layout_width="match_parent"
@@ -36,15 +50,16 @@
                 android:layout_marginBottom="30dp"
                 android:layout_gravity="bottom"
                 android:background="@drawable/search_selector"
-                android:queryHint="请输入物品名称">
+                android:queryHint="请输入物品名称"
+                android:visibility="gone">
             </android.support.v7.widget.SearchView>
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
+                app:titleTextColor="#bdbdbd"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
         <LinearLayout
@@ -52,29 +67,28 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!--app:tabSelectedTextColor="@color/white"
+                            app:tabTextColor="@color/text_secondary_light"
+                            app:tabIndicatorColor="@color/white"-->
             <android.support.design.widget.TabLayout
                 android:id="@+id/tab_layout"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:elevation="1dp"
-                app:tabSelectedTextColor="@color/white"
-                app:tabTextColor="@color/text_secondary_light"
-                app:tabIndicatorColor="@color/white"
+                android:elevation="4dp"
                 app:textAllCaps="false"
+                android:background="@drawable/layer_list"
                 android:layout_width="0dp" />
 
             <LinearLayout
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:background="@color/theme_color_primary">
+                android:background="@drawable/layer_list">
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_add_white_24dp"/>
             </LinearLayout>
-
-
         </LinearLayout>
     </android.support.design.widget.AppBarLayout>
 

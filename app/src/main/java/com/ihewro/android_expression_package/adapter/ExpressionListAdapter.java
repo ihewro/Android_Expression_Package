@@ -24,7 +24,7 @@ import pl.droidsonroids.gif.GifImageView;
  *     author : hewro
  *     e-mail : ihewro@163.com
  *     time   : 2018/04/06
- *     desc   :
+ *     desc   : 用来显示表情列表的数据适配器
  *     version: 1.0
  * </pre>
  */
