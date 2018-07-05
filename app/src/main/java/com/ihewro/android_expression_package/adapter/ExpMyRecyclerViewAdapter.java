@@ -46,63 +46,67 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
 
     @Override
     protected void convert(final BaseViewHolder helper, final ExpressionFolder item) {
-        ALog.d("convert","执行了");
-        helper.setText(R.id.exp_name,item.getName());
-        helper.setText(R.id.exp_num,item.getCount() + "+");
-        helper.setText(R.id.add_time,item.getCreateTime());
-        int min = UIUtil.getMinInt(item.getExpressionList().size(),5);
-        int imageViewArray[] = new int[]{R.id.image_1,R.id.image_2,R.id.image_3,R.id.image_4,R.id.image_5};
+        if (item.getCount() == 0){//如果是空表情包
+            helper.getView(R.id.item_view).setVisibility(View.GONE);
+        }else {
+            ALog.d("convert","执行了");
+            helper.setText(R.id.exp_name,item.getName());
+            helper.setText(R.id.exp_num,item.getCount() + "+");
+            helper.setText(R.id.add_time,item.getCreateTime());
+            int min = UIUtil.getMinInt(item.getExpressionList().size(),5);
+            int imageViewArray[] = new int[]{R.id.image_1,R.id.image_2,R.id.image_3,R.id.image_4,R.id.image_5};
 
-        for (int i =0;i<min;i++){
-            UIUtil.setImageToImageView(1,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
-        }
-        //如果表情包数目小于5，则剩余的表情占位不显示
-        for (int j = min; j < 5; j++){
-            helper.getView(imageViewArray[j]).setVisibility(View.INVISIBLE);
-            helper.getView(R.id.fl_image_5).setVisibility(View.INVISIBLE);
-        }
-
-        helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ExpLocalFolderDetailActivity.actionStart(activity,item.getId());
+            for (int i =0;i<min;i++){
+                UIUtil.setImageToImageView(1,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
             }
-        });
-
-        //删除表情包
-        helper.getView(R.id.delete_exp).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MaterialDialog dialog = new MaterialDialog.Builder(activity)
-                        .title("操作提示")
-                        .content("确认删除该表情包吗，你可以通过表情商店再次下载")
-                        .positiveText("好")
-                        .negativeText("先不删，留着过年")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //删除文件夹
-                                        FileUtil.delFolder(GlobalConfig.appDirPath + item.getName());
-                                        //删除数据库的内容
-                                        LitePal.deleteAll(ExpressionFolder.class,"name = ?" ,item.getName());
-                                        activity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
-                                                remove(helper.getAdapterPosition());
-                                                notifyDataSetChanged();
-                                            }
-                                        });
-                                    }
-                                }).start();
-
-                            }
-                        })
-                        .show();
+            //如果表情包数目小于5，则剩余的表情占位不显示
+            for (int j = min; j < 5; j++){
+                helper.getView(imageViewArray[j]).setVisibility(View.INVISIBLE);
+                helper.getView(R.id.fl_image_5).setVisibility(View.INVISIBLE);
             }
-        });
+
+            helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ExpLocalFolderDetailActivity.actionStart(activity,item.getId());
+                }
+            });
+
+            //删除表情包
+            helper.getView(R.id.delete_exp).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                            .title("操作提示")
+                            .content("确认删除该表情包吗，你可以通过表情商店再次下载")
+                            .positiveText("好")
+                            .negativeText("先不删，留着过年")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //删除文件夹
+                                            FileUtil.delFolder(GlobalConfig.appDirPath + item.getName());
+                                            //删除数据库的内容
+                                            LitePal.deleteAll(ExpressionFolder.class,"name = ?" ,item.getName());
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
+                                                    remove(helper.getAdapterPosition());
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
+                                    }).start();
+
+                                }
+                            })
+                            .show();
+                }
+            });
+        }
     }
 }

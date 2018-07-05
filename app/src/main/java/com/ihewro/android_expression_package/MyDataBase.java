@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.util.List;
@@ -38,7 +39,9 @@ public class MyDataBase {
     /**
      * 重新更新数据的信息，一般在错误发生或调用该函数
      */
-    public static void updateDatabaseByRefresh(){
+    public static void updateDatabaseByRefresh(UpdateDatabaseListener callback){
 
+
+        callback.onFinished();
     }
 }

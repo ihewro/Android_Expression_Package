@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.litepal.LitePal;
 import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
@@ -42,7 +43,7 @@ public class ExpressionFolder extends LitePalSupport {
     private String updateTime;//更新时间，时间戳
     private int dir;//网络层的目录id
 
-    private List<Expression> expressionList = new ArrayList<>();
+    private List<Expression> expressionList;
 
     public ExpressionFolder() {
     }
@@ -58,6 +59,7 @@ public class ExpressionFolder extends LitePalSupport {
         this.expressionList = expressionList;
         this.dir = dir;
     }
+
 
     public int getId() {
         return id;

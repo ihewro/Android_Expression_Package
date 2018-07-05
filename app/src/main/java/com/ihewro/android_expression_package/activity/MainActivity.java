@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -21,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -85,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     private long lastClickTime = -1;
     private long thisClickTime = -1;
     private int clickTimes = 0;
+
+    private MenuItem refreshItem;
 
     /**
      * 由启动页面启动主活动
@@ -432,11 +438,47 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.refresh){
             //刷新头图信息
+            showRefreshAnimation(item);
 
 
         }else if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    public void showRefreshAnimation(MenuItem item) {
+
+        hideRefreshAnimation();
+        refreshItem = item;
+
+        //这里使用一个ImageView设置成MenuItem的ActionView，这样我们就可以使用这个ImageView显示旋转动画了
+        ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.item_refresh_menu, null);
+        refreshActionView.setImageResource(R.drawable.logo);
+        item.setActionView(refreshActionView);
+
+        Animation rotateAnimation= AnimationUtils.loadAnimation(this,R.anim.rotate);
+        refreshActionView.setAnimation(rotateAnimation);
+        refreshActionView.startAnimation(rotateAnimation);
+        refreshActionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideRefreshAnimation();
+            }
+        });
+    }
+
+    @SuppressLint("NewApi")
+    private void hideRefreshAnimation() {
+        if (refreshItem != null) {
+            View view = refreshItem.getActionView();
+            if (view != null) {
+                view.clearAnimation();
+                refreshItem.setActionView(null);
+            }
+        }
     }
 }

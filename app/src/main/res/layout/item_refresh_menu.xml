@@ -1,0 +1,7 @@
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@android:style/Widget.ActionButton"
+    android:layout_width="wrap_content"
+    android:scaleType="centerInside"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:layout_height="wrap_content" />

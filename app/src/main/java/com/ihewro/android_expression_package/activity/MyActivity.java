@@ -3,18 +3,22 @@ package com.ihewro.android_expression_package.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
+import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
@@ -118,11 +122,60 @@ public class MyActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.re_update){
             //重新同步数据库
+            new MaterialDialog.Builder(this)
+                    .title("操作通知")
+                    .content("您确定需要重新同步数据吗？一般本地表情包数据显示不正常才需要执行此操作。\n并且执行此操作会丢失表情包作者的头像和名称（不影响具体使用）。")
+                    .positiveText("朕确定")
+                    .negativeText("我只是点着玩的，快关掉快关掉！")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
 
+                                private MaterialDialog updateLoadingDialog;
+
+                                @Override
+                                public void onFinished() {
+                                    updateLoadingDialog.setContent("终于同步完成");
+                                }
+
+                                @Override
+                                public void onProgress(int progress,int max) {
+                                    if (max > 0){
+                                        if (!updateLoadingDialog.isShowing()){
+                                            updateLoadingDialog.setMaxProgress(max);
+                                            updateLoadingDialog.show();
+                                            ALog.d("有点问题");
+                                        }
+
+                                        if (progress > 0){
+                                            updateLoadingDialog.setProgress(progress);
+                                        }
+
+                                    }
+                                }
+
+                                @Override
+                                public void onStart() {
+                                    updateLoadingDialog = new MaterialDialog.Builder(MyActivity.this)
+                                            .title("正在同步信息")
+                                            .content("陛下，耐心等下……（同步过程）")
+                                            .progress(false, 0, true)
+                                            .build();
+
+                                }
+                            });
+                            task.execute();
+                        }
+                    })
+                    .show();
 
         }else if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
 }

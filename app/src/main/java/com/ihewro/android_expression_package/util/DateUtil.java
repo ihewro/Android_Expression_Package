@@ -20,4 +20,9 @@ public class DateUtil {
         return sdf.format(d);
     }
 
+    public static String getTimeStringByInt(long time){
+        SimpleDateFormat format =  new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        return format.format(time);
+    }
+
 }
