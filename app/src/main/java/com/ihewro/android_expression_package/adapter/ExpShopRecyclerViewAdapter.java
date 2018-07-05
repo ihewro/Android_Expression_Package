@@ -18,9 +18,7 @@ import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.activity.ExpWebFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.bean.local.database.DatabaseExp;
-import com.ihewro.android_expression_package.bean.local.database.DatabaseExpFolder;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.DateUtil;
@@ -55,7 +53,7 @@ import retrofit2.Retrofit;
  *     version: 1.0
  * </pre>
  */
-public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFolder, BaseViewHolder> {
+public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder, BaseViewHolder> {
     @BindView(R.id.exp_name)
     TextView expName;
     @BindView(R.id.image_1)
@@ -74,7 +72,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
     TextView ownerName;
 
     private Activity activity = null;
-    public ExpShopRecyclerViewAdapter(@Nullable List<WebExpressionFolder> data,Activity activity) {
+    public ExpShopRecyclerViewAdapter(@Nullable List<ExpressionFolder> data, Activity activity) {
         super(R.layout.item_exp_shop, data);
         this.activity = activity;
     }
@@ -83,11 +81,11 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
     private int downloadCount = 0;//合集已经下载的数目
     private int downloadAllCount;//要下载的合集数目
 
-    List<DatabaseExpFolder> databaseExpFolderList = new ArrayList<>();
-    private DatabaseExpFolder databaseExpFolder;
+    List<ExpressionFolder> expressionFolderList = new ArrayList<>();
+    private ExpressionFolder expressionFolder;
 
     @Override
-    protected void convert(BaseViewHolder helper, final WebExpressionFolder item) {
+    protected void convert(BaseViewHolder helper, final ExpressionFolder item) {
         helper.setText(R.id.exp_name,item.getName());
         helper.setText(R.id.exp_num,item.getCount() + "+");
         helper.setText(R.id.owner_name,item.getOwner());
@@ -162,26 +160,26 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                                 //数据库中添加目录信息,添加之前需要查询数据库中是否已经存在该表情包，如果存在的话，需要更新
 
                                 //当前目录的持久化对象，这里更新数据不能适用update,否则表情的表的外键无法更新的。url:https://github.com/LitePalFramework/LitePal/issues/282
-                                databaseExpFolder = null;
+                                expressionFolder = null;
 
-                                databaseExpFolderList.clear();;
-                                databaseExpFolderList = LitePal.where("name = ? and exist = ?",item.getName(),"1").find(DatabaseExpFolder.class);
+                                expressionFolderList.clear();;
+                                expressionFolderList = LitePal.where("name = ? and exist = ?",item.getName(),"1").find(ExpressionFolder.class);
 
-                                if (databaseExpFolderList.size()>0){//这里按照我的逻辑，大小肯定是1的，如果不是，就抛出错误提示吧，因为表情包的文件名称肯定是唯一的。
+                                if (expressionFolderList.size()>0){//这里按照我的逻辑，大小肯定是1的，如果不是，就抛出错误提示吧，因为表情包的文件名称肯定是唯一的。
 
                                     //如果存在的话，需要更新
-                                    databaseExpFolder = databaseExpFolderList.get(0);
-                                    ALog.d(databaseExpFolder);
-                                    databaseExpFolder.setCount(0);
-                                    databaseExpFolder.setUpdateTime(DateUtil.getNowDateStr());
-                                    databaseExpFolder.save();
+                                    expressionFolder = expressionFolderList.get(0);
+                                    ALog.d(expressionFolder);
+                                    expressionFolder.setCount(0);
+                                    expressionFolder.setUpdateTime(DateUtil.getNowDateStr());
+                                    expressionFolder.save();
 
                                     //需要删除该目录对应的表情列表，然后再更新，否则就重复了
-                                    LitePal.deleteAll(DatabaseExp.class,"name = ?",databaseExpFolder.getName());
+                                    LitePal.deleteAll(Expression.class,"name = ?", expressionFolder.getName());
 
                                 }else {
-                                    databaseExpFolder = new DatabaseExpFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<DatabaseExp>());
-                                    databaseExpFolder.save();
+                                    expressionFolder = new ExpressionFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<Expression>());
+                                    expressionFolder.save();
                                 }
 
 
@@ -203,14 +201,14 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<WebExpressionFo
                                                 downloadCount++;
 
                                                 //下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                                DatabaseExp databaseExp = new DatabaseExp(expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),item.getName());
-                                                databaseExp.save();
+                                                Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),item.getName());
+                                                expression.save();
 
                                                 //更新数据中该目录的关联数据
-                                                ALog.d("folder",databaseExpFolder.isSaved() + "" + databaseExpFolder.getId());
-                                                databaseExpFolder.setCount(downloadCount);
-                                                databaseExpFolder.getDatabaseExpList().add(databaseExp);
-                                                databaseExpFolder.save();
+                                                ALog.d("folder", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                                expressionFolder.setCount(downloadCount);
+                                                expressionFolder.getExpressionList().add(expression);
+                                                expressionFolder.save();
 
                                                 //更新图片库
                                                 FileUtil.updateMediaStore(activity,file.getAbsolutePath());

@@ -6,8 +6,7 @@ import android.support.annotation.Nullable;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.R;
-import com.ihewro.android_expression_package.bean.local.LocalExpressionFolder;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 
 import java.util.List;
 
@@ -20,16 +19,16 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<LocalExpressionFolder, BaseViewHolder> {
+public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder, BaseViewHolder> {
 
     private Activity activity;
-    public ExpMyRecyclerViewAdapter(@Nullable List<LocalExpressionFolder> data, Activity activity) {
+    public ExpMyRecyclerViewAdapter(@Nullable List<ExpressionFolder> data, Activity activity) {
         super(R.layout.item_exp_my,data);
         this.activity = activity;
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, LocalExpressionFolder item) {
+    protected void convert(BaseViewHolder helper, ExpressionFolder item) {
 
 
 

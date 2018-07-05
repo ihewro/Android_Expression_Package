@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;

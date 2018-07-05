@@ -1,8 +1,7 @@
 package com.ihewro.android_expression_package.http;
 
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolderList;
+import com.ihewro.android_expression_package.bean.ExpressionFolderList;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ import retrofit2.http.Url;
  */
 public interface WebImageInterface {
     @GET("expFolderList.php")
-    public Call<WebExpressionFolderList> getDirList();
+    public Call<ExpressionFolderList> getDirList();
 
     @GET("expFolderDetail.php")
     public Call<List<Expression>> getDirDetail(@Query("dir") int dir, @Query("page") int page, @Query("pageSize") int pageSize);

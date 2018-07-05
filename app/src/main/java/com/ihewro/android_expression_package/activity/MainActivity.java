@@ -24,6 +24,8 @@ import android.widget.Toast;
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -35,13 +37,11 @@ import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
 import com.jaeger.library.StatusBarUtil;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -346,12 +346,15 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
         for (int i =0;i<expressionListList.size();i++) {
 
-            ExpressionContentFragment fragment = new ExpressionContentFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("data", (Serializable) expressionListList.get(i));
-            bundle.putString("name",pageTitleList.get(i));
-            fragment.setArguments(bundle);
-            fragmentList.add(fragment);
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonString = mapper.writeValueAsString(expressionListList.get(i));
+                fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,pageTitleList.get(i)));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+
         }
 
 

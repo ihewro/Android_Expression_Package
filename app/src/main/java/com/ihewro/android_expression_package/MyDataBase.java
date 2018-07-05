@@ -2,10 +2,8 @@ package com.ihewro.android_expression_package;
 
 import android.widget.Toast;
 
-import com.ihewro.android_expression_package.bean.local.LocalExpressionFolder;
-import com.ihewro.android_expression_package.bean.local.database.DatabaseExp;
-import com.ihewro.android_expression_package.bean.local.database.DatabaseExpFolder;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
+import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.util.List;
@@ -26,8 +24,8 @@ public class MyDataBase {
     /**
      * 增加一个表情包的记录
      */
-    public static void addStorageExpFolderName(WebExpressionFolder expressionFolder, List<DatabaseExp> databaseExpList){
-        DatabaseExpFolder folder = new DatabaseExpFolder(1,expressionFolder.getCount(),expressionFolder.getName(),expressionFolder.getOwner(),expressionFolder.getOwnerAvatar(),expressionFolder.getCreateTime(),expressionFolder.getUpdateTime(),databaseExpList);
+    public static void addStorageExpFolderName(ExpressionFolder expressionFolder, List<Expression> expressionList){
+        ExpressionFolder folder = new ExpressionFolder(1,expressionFolder.getCount(),expressionFolder.getName(),expressionFolder.getOwner(),expressionFolder.getOwnerAvatar(),expressionFolder.getCreateTime(),expressionFolder.getUpdateTime(), expressionList);
         if (folder.save()){
             Toasty.success(UIUtil.getContext(),"表情包合集保存本地成功",Toast.LENGTH_SHORT).show();
 

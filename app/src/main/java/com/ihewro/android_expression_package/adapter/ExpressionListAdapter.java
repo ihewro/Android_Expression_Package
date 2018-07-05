@@ -1,20 +1,14 @@
 package com.ihewro.android_expression_package.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifImageView;

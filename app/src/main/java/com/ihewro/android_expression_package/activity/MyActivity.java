@@ -11,14 +11,9 @@ import android.support.v7.widget.Toolbar;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
-import com.ihewro.android_expression_package.adapter.ExpShopRecyclerViewAdapter;
-import com.ihewro.android_expression_package.bean.local.LocalExpressionFolder;
-import com.ihewro.android_expression_package.bean.local.database.DatabaseExpFolder;
-import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-
-import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +34,7 @@ public class MyActivity extends AppCompatActivity {
     //适配器
     private ExpMyRecyclerViewAdapter adapter;
 
-    private List<LocalExpressionFolder> expressionFolderList = new ArrayList<>();
+    private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
 
 
     public static void actionStart(Activity activity){
@@ -79,7 +74,7 @@ public class MyActivity extends AppCompatActivity {
      */
     private void initData() {
         //查询到所有的表情包目录，但是有的表情包目录status可能是-1，即无效表情包
-        List<DatabaseExpFolder> databaseExpFolderList = LitePal.findAll(DatabaseExpFolder.class);
+        //List<ExpressionFolder> databaseExpFolderList =(List<ExpressionFolder>) LitePal.findAll(ExpressionFolder.class);
 
 
 
