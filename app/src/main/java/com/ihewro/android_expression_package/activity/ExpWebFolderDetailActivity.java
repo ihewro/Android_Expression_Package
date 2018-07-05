@@ -38,7 +38,7 @@ import retrofit2.Response;
 /**
  * 显示网络的一个表情包合集
  */
-public class ExpWebFolderDetailActivity extends AppCompatActivity {
+public class ExpWebFolderDetailActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;

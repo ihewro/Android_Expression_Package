@@ -178,7 +178,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                                     LitePal.deleteAll(Expression.class,"name = ?", expressionFolder.getName());
 
                                 }else {
-                                    expressionFolder = new ExpressionFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<Expression>());
+                                    expressionFolder = new ExpressionFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),item.getDir());
                                     expressionFolder.save();
                                 }
 

@@ -71,7 +71,7 @@
                 android:layout_alignParentRight="true"
                 android:text="删除"
                 android:textColor="@color/red"
-                android:background="@drawable/bg_download"/>
+                android:background="@drawable/bg_delete"/>
         </RelativeLayout>
     </RelativeLayout>
 

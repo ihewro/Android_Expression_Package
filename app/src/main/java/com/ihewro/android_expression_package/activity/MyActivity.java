@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
@@ -15,13 +18,15 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import org.litepal.LitePal;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MyActivity extends AppCompatActivity {
+public class MyActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -74,8 +79,18 @@ public class MyActivity extends AppCompatActivity {
      */
     private void initData() {
         //查询到所有的表情包目录，但是有的表情包目录status可能是-1，即无效表情包
-        //List<ExpressionFolder> databaseExpFolderList =(List<ExpressionFolder>) LitePal.findAll(ExpressionFolder.class);
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.setNewData(expressionFolderList);
+                    }
+                });
+            }
+        }).start();
 
 
     }
@@ -84,8 +99,30 @@ public class MyActivity extends AppCompatActivity {
      * 监听事件
      */
     private void initListener() {
-
+        /*adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            }
+        });*/
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_my, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.re_update){
+            //重新同步数据库
+
+
+        }else if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -18,6 +18,7 @@ import com.ihewro.android_expression_package.R;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -127,7 +128,10 @@ public class UIUtil {
 
             case 1://存储在sd卡中
                 //获取路径
-                Glide.with(UIUtil.getContext()).load(url).into(imageView);
+                //本地文件
+                File file = new File(url);
+                //加载图片
+                Glide.with(UIUtil.getContext()).load(file).into(imageView);
                 break;
 
             case 2://加载网络地址

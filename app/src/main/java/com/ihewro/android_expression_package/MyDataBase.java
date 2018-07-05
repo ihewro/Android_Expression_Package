@@ -25,7 +25,7 @@ public class MyDataBase {
      * 增加一个表情包的记录
      */
     public static void addStorageExpFolderName(ExpressionFolder expressionFolder, List<Expression> expressionList){
-        ExpressionFolder folder = new ExpressionFolder(1,expressionFolder.getCount(),expressionFolder.getName(),expressionFolder.getOwner(),expressionFolder.getOwnerAvatar(),expressionFolder.getCreateTime(),expressionFolder.getUpdateTime(), expressionList);
+        ExpressionFolder folder = new ExpressionFolder(1,expressionFolder.getCount(),expressionFolder.getName(),expressionFolder.getOwner(),expressionFolder.getOwnerAvatar(),expressionFolder.getCreateTime(),expressionFolder.getUpdateTime(), expressionList,expressionFolder.getDir());
         if (folder.save()){
             Toasty.success(UIUtil.getContext(),"表情包合集保存本地成功",Toast.LENGTH_SHORT).show();
 

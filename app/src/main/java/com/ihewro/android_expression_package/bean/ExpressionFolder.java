@@ -47,7 +47,7 @@ public class ExpressionFolder extends LitePalSupport {
     public ExpressionFolder() {
     }
 
-    public ExpressionFolder(int exist, int count, String name, String owner, String ownerAvatar, String createTime, String updateTime, List<Expression> expressionList) {
+    public ExpressionFolder(int exist, int count, String name, String owner, String ownerAvatar, String createTime, String updateTime, List<Expression> expressionList,int dir) {
         this.exist = exist;
         this.count = count;
         this.name = name;
@@ -56,6 +56,7 @@ public class ExpressionFolder extends LitePalSupport {
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.expressionList = expressionList;
+        this.dir = dir;
     }
 
     public int getId() {

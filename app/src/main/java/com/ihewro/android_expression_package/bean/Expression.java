@@ -34,7 +34,7 @@ public class Expression extends LitePalSupport{
         this.url = url;
         this.folderName = folderName;
     }
-    
+
 
     public int getId() {
         return id;
