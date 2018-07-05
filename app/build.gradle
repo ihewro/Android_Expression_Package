@@ -122,5 +122,8 @@ dependencies {
     //进度条管理（真实进度）
     implementation 'me.jessyan:progressmanager:1.5.0'
 
+    //捐赠
+    compile 'com.canking.minipay:minipay:1.0.2'
+
 
 }

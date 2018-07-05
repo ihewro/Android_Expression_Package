@@ -1,5 +1,7 @@
 package com.ihewro.android_expression_package.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,9 +13,12 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.adapter.ExpShopRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.local.LocalExpressionFolder;
+import com.ihewro.android_expression_package.bean.local.database.DatabaseExpFolder;
 import com.ihewro.android_expression_package.bean.web.WebExpressionFolder;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+
+import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +41,11 @@ public class MyActivity extends AppCompatActivity {
 
     private List<LocalExpressionFolder> expressionFolderList = new ArrayList<>();
 
+
+    public static void actionStart(Activity activity){
+        Intent intent = new Intent(activity,MyActivity.class);
+        activity.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +78,10 @@ public class MyActivity extends AppCompatActivity {
      * 读取数据库的信息，获取本地的图片信息
      */
     private void initData() {
+        //查询到所有的表情包目录，但是有的表情包目录status可能是-1，即无效表情包
+        List<DatabaseExpFolder> databaseExpFolderList = LitePal.findAll(DatabaseExpFolder.class);
+
+
 
     }
 

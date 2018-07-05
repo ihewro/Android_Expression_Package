@@ -55,7 +55,8 @@
         <activity android:name=".activity.MyActivity" />
         <activity android:name=".activity.ExpWebFolderDetailActivity" />
         <activity android:name=".activity.WelcomeActivity" />
-        <activity android:name=".activity.ExpLocalFolderDetailActivity"></activity>
+        <activity android:name=".activity.ExpLocalFolderDetailActivity" />
+        <activity android:name=".activity.AboutActivity"></activity>
     </application>
 
 </manifest>

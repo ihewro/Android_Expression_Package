@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bilibili.magicasakura.utils.ThemeUtils;
+import com.canking.minipay.Config;
+import com.canking.minipay.MiniPayUtils;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withCompactStyle(false)
-                .withHeaderBackground(R.drawable.bg)
+                .withHeaderBackground(R.drawable.logo)
                 .withSavedInstance(savedInstanceState)
                 .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
                     @Override
@@ -238,32 +240,40 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withToolbar(toolbar)
                 .withFullscreen(true)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("主页").withIcon(FontAwesome.Icon.faw_home).withIdentifier(1).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                            @Override
-                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                result.closeDrawer();
-                                return false;
-                            }
-                        }),
-                        new PrimaryDrawerItem().withName("表情商店").withIcon(FontAwesome.Icon.faw_gamepad).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)),
-                        new PrimaryDrawerItem().withName("我的").withIcon(FontAwesome.Icon.faw_user).withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withEnabled(false),
-                        new PrimaryDrawerItem().withName("换肤").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(GoogleMaterial.Icon.gmd_color_lens),
-                        new SectionDrawerItem().withName("其他"),
-                        new SecondaryDrawerItem().withName("设置").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(FontAwesome.Icon.faw_cog).withEnabled(false),
-                        new SecondaryDrawerItem().withName("五星好评").withSelectedTextColor(getResources().getColor(R.color.theme_color_primary)).withSelectedIconColor(getResources().getColor(R.color.theme_color_primary)).withIcon(FontAwesome.Icon.faw_question).withEnabled(false)
+                        new SecondaryDrawerItem().withName("主页").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1),//1
+                        new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart),//2
+                        new SecondaryDrawerItem().withName("我的").withIcon(GoogleMaterial.Icon.gmd_photo_library),//3
+                        new SecondaryDrawerItem().withName("换肤").withIcon(GoogleMaterial.Icon.gmd_color_lens),//4
+                        new SectionDrawerItem().withName("其他"),//5
+                        new SecondaryDrawerItem().withName("关于").withIcon(R.drawable.logo).withEnabled(false),//6
+                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withEnabled(false),//7
+                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment)//8
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch (position){
+                            case 1:
+                                result.closeDrawer();
+                                break;
                             case 2://进入表情商店
                                 ShopActivity.actionStart(MainActivity.this);
+                                break;
+                            case 3: //进入我的表情管理
+                                MyActivity.actionStart(MainActivity.this);
                                 break;
                             case 4://切换主题
                                 CardPickerDialog dialog = new CardPickerDialog();
                                 dialog.setClickListener(MainActivity.this);
                                 dialog.show(getSupportFragmentManager(), CardPickerDialog.TAG);
                                 break;
+
+                            case 8://捐赠
+                                MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechat).build());
+
+                                break;
+
+
                         }
 
                         return true;
