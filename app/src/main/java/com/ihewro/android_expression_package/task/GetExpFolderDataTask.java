@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.blankj.ALog;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
@@ -51,19 +52,9 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
     protected String doInBackground(Void... voids) {
         beginTime = System.currentTimeMillis();
         //获取one数据库信息
-        List<OneDetailList> oneDetailListList = LitePal.findAll(OneDetailList.class);
-        boolean flag = false;
-        if (oneDetailListList.size()>0){
-            if (DateUtil.isTimeout(DateUtil.getNowDateStr(),oneDetailListList.get(0).getDate())){//超时了，需要更新数据库信息
-                flag = true;
-            }
-        }else {//数据库中没有内容获取新的请求，更新数据库信息
-            flag = true;
-        }
-
+        boolean flag = MyDataBase.isNeedGetOnes();
         Call<OneDetailList> call = null;
         if (flag){
-
             call = HttpUtil.getOnes(new Callback<OneDetailList>() {
                 @Override
                 public void onResponse(@NonNull Call<OneDetailList> call, @NonNull Response<OneDetailList> response) {
@@ -91,6 +82,8 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
                     ALog.d("请求失败" + t.getMessage());
                 }
             });
+        }else {
+            getOnes = true;//数据库已经有ones了
         }
 
         //获取表情包数据库信息
@@ -98,10 +91,11 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonString = mapper.writeValueAsString(expressionFolderList);
-            while (true){
+
+            //循环等待前面的请求结束,如果没有网络请求的话，getOnes为true，不会执行这里的判断的
+            while (!getOnes){
                 ALog.d("getones",getOnes);
                 endTime = System.currentTimeMillis();
-
                 if (endTime - beginTime > 1500){//最大容忍度为1.5s，1.5秒还没有请求就歇着吧，用户不然就要关闭应用了
                     if (call!=null){
                         //请求超时了
@@ -109,9 +103,6 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
                         call.cancel();
                     }
                     getOnes = true;
-                }
-                if (getOnes){
-                    break;
                 }else {
                     sleep(10);
                 }
@@ -119,8 +110,8 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
 
             endTime = System.currentTimeMillis();
             long diff = endTime - beginTime;//执行的毫秒数
-            if (diff <1700){//再让他睡会，否则启动页面都看不见
-                sleep(1700-diff);
+            if (diff <1500){//再让他睡会，否则启动页面都看不清
+                sleep(1500-diff);
             }
             return jsonString;
         } catch (JsonProcessingException | InterruptedException e) {

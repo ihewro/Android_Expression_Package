@@ -5,6 +5,7 @@ import android.widget.Toast;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -68,5 +69,24 @@ public class MyDataBase {
 
 
         return true;
+    }
+
+
+    public static boolean isNeedGetOnes(){
+        //获取one数据库信息
+        List<OneDetailList> oneDetailListList = LitePal.findAll(OneDetailList.class);
+        boolean flag = false;
+        if (oneDetailListList.size()>0){
+            if (DateUtil.isTimeout(DateUtil.getNowDateStr(),oneDetailListList.get(0).getDate())){//超时了，需要更新数据库信息
+                flag = true;
+            }
+        }else {//数据库中没有内容获取新的请求，更新数据库信息
+            flag = true;
+        }
+
+        if (flag){
+            ALog.d("需要重新请求ones数据");
+        }
+        return flag;
     }
 }

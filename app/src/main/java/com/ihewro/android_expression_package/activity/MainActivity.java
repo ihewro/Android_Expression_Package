@@ -4,21 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
-import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,28 +25,37 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amitshekhar.DebugDB;
 import com.bilibili.magicasakura.utils.ThemeUtils;
+import com.blankj.ALog;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
-import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.bean.OneDetail;
+import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
+import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
-import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
-import com.jaeger.library.StatusBarUtil;
+import com.ihewro.android_expression_package.view.CustomImageView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -55,24 +63,30 @@ import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import org.litepal.LitePal;
+
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.glide.transformations.BlurTransformation;
+import es.dmoral.toasty.Toasty;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import me.jessyan.progressmanager.ProgressListener;
+import me.jessyan.progressmanager.ProgressManager;
+import me.jessyan.progressmanager.body.ProgressInfo;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
-public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks  {
+public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -84,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     CollapsingToolbarLayout collapsingToolbar;
     @BindView(R.id.main_item)
     CoordinatorLayout mainItem;
+    @BindView(R.id.top_image)
+    CustomImageView topImage;
+    @BindView(R.id.one_text)
+    TextView oneText;
 
     private Drawer result;
     private AccountHeader headerResult;
@@ -96,15 +114,19 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     private MenuItem refreshItem;
 
+    private int oneItem = 0;//one的序号
+
     /**
      * 由启动页面启动主活动
+     *
      * @param activity
      */
-    public static void actionStart(Activity activity,String jsonString){
-        Intent intent = new Intent(activity,MainActivity.class);
-        intent.putExtra("data",jsonString);
+    public static void actionStart(Activity activity, String jsonString) {
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra("data", jsonString);
         activity.startActivity(intent);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     }
 
 
-    private void initPermission(){
+    private void initPermission() {
         String[] notPermission = CheckPermissionUtils.checkPermission(UIUtil.getContext());
-        if (notPermission.length!=0){//需要的权限没有全部被运行
+        if (notPermission.length != 0) {//需要的权限没有全部被运行
             ActivityCompat.requestPermissions(this, notPermission, 100);
         }
     }
@@ -142,24 +164,23 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
         //权限被申请成功
-        Toast.makeText(UIUtil.getContext(),"权限申请成功，愉快使用表情宝宝吧😁",Toast.LENGTH_SHORT).show();
+        Toast.makeText(UIUtil.getContext(), "权限申请成功，愉快使用表情宝宝吧😁", Toast.LENGTH_SHORT).show();
 
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // 权限被拒绝
-        Toast.makeText(UIUtil.getContext(),"权限没有被通过，该软件运行过程中可能会闪退，请留意",Toast.LENGTH_SHORT).show();
+        Toast.makeText(UIUtil.getContext(), "权限没有被通过，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
     }
 
 
     /**
      * 初始化布局
+     *
      * @param savedInstanceState
      */
-    private void initView(Bundle savedInstanceState){
-
-
+    private void initView(Bundle savedInstanceState) {
 
         //初始化侧边栏
         headerResult = new AccountHeaderBuilder()
@@ -170,16 +191,16 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
                     @Override
                     public boolean onClick(View view, IProfile profile) {
-                        if (lastClickTime == -1){
+                        if (lastClickTime == -1) {
                             lastClickTime = System.currentTimeMillis();
                             thisClickTime = System.currentTimeMillis();
                             ToastUtil.showMessageShort("你戳我？很痛哎");
-                        }else {//不是第一次点击的
+                        } else {//不是第一次点击的
                             thisClickTime = System.currentTimeMillis();
-                            if (thisClickTime - lastClickTime < 500){//是在0.8秒内点击的
+                            if (thisClickTime - lastClickTime < 500) {//是在0.8秒内点击的
                                 lastClickTime = thisClickTime;
-                                clickTimes ++;
-                                switch (clickTimes){
+                                clickTimes++;
+                                switch (clickTimes) {
                                     case 3:
                                         ToastUtil.showMessageShort("还戳！！！");
                                         break;
@@ -238,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                         break;
 
                                 }
-                            }else{//已经超过连续点击的时间，将变量初始化
+                            } else {//已经超过连续点击的时间，将变量初始化
                                 lastClickTime = -1;
                                 thisClickTime = -1;
                                 clickTimes = 0;
@@ -270,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        switch (position){
+                        switch (position) {
                             case 1:
                                 result.closeDrawer();
                                 break;
@@ -305,9 +326,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
                 layoutParams.rightMargin, layoutParams.bottomMargin);
 
-        Glide.with(this).load(R.drawable.header)
-                .apply(bitmapTransform(new RoundedCornersTransformation(40, 3)))
-                .into((ImageView) findViewById(R.id.top_image));
+
 
     }
 
@@ -316,9 +335,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
      * 初始化表情包数据
      * 这个表情包是内置在apk中，用户无需下载即可直接使用
      */
-    private void initData(){
+    private void initData() {
 
-        if (getIntent()!=null){
+        if (getIntent() != null) {
             try {
                 String jsonString = getIntent().getStringExtra("data");
                 ObjectMapper mapper = new ObjectMapper();
@@ -343,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     }
 
+
     /**
      * 设置ViewPager
      */
@@ -350,14 +370,14 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //碎片列表
         List<Fragment> fragmentList = new ArrayList<>();
 
-        for (int i =0;i<expressionFolderList.size();i++) {
-            if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null){
+        for (int i = 0; i < expressionFolderList.size(); i++) {
+            if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null) {
                 //过滤掉空文件夹
-            }else {
+            } else {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
                     String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
-                    fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,expressionFolderList.get(i).getName()));
+                    fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString, expressionFolderList.get(i).getName()));
                     pageTitleList.add(expressionFolderList.get(i).getName());
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
@@ -417,19 +437,16 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.refresh){
-            //刷新头图信息
-            showRefreshAnimation(item);
-        }else if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == R.id.refresh) {
+            getOne(item);
+        } else if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
 
     public void showRefreshAnimation(MenuItem item) {
 
@@ -441,15 +458,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         refreshActionView.setImageResource(R.drawable.logo);
         item.setActionView(refreshActionView);
 
-        Animation rotateAnimation= AnimationUtils.loadAnimation(this,R.anim.rotate);
+        Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         refreshActionView.setAnimation(rotateAnimation);
         refreshActionView.startAnimation(rotateAnimation);
-        refreshActionView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideRefreshAnimation();
-            }
-        });
     }
 
     @SuppressLint("NewApi")
@@ -463,7 +474,89 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         }
     }
 
+
+    private void getOne(MenuItem item) {
+        //刷新头图信息
+        showRefreshAnimation(item);
+
+        if (MyDataBase.isNeedGetOnes()) {//如果已经过时了，则需要从网络上请求数据
+            HttpUtil.getOnes(new Callback<OneDetailList>() {
+                @Override
+                public void onResponse(@NonNull Call<OneDetailList> call, @NonNull Response<OneDetailList> response) {
+
+                    //获取数据成功后删除旧的数据
+                    LitePal.deleteAll(OneDetailList.class);
+                    LitePal.deleteAll(OneDetail.class);
+
+                    //存储新的数据
+                    final OneDetailList oneDetailList = response.body();
+                    assert oneDetailList != null;
+                    oneDetailList.save();
+
+                    for (int i =0;i<oneDetailList.getCount();i++){
+                        OneDetail oneDetail = oneDetailList.getOneDetailList().get(i);
+                        oneDetail.setOneDetailList(oneDetailList);
+                        oneDetail.save();
+                    }
+
+                    setOneUI(oneDetailList.getOneDetailList());
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<OneDetailList> call, @NonNull Throwable t) {
+                    //什么也不做
+                    Toasty.error(MainActivity.this,"请求一个失败，请稍后重试",Toast.LENGTH_SHORT).show();
+                    ALog.d("请求失败" + t.getMessage());
+                }
+            });
+        }else {
+            setOneUI(LitePal.findAll(OneDetail.class));
+        }
+
+    }
+
+    private void setOneUI(List<OneDetail> oneDetailList){
+        OneDetail oneDetail = oneDetailList.get(oneItem%oneDetailList.size());
+        oneText.setText(oneDetail.getText());
+        ProgressManager.getInstance().addResponseListener(oneDetail.getImgUrl(), getGlideListener());//监听glide进度，加载完毕后，取消动画
+
+        Glide.with(this).load(oneDetail.getImgUrl())
+                .apply(bitmapTransform(new MultiTransformation(new CenterCrop(), new RoundedCornersTransformation(35, 0))))
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        topImage.setImageDrawable(resource);
+                        hideRefreshAnimation();
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        Toasty.error(MainActivity.this,"请求图片失败，请稍后重试",Toast.LENGTH_SHORT).show();
+                    }
+                });
+        oneItem++;//这样下次刷新显示下一条
+    }
+
+
+    @NonNull
+    private ProgressListener getGlideListener() {
+        return new ProgressListener() {
+            @Override
+            public void onProgress(ProgressInfo progressInfo) {
+                int progress = progressInfo.getPercent();
+                ALog.d("progress233",progress);
+            }
+
+            @Override
+            public void onError(long id, Exception e) {
+
+            }
+        };
+    }
+
+
     long startTime = 0;
+
     @Override
     public void onBackPressed() {
 
