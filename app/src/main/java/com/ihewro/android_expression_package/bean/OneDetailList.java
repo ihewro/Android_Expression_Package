@@ -1,5 +1,9 @@
 package com.ihewro.android_expression_package.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.litepal.crud.LitePalSupport;
+
 import java.util.List;
 
 /**
@@ -11,23 +15,32 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public class OneDetailList {
-    private String data;//存储时间，用来判断是否需要更新数据
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDetailList extends LitePalSupport {
+    private String date;//存储时间，用来判断是否需要更新数据
     private int count;//数目
     private List<OneDetail> oneDetailList;
 
-    public OneDetailList(String data, int count, List<OneDetail> oneDetailList) {
-        this.data = data;
+    public OneDetailList() {
+    }
+
+    public OneDetailList(String date, int count, List<OneDetail> oneDetailList) {
+        this.date = date;
         this.count = count;
         this.oneDetailList = oneDetailList;
     }
 
-    public String getData() {
-        return data;
+    public OneDetailList(String date, int count) {
+        this.date = date;
+        this.count = count;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public int getCount() {
@@ -45,4 +58,6 @@ public class OneDetailList {
     public void setOneDetailList(List<OneDetail> oneDetailList) {
         this.oneDetailList = oneDetailList;
     }
+
+
 }

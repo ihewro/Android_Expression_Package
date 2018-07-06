@@ -1,5 +1,9 @@
 package com.ihewro.android_expression_package.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.litepal.crud.LitePalSupport;
+
 /**
  * <pre>
  *     author : hewro
@@ -9,10 +13,14 @@ package com.ihewro.android_expression_package.bean;
  *     version: 1.0
  * </pre>
  */
-public class OneDetail {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDetail extends LitePalSupport {
     private String text;
     private String imgUrl;
     private OneDetailList oneDetailList;
+
+    public OneDetail() {
+    }
 
     public OneDetail(String text, String imgUrl) {
         this.text = text;

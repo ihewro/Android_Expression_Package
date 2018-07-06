@@ -19,7 +19,7 @@
 			For example:
     	<version value="1" />
     -->
-    <version value="4" />
+    <version value="5" />
 
     <!--
     	Define your models in the list with mapping tag, LitePal will
@@ -34,6 +34,8 @@
     <list>
         <mapping class="com.ihewro.android_expression_package.bean.ExpressionFolder"/>
         <mapping class="com.ihewro.android_expression_package.bean.Expression" />
+        <mapping class="com.ihewro.android_expression_package.bean.OneDetailList" />
+        <mapping class="com.ihewro.android_expression_package.bean.OneDetail" />
     </list>
 
     <!--

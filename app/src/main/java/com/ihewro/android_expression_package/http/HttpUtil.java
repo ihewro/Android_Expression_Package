@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.util.List;
@@ -97,6 +98,16 @@ public class HttpUtil {
         Call<List<Expression>> call = request.getDirDetail(dirId,dirName,1,pageSize);
 
         call.enqueue(callback);
+    }
+
+    public static Call<OneDetailList> getOnes (Callback<OneDetailList> callback){
+        Retrofit retrofit = getRetrofit(10,10,10);
+        WebImageInterface request = retrofit.create(WebImageInterface.class);
+        Call<OneDetailList> call = request.getOnes();
+        call.enqueue(callback);
+
+
+        return call;
     }
 
 

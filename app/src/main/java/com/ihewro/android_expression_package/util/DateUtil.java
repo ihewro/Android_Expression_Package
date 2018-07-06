@@ -25,4 +25,27 @@ public class DateUtil {
         return format.format(time);
     }
 
+    public static boolean isTimeout(String now,String last){
+
+        long to = date2TimeStamp(now);
+        long from = date2TimeStamp(last);
+        int days = (int) ((to - from)/(1000 * 60 * 60 * 24));
+        return days >= 1;
+    }
+
+    /**
+     * 日期格式字符串转换成时间戳
+     * @param date_str 字符串日期
+     * @return
+     */
+    public static long date2TimeStamp(String date_str){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return sdf.parse(date_str).getTime()/1000;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.http;
 
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolderList;
+import com.ihewro.android_expression_package.bean.OneDetailList;
 
 import java.util.List;
 
@@ -30,4 +31,7 @@ public interface WebImageInterface {
 
     @GET
     Call<ResponseBody> downloadWebExp(@Url String fileUrl);
+
+    @GET("one.php")
+    Call<OneDetailList> getOnes();
 }
