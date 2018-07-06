@@ -41,7 +41,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
-        android:text="v1.0"
+        android:text="v2.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.018"
         app:layout_constraintStart_toEndOf="@+id/textView"
@@ -79,7 +79,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:textSize="13dp"
-        android:text="首次启动，解压数据…"
+        android:text="启动中……"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

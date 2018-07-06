@@ -8,6 +8,8 @@ import android.support.v4.view.LayoutInflaterCompat;
 
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
+import com.ihewro.android_expression_package.activity.ErrorActivity;
+import com.ihewro.android_expression_package.activity.MainActivity;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 import com.scwang.smartrefresh.header.FlyRefreshHeader;
@@ -27,6 +29,8 @@ import com.scwang.smartrefresh.layout.footer.FalsifyFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 
 import org.litepal.LitePalApplication;
+
+import cat.ereza.customactivityoncrash.config.CaocConfig;
 
 
 /**
@@ -68,7 +72,7 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
             @Override
             public RefreshHeader createRefreshHeader(Context context, RefreshLayout layout) {
                 layout.setPrimaryColorsId(R.color.theme_color_primary_trans, android.R.color.white);//全局设置主题颜色
-                return new PhoenixHeader(
+                return new TaurusHeader(
                         context);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
             }
         });
@@ -91,6 +95,24 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
         mContext = this;
         ThemeUtils.setSwitchColor(this);
         initALog();
+        initErrorHandle();
+    }
+
+
+    private void initErrorHandle(){
+        CaocConfig.Builder.create()
+                .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT) //default: CaocConfig.BACKGROUND_MODE_SHOW_CUSTOM
+                .enabled(true) //default: true
+                .showErrorDetails(true) //default: true
+                .showRestartButton(true) //default: true
+                .logErrorOnRestart(true) //default: true
+                .trackActivities(true) //default: false
+                .minTimeBetweenCrashesMs(3000) //default: 3000
+                //.errorDrawable(R.drawable.ic_custom_drawable) //default: bug image
+                .restartActivity(MainActivity.class) //default: null (your app's launch activity)
+                .errorActivity(ErrorActivity.class) //default: null (default error activity)
+                .eventListener(null) //default: null
+                .apply();
     }
 
     @Override

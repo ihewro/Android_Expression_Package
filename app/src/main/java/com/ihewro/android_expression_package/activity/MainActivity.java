@@ -438,7 +438,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.refresh){
             //刷新头图信息
-            showRefreshAnimation(item);
+            throw new RuntimeException("Boom!");
+            //showRefreshAnimation(item);
 
 
         }else if (item.getItemId() == android.R.id.home) {

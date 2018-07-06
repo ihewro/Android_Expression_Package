@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -17,12 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activity.BaseActivity"
@@ -54,9 +47,19 @@
         <activity android:name=".activity.ShopActivity" />
         <activity android:name=".activity.MyActivity" />
         <activity android:name=".activity.ExpWebFolderDetailActivity" />
-        <activity android:name=".activity.WelcomeActivity" />
+        <activity android:name=".activity.WelcomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.ExpLocalFolderDetailActivity" />
-        <activity android:name=".activity.AboutActivity"></activity>
+        <activity android:name=".activity.AboutActivity" />
+        <activity
+            android:name=".activity.ErrorActivity"
+            android:label="抱歉，出错了"
+            android:process=":error_activity" />
     </application>
 
 </manifest>
