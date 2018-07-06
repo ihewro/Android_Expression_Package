@@ -41,7 +41,7 @@ public class ExpressionFolder extends LitePalSupport {
     private String ownerAvatar;//上传作者的头像
     private String createTime;//创建时间,时间戳
     private String updateTime;//更新时间，时间戳
-    private int dir;//网络层的目录id
+    private int dir;//网络层的目录id，只在网络层中找到表情包目录对应的表情列表有用，存到本地数据库的时候可以随便存储一个值，这个不需要的
 
     private List<Expression> expressionList;
 

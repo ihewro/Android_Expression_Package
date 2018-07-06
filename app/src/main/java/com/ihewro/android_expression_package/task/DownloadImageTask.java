@@ -1,5 +1,11 @@
 package com.ihewro.android_expression_package.task;
 
+import android.os.AsyncTask;
+
+import com.ihewro.android_expression_package.bean.Expression;
+
+import java.util.List;
+
 /**
  * <pre>
  *     author : hewro
@@ -9,5 +15,10 @@ package com.ihewro.android_expression_package.task;
  *     version: 1.0
  * </pre>
  */
-public class DownloadImageTask {
+public class DownloadImageTask extends AsyncTask<List<Expression>, Integer, Boolean> {
+
+    @Override
+    protected Boolean doInBackground(List<Expression>... lists) {
+        return null;
+    }
 }

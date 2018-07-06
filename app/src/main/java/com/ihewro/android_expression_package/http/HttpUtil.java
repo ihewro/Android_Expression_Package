@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -42,7 +43,7 @@ public class HttpUtil {
             @Override
             public void log(String message) {
                 //打印retrofit日志
-                //ALog.dTag("RetrofitLog","retrofitBack = "+message);
+                ALog.dTag("RetrofitLog","retrofitBack = "+message);
             }
         });
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
@@ -89,11 +90,11 @@ public class HttpUtil {
     }
 
 
-    public static void getExpressionList(int dirId, int page, int pageSize, Callback<List<Expression>> callback){
+    public static void getExpressionList(int dirId, int page, int pageSize,String dirName, Callback<List<Expression>> callback){
 
         Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
         WebImageInterface request = retrofit.create(WebImageInterface.class);
-        Call<List<Expression>> call = request.getDirDetail(dirId,1,pageSize);
+        Call<List<Expression>> call = request.getDirDetail(dirId,dirName,1,pageSize);
 
         call.enqueue(callback);
     }

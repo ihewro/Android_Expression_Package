@@ -10,7 +10,10 @@ import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.mikepenz.iconics.context.IconicsLayoutInflater2;
+import com.scwang.smartrefresh.header.FlyRefreshHeader;
 import com.scwang.smartrefresh.header.FunGameBattleCityHeader;
+import com.scwang.smartrefresh.header.PhoenixHeader;
+import com.scwang.smartrefresh.header.TaurusHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshFooterCreator;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreator;
@@ -65,7 +68,8 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
             @Override
             public RefreshHeader createRefreshHeader(Context context, RefreshLayout layout) {
                 layout.setPrimaryColorsId(R.color.theme_color_primary_trans, android.R.color.white);//全局设置主题颜色
-                return new FunGameBattleCityHeader(context);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
+                return new PhoenixHeader(
+                        context);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
             }
         });
         //设置全局的Footer构建器

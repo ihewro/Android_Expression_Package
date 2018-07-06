@@ -96,7 +96,7 @@ public class ShopActivity extends AppCompatActivity {
      */
     private void requestData(){
 
-        Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
+        Retrofit retrofit = HttpUtil.getRetrofit(20,20,20);
         WebImageInterface request = retrofit.create(WebImageInterface.class);
         Call<ExpressionFolderList> call = request.getDirList();
 

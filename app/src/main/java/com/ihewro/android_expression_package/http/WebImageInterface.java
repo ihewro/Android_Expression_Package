@@ -25,7 +25,7 @@ public interface WebImageInterface {
     public Call<ExpressionFolderList> getDirList();
 
     @GET("expFolderDetail.php")
-    public Call<List<Expression>> getDirDetail(@Query("dir") int dir, @Query("page") int page, @Query("pageSize") int pageSize);
+    public Call<List<Expression>> getDirDetail(@Query("dir") int dir, @Query("dirName")String dirName,@Query("page") int page, @Query("pageSize") int pageSize);
 
 
     @GET

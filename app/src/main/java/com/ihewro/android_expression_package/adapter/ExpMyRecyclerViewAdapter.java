@@ -46,8 +46,8 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
 
     @Override
     protected void convert(final BaseViewHolder helper, final ExpressionFolder item) {
-        if (item.getCount() == 0){//如果是空表情包
-            helper.getView(R.id.item_view).setVisibility(View.GONE);
+        if (item.getCount() == 0 || item.getExpressionList() == null || item.getExpressionList().size() == 0){//如果是空表情包
+            remove(helper.getAdapterPosition());//空文件夹则不显示
         }else {
             ALog.d("convert","执行了");
             helper.setText(R.id.exp_name,item.getName());

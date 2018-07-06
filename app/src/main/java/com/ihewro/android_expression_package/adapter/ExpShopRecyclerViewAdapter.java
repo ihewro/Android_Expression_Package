@@ -121,7 +121,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExpWebFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir());
+                    ExpWebFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir(),item.getName());
                 }
             });
 
@@ -142,7 +142,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                         .progress(false, item.getCount(), true)
                         .show();
 
-                HttpUtil.getExpressionList(item.getDir(), 1, 99999999, new Callback<List<Expression>>() {//获取该目录下的所有表情包，不分页
+                HttpUtil.getExpressionList(item.getDir(), 1, 99999999,item.getName(), new Callback<List<Expression>>() {//获取该目录下的所有表情包，不分页
                     @Override
                     public void onResponse(Call<List<Expression>> call, Response<List<Expression>> response) {
                         if (response.isSuccessful()){

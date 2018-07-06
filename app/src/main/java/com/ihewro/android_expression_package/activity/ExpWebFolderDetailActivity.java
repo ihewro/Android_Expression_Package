@@ -52,13 +52,15 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
 
     private int dirId = 0;
+    private String dirName;
     private List<Expression> expressionList = new ArrayList<>();
     private ExpressionListAdapter adapter;
     int currentPosition = 0;
 
-    public static void actionStart(Context activity, int dir){
+    public static void actionStart(Context activity, int dir,String dirName){
         Intent intent = new Intent(activity,ExpWebFolderDetailActivity.class);
         intent.putExtra("dir",dir);
+        intent.putExtra("dirName",dirName);
         activity.startActivity(intent);
     }
 
@@ -81,6 +83,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     private void initData() {
         if (getIntent()!=null){
             dirId = getIntent().getIntExtra("dir",0);
+            dirName = getIntent().getStringExtra("dirName");
         }
     }
 
@@ -104,7 +107,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
     private void requestData(){
 
-        HttpUtil.getExpressionList(dirId,1,50, new Callback<List<Expression>>() {
+        HttpUtil.getExpressionList(dirId,1,50,dirName, new Callback<List<Expression>>() {
             @Override
             public void onResponse(@NonNull Call<List<Expression>> call, @NonNull Response<List<Expression>> response) {
                 if (response.isSuccessful()){

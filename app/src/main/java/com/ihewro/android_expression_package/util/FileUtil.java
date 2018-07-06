@@ -1,43 +1,29 @@
 package com.ihewro.android_expression_package.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.Pair;
-import android.widget.Toast;
 
 import com.blankj.ALog;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.bean.Expression;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.Objects;
 
-import me.jessyan.progressmanager.ProgressListener;
-import me.jessyan.progressmanager.ProgressManager;
-import me.jessyan.progressmanager.body.ProgressInfo;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
 
 /**
  * <pre>
@@ -49,54 +35,6 @@ import me.jessyan.progressmanager.body.ProgressInfo;
  * </pre>
  */
 public class FileUtil {
-
-
-    /**
-     *
-     * @param context
-     * @param drawable
-     * @param imageUrl
-     * @param dirName
-     * @param fileName
-     * @param origin 保存来源，1表示直接保存，2表示保存后需要删除
-     * @return
-     */
-    public static Pair<File,Integer> saveImageToGallery(Context context, Drawable drawable, String imageUrl,String dirName, String fileName, int origin) {
-
-        Pair<File,Integer> results = null;
-        //保存文件前是否已经保存。-1表示未保存,如果是请求分享的过程中保存图片，并且是-1，就需要把临时生成的文件删除掉
-        int status = -1;
-
-        // 首先保存图片
-        File appDir = new File(Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName +"/" + dirName);
-        if (!appDir.exists()) {
-            appDir.mkdir();
-        }
-        File file = new File(appDir, fileName);
-        if (file.exists()){
-            status = 1;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            InputStream is = UIUtil.getContext().getAssets().open(imageUrl);
-            byte[] bytes = UIUtil.InputStreamTOByte(is);
-            fos.write(bytes);
-            fos.flush();
-            fos.close();
-            if (origin == 1){
-                Toast.makeText(UIUtil.getContext(),"保存到" + Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName + "/" + dirName + "/" +fileName,Toast.LENGTH_SHORT).show();
-            }
-            updateMediaStore(UIUtil.getContext(),file.getAbsolutePath());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(UIUtil.getContext(),"保存失败，请重试",Toast.LENGTH_SHORT).show();
-        }
-
-        results = new Pair<>(file,status);
-
-        return results;
-    }
 
     /**
      * 从图片库中删除图片
@@ -185,5 +123,50 @@ public class FileUtil {
 
 
 
+
+    public static boolean copyFileToTarget(String origin,String target){
+        if (Objects.equals(origin, target)){//如果路径相同，直接返回true,否则会发生crash，因为一个文件不能打开的同时边读边写
+            return true;
+        }else {
+            return copyFileToTarget(new File(origin),new File(target));
+        }
+    }
+
+    public static boolean copyFileToTarget(File source,File target){
+        if (Objects.equals(source.getAbsolutePath(), target.getAbsolutePath())){
+            return true;
+        }else {
+            File fileParent = target.getParentFile();//如果表情包目录都不存在，则需要先创建目录
+            if(!fileParent.exists()){
+                fileParent.mkdirs();
+            }
+            FileInputStream fileInputStream = null;
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileInputStream = new FileInputStream(source);
+                fileOutputStream = new FileOutputStream(target);
+                byte[] buffer = new byte[1024];
+                while (fileInputStream.read(buffer) > 0) {
+                    fileOutputStream.write(buffer);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            } finally {
+                try {
+                    if (fileInputStream != null) {
+                        fileInputStream.close();
+                    }
+                    if (fileOutputStream != null) {
+                        fileOutputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 
 }
