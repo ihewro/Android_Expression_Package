@@ -59,6 +59,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
 
         publishProgress(0);
         LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
+        LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
         for (int i = 0;i < dir.length;i++){//app目录下面的每个目录分别进行扫描
             if (dir[i].isDirectory()){//表情包目录
                 File[] files = dir[i].listFiles();//所有文件
@@ -70,7 +71,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                     for (int j = 0; j<files.length;j++){
                         if (files[j].isFile() && files[j].getTotalSpace() > 0){//排除0B大小的文件
                             ALog.d("保存表情");
-                            Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName());
+                            Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder);
                             expression.save();
                             currentFolderCount++;
                             alCount++;

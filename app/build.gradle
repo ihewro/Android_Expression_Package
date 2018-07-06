@@ -131,5 +131,9 @@ dependencies {
     //全局错误异常捕捉
     compile 'cat.ereza:customactivityoncrash:2.2.0'
 
+    //数据库监视
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+
+
 
 }

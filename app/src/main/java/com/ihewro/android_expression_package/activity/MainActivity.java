@@ -28,6 +28,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.amitshekhar.DebugDB;
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.bumptech.glide.Glide;
 import com.canking.minipay.Config;
@@ -52,6 +53,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
+        DebugDB.getAddressLog();
 
         //初始化数据
         initData();
@@ -258,8 +261,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                         new SecondaryDrawerItem().withName("主页").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1),//1
                         new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart),//2
                         new SecondaryDrawerItem().withName("我的").withIcon(GoogleMaterial.Icon.gmd_photo_library),//3
-                        new SecondaryDrawerItem().withName("换肤").withIcon(GoogleMaterial.Icon.gmd_color_lens),//4
-                        new SectionDrawerItem().withName("其他"),//5
+                        new SecondaryDrawerItem().withName("退出").withIcon(GoogleMaterial.Icon.gmd_exit_to_app),//4
+                        new DividerDrawerItem(),//5
                         new SecondaryDrawerItem().withName("关于").withIcon(R.drawable.logo).withEnabled(false),//6
                         new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withEnabled(false),//7
                         new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment)//8
@@ -277,18 +280,13 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                             case 3: //进入我的表情管理
                                 MyActivity.actionStart(MainActivity.this);
                                 break;
-                            case 4://切换主题
-                                CardPickerDialog dialog = new CardPickerDialog();
-                                dialog.setClickListener(MainActivity.this);
-                                dialog.show(getSupportFragmentManager(), CardPickerDialog.TAG);
+                            case 4://退出应用
+                                finish();
                                 break;
 
                             case 8://捐赠
                                 MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechat).build());
-
                                 break;
-
-
                         }
 
                         return true;
@@ -353,15 +351,19 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         List<Fragment> fragmentList = new ArrayList<>();
 
         for (int i =0;i<expressionFolderList.size();i++) {
-
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
-                fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,expressionFolderList.get(i).getName()));
-                pageTitleList.add(expressionFolderList.get(i).getName());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null){
+                //过滤掉空文件夹
+            }else {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
+                    fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,expressionFolderList.get(i).getName()));
+                    pageTitleList.add(expressionFolderList.get(i).getName());
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
 
         //新建适配器
@@ -458,6 +460,19 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 view.clearAnimation();
                 refreshItem.setActionView(null);
             }
+        }
+    }
+
+    long startTime = 0;
+    @Override
+    public void onBackPressed() {
+
+        long currentTime = System.currentTimeMillis();
+        if ((currentTime - startTime) >= 2000) {
+            Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
+            startTime = currentTime;
+        } else {
+            finish();
         }
     }
 }

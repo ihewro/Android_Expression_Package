@@ -36,6 +36,16 @@ public class Expression extends LitePalSupport{
     }
 
 
+    //构造方法里面增加了ExpressionFolder，避免某些情况，无法自动关联外键的情况，快被这个外键折腾疯了
+    public Expression(int status, String name, String url, String folderName,ExpressionFolder expressionFolder) {
+        this.status = status;
+        this.name = name;
+        this.url = url;
+        this.folderName = folderName;
+        this.expressionFolder = expressionFolder;
+    }
+
+
     public int getId() {
         return id;
     }

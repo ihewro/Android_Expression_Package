@@ -76,7 +76,7 @@ public class ExpressionContentFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),5);
+        GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),4);
         recyclerView.setLayoutManager(gridLayoutManager);
 
         initExpressionData();

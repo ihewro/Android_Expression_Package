@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import es.dmoral.toasty.Toasty;
 import me.jessyan.progressmanager.ProgressListener;
 import me.jessyan.progressmanager.ProgressManager;
 import me.jessyan.progressmanager.body.ProgressInfo;
@@ -175,7 +177,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                                     expressionFolder.save();
 
                                     //需要删除该目录对应的表情列表，然后再更新，否则就重复了
-                                    LitePal.deleteAll(Expression.class,"name = ?", expressionFolder.getName());
+                                    LitePal.deleteAll(Expression.class,"foldername = ?", expressionFolder.getName());
 
                                 }else {
                                     expressionFolder = new ExpressionFolder(1,0,item.getName(),item.getOwner(),item.getOwnerAvatar(), DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),item.getDir());
@@ -201,11 +203,11 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                                                 downloadCount++;
 
                                                 //下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                                Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),item.getName());
+                                                Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),item.getName(),expressionFolder);
                                                 expression.save();
 
                                                 //更新数据中该目录的关联数据
-                                                ALog.d("folder", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                                ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
                                                 expressionFolder.setCount(downloadCount);
                                                 expressionFolder.getExpressionList().add(expression);
                                                 expressionFolder.save();
@@ -233,7 +235,10 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
 
                                         @Override
                                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                            //一般情况下是不可能下载失败的
+                                            //某个文件下载失败
+                                            Toasty.error(activity,expFolderAllExpList.get(finalI).getName() +"文件下载失败", Toast.LENGTH_SHORT).show();
+                                            downloadCount++;//同样也需要加一，否则进度条就不对了
                                         }
                                     });
 
@@ -246,7 +251,8 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
 
                     @Override
                     public void onFailure(Call<List<Expression>> call, Throwable t) {
-
+                        //获取表情包合集失败，终止下载
+                        downloadAllDialog.setContent("下载失败，请稍后重试");
                     }
                 });
 

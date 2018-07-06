@@ -49,7 +49,7 @@ public class MyDataBase {
             return false;//这种错误几乎不会发生，除非数据库的错误严重错乱
         }
         //3. 把表情的信息存储进去,执行这里的时候有两种情况，一种是目录和表情都没有的。一种目录存在，但是表情不存在。
-        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName());
+        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder);
         currentExpression.save();
 
         expressionFolder.setCount(expressionFolder.getCount() + 1);

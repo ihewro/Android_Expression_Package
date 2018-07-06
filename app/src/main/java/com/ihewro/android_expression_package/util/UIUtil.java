@@ -13,6 +13,8 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
 
@@ -24,6 +26,8 @@ import java.io.InputStream;
 
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
  * <pre>
@@ -100,42 +104,24 @@ public class UIUtil {
 
 
     public static void setImageToImageView(int status, String url, GifImageView imageView){
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.fail)
+                .disallowHardwareConfig();
+
         switch (status){
-            case -1://apk内置图片
-                AssetFileDescriptor fd = null;
-                try {
-                    fd = UIUtil.getContext().getAssets().openFd(url);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    GifDrawable gifFromAfd = new GifDrawable(fd);
-                    imageView.setImageDrawable(gifFromAfd);
-
-                } catch (IOException e) {//不是gif图片
-                    //e.printStackTrace();
-                    Bitmap bitmap= null;
-                    try {
-                        InputStream is = UIUtil.getContext().getAssets().open(url);
-                        bitmap = BitmapFactory.decodeStream(is);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                    imageView.setImageBitmap(bitmap);
-                }
-
-                break;
-
             case 1://存储在sd卡中
                 //获取路径
                 //本地文件
                 File file = new File(url);
                 //加载图片
-                Glide.with(UIUtil.getContext()).load(file).into(imageView);
+                Glide.with(UIUtil.getContext()).load(file).apply(options).transition(withCrossFade()).into(imageView);
                 break;
 
             case 2://加载网络地址
-                Glide.with(UIUtil.getContext()).load(url).into(imageView);
+                Glide.with(UIUtil.getContext()).load(url).apply(options).transition(withCrossFade())
+                .into(imageView);
                 break;
         }
 
