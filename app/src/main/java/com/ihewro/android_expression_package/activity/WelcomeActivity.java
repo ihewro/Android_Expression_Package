@@ -5,6 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.callback.GetExpFolderDataListener;
+import com.ihewro.android_expression_package.task.GetExpFolderDataTask;
+
+import static java.lang.Thread.sleep;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -14,12 +18,13 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcom);
 
 
-        new AsyncTask<Void, Void, Void>() {
+        new GetExpFolderDataTask(new GetExpFolderDataListener() {
             @Override
-            protected Void doInBackground(Void... voids) {
-                return null;
+            public void onFinish(String jsonString) {
+                finish();
+                MainActivity.actionStart(WelcomeActivity.this,jsonString);
             }
-        }.execute()
+        }).execute();
 
     }
 

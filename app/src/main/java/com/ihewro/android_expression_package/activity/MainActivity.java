@@ -33,10 +33,12 @@ import com.bumptech.glide.Glide;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.GlobalConfig;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     private Drawer result;
     private AccountHeader headerResult;
-    private List<List<Expression>> expressionListList = new ArrayList<>();
+    private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
     private List<String> pageTitleList = new ArrayList<>();
     //毫秒
     private long lastClickTime = -1;
@@ -96,8 +98,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
      * 由启动页面启动主活动
      * @param activity
      */
-    public void actionStart(Activity activity){
+    public static void actionStart(Activity activity,String jsonString){
         Intent intent = new Intent(activity,MainActivity.class);
+        intent.putExtra("data",jsonString);
         activity.startActivity(intent);
     }
     @Override
@@ -316,26 +319,14 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
      * 这个表情包是内置在apk中，用户无需下载即可直接使用
      */
     private void initData(){
-        AssetManager assetManager = getAssets();
-        String[] files =null;
-        try{
-            files = assetManager.list("imagehuyi");
-        }catch(IOException e){
-            Log.e("tag", e.getMessage());
-        }
 
-        for (int i =0;i<files.length;i++){
-            Log.e("filelist",files[i]);
-            String []tempFiles = null;
-            List<Expression> expressionList = new ArrayList<>();
-            pageTitleList.add(files[i]);
+        if (getIntent()!=null){
             try {
-                tempFiles = assetManager.list(GlobalConfig.assetsFolderName + "/" + files[i]);
-                for (String tempFile : tempFiles) {
-                    Log.d("filename",tempFile);
-                    expressionList.add(new Expression(-1, tempFile, GlobalConfig.assetsFolderName +  "/" + files[i] + "/" + tempFile,files[i]));
-                }
-                expressionListList.add(expressionList);
+                String jsonString = getIntent().getStringExtra("data");
+                ObjectMapper mapper = new ObjectMapper();
+                JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, ExpressionFolder.class);
+                expressionFolderList = mapper.readValue(jsonString, javaType);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -361,27 +352,17 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //碎片列表
         List<Fragment> fragmentList = new ArrayList<>();
 
-        for (int i =0;i<expressionListList.size();i++) {
+        for (int i =0;i<expressionFolderList.size();i++) {
 
             try {
                 ObjectMapper mapper = new ObjectMapper();
-                String jsonString = mapper.writeValueAsString(expressionListList.get(i));
-                fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,pageTitleList.get(i)));
+                String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
+                fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString,expressionFolderList.get(i).getName()));
+                pageTitleList.add(expressionFolderList.get(i).getName());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-
-
         }
-
-
-
-
-        //标题列表
-        //pageTitleList.clear();
-        //pageTitleList.add("坏坏");
-        //pageTitleList.add("猥琐萌");
-
 
         //新建适配器
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, pageTitleList);
@@ -438,10 +419,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.refresh){
             //刷新头图信息
-            throw new RuntimeException("Boom!");
-            //showRefreshAnimation(item);
-
-
+            showRefreshAnimation(item);
         }else if (item.getItemId() == android.R.id.home) {
             finish();
         }

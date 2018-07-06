@@ -70,7 +70,11 @@ public class ExpressionFolder extends LitePalSupport {
     }
 
     public List<Expression> getExpressionList() {
-        return expressionList;
+        if (expressionList == null){
+            return new ArrayList<Expression>();
+        }else {
+            return expressionList;
+        }
     }
 
     public void setExpressionList(List<Expression> expressionList) {
