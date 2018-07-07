@@ -65,7 +65,7 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
         helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExpLocalFolderDetailActivity.actionStart(activity,item.getId());
+                ExpLocalFolderDetailActivity.actionStart(activity,item.getId(),item.getName());
             }
         });
 
@@ -94,6 +94,7 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
                                                 Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
                                                 remove(helper.getAdapterPosition());
                                                 notifyDataSetChanged();
+                                                activity.setResult(1);
                                             }
                                         });
                                     }

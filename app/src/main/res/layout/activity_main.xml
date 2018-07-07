@@ -38,29 +38,30 @@
 
                     <com.ihewro.android_expression_package.view.CustomImageView
                         android:id="@+id/top_image"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginTop="10dp"
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="30dp"
                         android:layout_width="fill_parent"
                         android:layout_height="130dp"
                         android:src="@drawable/header"
                         android:scaleType="centerCrop"
+                        android:clickable="true"
+                        android:background="?attr/selectableItemBackground"
+
                         />
 
 
                     <TextView
+                        android:clickable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:id="@+id/one_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
                         android:paddingBottom="20dp"
-                        android:paddingLeft="30dp"
-                        android:paddingRight="30dp"
-                        android:paddingTop="10dp"
+                        android:paddingLeft="50dp"
+                        android:paddingRight="50dp"
+                        android:paddingTop="20dp"
                         android:text="我心中已经听到来自远方的呼唤，再不需要回过头去关心身后的种种是非。"
                         android:textColor="#5a5e59" />
 
@@ -86,14 +87,20 @@
                 android:layout_width="0dp" />
 
             <LinearLayout
-                android:layout_width="40dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@drawable/layer_list">
+                android:background="@drawable/layer_list"
+                >
                 <ImageView
+                    android:id="@+id/add_exp"
+                    android:clickable="true"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_add_white_24dp"/>
+                    android:src="@drawable/ic_add_black_24dp"/>
             </LinearLayout>
         </LinearLayout>
     </android.support.design.widget.AppBarLayout>

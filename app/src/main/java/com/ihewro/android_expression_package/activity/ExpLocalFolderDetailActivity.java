@@ -55,10 +55,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     private List<Expression> expressionList;
     private ExpressionListAdapter adapter;
     private int dirId;
+    private String dirName;
 
-    public static void actionStart(Activity activity,int dirId){
+    public static void actionStart(Activity activity,int dirId,String dirName){
         Intent intent = new Intent(activity,ExpLocalFolderDetailActivity.class);
-        intent.putExtra("name",dirId);
+        intent.putExtra("id",dirId);
+        intent.putExtra("folderName",dirName);
         activity.startActivity(intent);
     }
 
@@ -68,9 +70,9 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_exp_local_folder_detail);
         ButterKnife.bind(this);
 
-        initView();
-
         initData();
+
+        initView();
 
         initListener();
     }
@@ -80,6 +82,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        toolbar.setTitle(dirName);
 
         GridLayoutManager gridLayoutManager =  new GridLayoutManager(this,3);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -96,7 +100,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     private void initData(){
 
         if (getIntent()!=null){
-            dirId = getIntent().getIntExtra("name",1);
+            dirId = getIntent().getIntExtra("id",1);
+            dirName = getIntent().getStringExtra("folderName");
         }
 
         new Thread(new Runnable() {

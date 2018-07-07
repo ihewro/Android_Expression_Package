@@ -1,5 +1,7 @@
 package com.ihewro.android_expression_package.util;
 
+import com.blankj.ALog;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,7 +31,8 @@ public class DateUtil {
 
         long to = date2TimeStamp(now);
         long from = date2TimeStamp(last);
-        int days = (int) ((to - from)/(1000 * 60 * 60 * 24));
+        int days = (int) ((to - from)/(1000* 60 * 60 * 24));
+        ALog.d("days",days + "diff:" + (to - from));
         return days >= 1;
     }
 
@@ -41,7 +44,7 @@ public class DateUtil {
     public static long date2TimeStamp(String date_str){
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return sdf.parse(date_str).getTime()/1000;
+            return sdf.parse(date_str).getTime();
         } catch (Exception e) {
             e.printStackTrace();
         }

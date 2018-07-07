@@ -32,6 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never"
+                android:layout_marginBottom="45dp"
                 android:background="#fff"/>
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
@@ -42,7 +43,8 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:paddingRight="10dp"
+            android:background="#fafafa">
             <TextView
                 android:id="@+id/download_time_tip"
                 android:layout_centerVertical="true"

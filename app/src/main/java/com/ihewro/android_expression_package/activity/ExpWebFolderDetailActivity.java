@@ -94,6 +94,8 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        toolbar.setTitle(dirName);
+
         GridLayoutManager gridLayoutManager =  new GridLayoutManager(this,4);
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);

@@ -94,6 +94,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
      */
     @Override
     protected void onProgressUpdate(Integer... values) {
+        ALog.d("更新进度");
         if (count > 0){
             int progress = values[0];
             if (progress > lastProgress) {
@@ -109,6 +110,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
      */
     @Override
     protected void onPreExecute() {
+        ALog.d("开始任务");
         listener.onStart();
     }
 

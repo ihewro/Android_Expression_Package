@@ -28,6 +28,11 @@ import es.dmoral.toasty.Toasty;
  */
 public class MyDataBase {
 
+    /**
+     * 把一个表情信息加入到数据库
+     * @param expression
+     * @return
+     */
     public static boolean addExpressionRecord(Expression expression){
         //1. 检查有没有表情对应的目录
         List<ExpressionFolder> expressionFolderList = LitePal.where("name = ? and exist = ?",expression.getFolderName(), String.valueOf(1)).find(ExpressionFolder.class,true);

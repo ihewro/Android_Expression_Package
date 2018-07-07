@@ -9,6 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -29,6 +32,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.dmoral.toasty.Toasty;
 
 public class MyActivity extends BaseActivity {
 
@@ -39,6 +43,7 @@ public class MyActivity extends BaseActivity {
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
 
+    View notDataView;
 
     //适配器
     private ExpMyRecyclerViewAdapter adapter;
@@ -48,7 +53,7 @@ public class MyActivity extends BaseActivity {
 
     public static void actionStart(Activity activity){
         Intent intent = new Intent(activity,MyActivity.class);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent,2);
     }
 
     @Override
@@ -71,6 +76,7 @@ public class MyActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
@@ -90,7 +96,12 @@ public class MyActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        adapter.setNewData(expressionFolderList);
+                        if (expressionFolderList.size() == 0){
+                            adapter.setNewData(null);
+                            adapter.setEmptyView(notDataView);
+                        }else {
+                            adapter.setNewData(expressionFolderList);
+                        }
                     }
                 });
             }
@@ -137,8 +148,11 @@ public class MyActivity extends BaseActivity {
                                 @Override
                                 public void onFinished() {
                                     updateLoadingDialog.setContent("终于同步完成");
+                                    Toasty.success(MyActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
                                     //更新RecyclerView 布局
                                     initData();
+
+                                    setResult(1);
                                 }
 
                                 @Override

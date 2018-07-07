@@ -44,6 +44,7 @@ public class ExpressionContentFragment extends Fragment {
     private List<Expression> expressionList;
     private ExpImageDialog expressionDialog;
     private int currentPosition = -1;
+    View notDataView;
 
 
     public static Fragment fragmentInstant(String data,String name){
@@ -65,6 +66,7 @@ public class ExpressionContentFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_expression_content, container, false);
         unbinder = ButterKnife.bind(this, view);
+        notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
 
         //初始化弹出层相关信息
         initView();
@@ -76,13 +78,21 @@ public class ExpressionContentFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ALog.d("重新创建了该fragment");
+
         GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),4);
         recyclerView.setLayoutManager(gridLayoutManager);
+
 
         initExpressionData();
 
         adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
         recyclerView.setAdapter(adapter);
+
+        if (expressionList.size() == 0){
+            adapter.setNewData(null);
+            adapter.setEmptyView(notDataView);
+        }
 
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -106,10 +116,14 @@ public class ExpressionContentFragment extends Fragment {
         assert bundle != null;
         try {
             String jsonString = bundle.getString("data");
-            ObjectMapper mapper = new ObjectMapper();
-            JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Expression.class);
-            expressionList = mapper.readValue(jsonString, javaType);
-            ALog.d("list",expressionList.size());
+            if (Objects.equals(jsonString, "")){
+                expressionList = new ArrayList<>();
+            }else {
+                ObjectMapper mapper = new ObjectMapper();
+                JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Expression.class);
+                expressionList = mapper.readValue(jsonString, javaType);
+                ALog.d("list",expressionList.size());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

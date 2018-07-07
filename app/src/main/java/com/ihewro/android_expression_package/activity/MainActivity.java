@@ -3,9 +3,12 @@ package com.ihewro.android_expression_package.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +18,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -34,7 +38,6 @@ import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
@@ -45,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
+import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
@@ -56,6 +60,7 @@ import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CardPickerDialog;
 import com.ihewro.android_expression_package.view.CustomImageView;
+import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -71,6 +76,7 @@ import org.litepal.LitePal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,6 +91,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks {
 
@@ -102,11 +109,12 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     CustomImageView topImage;
     @BindView(R.id.one_text)
     TextView oneText;
+    @BindView(R.id.add_exp)
+    ImageView addExp;
 
     private Drawer result;
     private AccountHeader headerResult;
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
-    private List<String> pageTitleList = new ArrayList<>();
     //毫秒
     private long lastClickTime = -1;
     private long thisClickTime = -1;
@@ -115,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     private MenuItem refreshItem;
 
     private int oneItem = 0;//one的序号
+
+    private ViewPagerAdapter adapter;
 
     /**
      * 由启动页面启动主活动
@@ -134,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        DebugDB.getAddressLog();
 
         //初始化数据
         initData();
@@ -146,6 +155,33 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //初始化权限申请
         initPermission();
 
+        //监听器
+        initListener();
+
+
+        getOne(refreshItem);
+
+
+    }
+
+
+    private void initListener(){
+        addExp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShopActivity.actionStart(MainActivity.this);
+            }
+        });
+
+        oneText.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                android.content.ClipboardManager clipboardManager = (android.content.ClipboardManager)MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(null, oneText.getText()));
+                Toasty.success(MainActivity.this,"复制成功",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
     }
 
 
@@ -186,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withCompactStyle(false)
-                .withHeaderBackground(R.drawable.logo)
+                .withHeaderBackground(R.drawable.header)
                 .withSavedInstance(savedInstanceState)
                 .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
                     @Override
@@ -279,20 +315,21 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .withToolbar(toolbar)
                 .withFullscreen(true)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("主页").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1),//1
+                        new SecondaryDrawerItem().withName("我的主页").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1),//1
                         new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart),//2
-                        new SecondaryDrawerItem().withName("我的").withIcon(GoogleMaterial.Icon.gmd_photo_library),//3
-                        new SecondaryDrawerItem().withName("退出").withIcon(GoogleMaterial.Icon.gmd_exit_to_app),//4
-                        new DividerDrawerItem(),//5
-                        new SecondaryDrawerItem().withName("关于").withIcon(R.drawable.logo).withEnabled(false),//6
-                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withEnabled(false),//7
-                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment)//8
+                        new SecondaryDrawerItem().withName("表情管理").withIcon(GoogleMaterial.Icon.gmd_photo_library),//3
+                        new SecondaryDrawerItem().withName("清除缓存").withIcon(GoogleMaterial.Icon.gmd_delete),//4
+                        new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app),//5
+                        new DividerDrawerItem(),//6
+                        new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo),//7
+                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite),//8
+                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment)//9
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch (position) {
-                            case 1:
+                            case 1://我的首页，没卵用的一个按钮
                                 result.closeDrawer();
                                 break;
                             case 2://进入表情商店
@@ -301,11 +338,25 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                             case 3: //进入我的表情管理
                                 MyActivity.actionStart(MainActivity.this);
                                 break;
-                            case 4://退出应用
+                            case 4://清除缓存
+
+                                break;
+                            case 5://退出应用
                                 finish();
                                 break;
-
-                            case 8://捐赠
+                            case 7://关于我们
+                                AboutActivity.actionStart(MainActivity.this);
+                                break;
+                            case 8://五星好评
+                                Uri uri = Uri.parse("market://details?id=" + UIUtil.getContext().getPackageName());
+                                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                                try {
+                                    startActivity(goToMarket);
+                                } catch (ActivityNotFoundException e) {
+                                    Toasty.error(MainActivity.this,"无法启动应用市场，请重试",Toast.LENGTH_SHORT).show();
+                                }
+                                break;
+                            case 9://捐赠
                                 MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechat).build());
                                 break;
                         }
@@ -318,14 +369,13 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
 
         //初始化TabLayout
-        initTabLayout();
+        initTabLayout(false);
 
         //设置沉浸式状态栏
         //StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
         layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
                 layoutParams.rightMargin, layoutParams.bottomMargin);
-
 
 
     }
@@ -351,12 +401,16 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     }
 
+    private void updateData(){
+        expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+    }
+
 
     /**
      * 初始化TabLayout 数据
      */
-    private void initTabLayout() {
-        setViewPager(viewPager);
+    private void initTabLayout(boolean isUpdate) {
+        setViewPager(viewPager,isUpdate);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
@@ -366,29 +420,38 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     /**
      * 设置ViewPager
      */
-    private void setViewPager(ViewPager viewPager) {
-        //碎片列表
-        List<Fragment> fragmentList = new ArrayList<>();
-
-        for (int i = 0; i < expressionFolderList.size(); i++) {
-            if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null) {
-                //过滤掉空文件夹
-            } else {
-                try {
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
-                    fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString, expressionFolderList.get(i).getName()));
-                    pageTitleList.add(expressionFolderList.get(i).getName());
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            }
-
+    private void setViewPager(ViewPager viewPager,boolean isUpdate) {
+        if (isUpdate){
+            viewPager.removeAllViewsInLayout();
         }
+        ALog.d("表情包的数目" + expressionFolderList.size());
+        //碎片列表
+        List<String> pageTitleList = new ArrayList<>();
+        List<Fragment> fragmentList = new ArrayList<>();
+        if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
+            fragmentList.add(ExpressionContentFragment.fragmentInstant("", "默认"));
+            pageTitleList.add("默认");
+        } else {
+            for (int i = 0; i < expressionFolderList.size(); i++) {
+                if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null) {
+                    //过滤掉空文件夹
+                    ALog.d("该表情包的表情数目为0");
+                } else {
+                    ALog.d("该表情包的表情数目为 " + expressionFolderList.get(i).getExpressionList().size());
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+                        String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
+                        fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString, expressionFolderList.get(i).getName()));
+                        pageTitleList.add(expressionFolderList.get(i).getName());
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
 
+            }
+        }
         //新建适配器
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, pageTitleList);
-
+        adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, pageTitleList);
         //设置ViewPager
         viewPager.setAdapter(adapter);
 
@@ -434,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
+        refreshItem = menu.findItem(R.id.refresh);
         return true;
     }
 
@@ -456,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //这里使用一个ImageView设置成MenuItem的ActionView，这样我们就可以使用这个ImageView显示旋转动画了
         ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.item_refresh_menu, null);
         refreshActionView.setImageResource(R.drawable.logo);
+        refreshActionView.setPadding(10,10,10,10);
         item.setActionView(refreshActionView);
 
         Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
@@ -465,19 +529,37 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     @SuppressLint("NewApi")
     private void hideRefreshAnimation() {
-        if (refreshItem != null) {
-            View view = refreshItem.getActionView();
-            if (view != null) {
-                view.clearAnimation();
-                refreshItem.setActionView(null);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sleep(1700);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (refreshItem != null) {
+                            View view = refreshItem.getActionView();
+                            if (view != null) {
+                                view.clearAnimation();
+                                refreshItem.setActionView(null);
+                            }
+                        }
+                    }
+                });
             }
-        }
+        }).start();
     }
 
 
     private void getOne(MenuItem item) {
-        //刷新头图信息
-        showRefreshAnimation(item);
+        if (item != null){
+            //刷新头图信息
+            showRefreshAnimation(item);
+        }
 
         if (MyDataBase.isNeedGetOnes()) {//如果已经过时了，则需要从网络上请求数据
             HttpUtil.getOnes(new Callback<OneDetailList>() {
@@ -493,30 +575,31 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                     assert oneDetailList != null;
                     oneDetailList.save();
 
-                    for (int i =0;i<oneDetailList.getCount();i++){
+                    for (int i = 0; i < oneDetailList.getCount(); i++) {
                         OneDetail oneDetail = oneDetailList.getOneDetailList().get(i);
                         oneDetail.setOneDetailList(oneDetailList);
                         oneDetail.save();
                     }
 
-                    setOneUI(oneDetailList.getOneDetailList());
+                    setOneUI(oneDetailList);
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<OneDetailList> call, @NonNull Throwable t) {
                     //什么也不做
-                    Toasty.error(MainActivity.this,"请求一个失败，请稍后重试",Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "请求一个失败，请稍后重试", Toast.LENGTH_SHORT).show();
                     ALog.d("请求失败" + t.getMessage());
                 }
             });
-        }else {
-            setOneUI(LitePal.findAll(OneDetail.class));
+        } else {
+            setOneUI(LitePal.findFirst(OneDetailList.class,true));
         }
 
     }
 
-    private void setOneUI(List<OneDetail> oneDetailList){
-        OneDetail oneDetail = oneDetailList.get(oneItem%oneDetailList.size());
+    private void setOneUI(final OneDetailList oneDetailLists) {
+        final List<OneDetail> oneDetailList = oneDetailLists.getOneDetailList();
+        OneDetail oneDetail = oneDetailList.get(oneItem % oneDetailList.size());
         oneText.setText(oneDetail.getText());
         ProgressManager.getInstance().addResponseListener(oneDetail.getImgUrl(), getGlideListener());//监听glide进度，加载完毕后，取消动画
 
@@ -531,10 +614,23 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
                     @Override
                     public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        Toasty.error(MainActivity.this,"请求图片失败，请稍后重试",Toast.LENGTH_SHORT).show();
+                        Toasty.error(MainActivity.this, "请求图片失败，请稍后重试", Toast.LENGTH_SHORT).show();
                     }
                 });
         oneItem++;//这样下次刷新显示下一条
+
+        topImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Expression expression = new Expression(2,oneDetailLists.getDate().substring(0,9) + (oneItem - 1) + ".jpg",oneDetailList.get(oneItem - 1).getImgUrl(),"头图");
+                ExpImageDialog expImageDialog =  new ExpImageDialog.Builder(MainActivity.this)
+                        .setContext(MainActivity.this,null)
+                        .build();
+                expImageDialog.setImageData(expression);
+                expImageDialog.show();
+            }
+        });
     }
 
 
@@ -544,7 +640,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
             @Override
             public void onProgress(ProgressInfo progressInfo) {
                 int progress = progressInfo.getPercent();
-                ALog.d("progress233",progress);
+                ALog.d("progress233", progress);
             }
 
             @Override
@@ -567,5 +663,20 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         } else {
             finish();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ALog.d("requestCode" + requestCode + "|" + "resultCode" + resultCode);
+
+        if (requestCode == 1 && resultCode == 1){//从表情商店返回 TODO:没有更新布局
+            updateData();
+            initTabLayout(true);
+        }else if (requestCode == 2 && resultCode == 1){//从我的表情管理返回
+            updateData();
+            initTabLayout(true);
+        }
+
     }
 }

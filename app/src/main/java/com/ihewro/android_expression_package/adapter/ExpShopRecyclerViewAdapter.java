@@ -133,6 +133,9 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
         helper.getView(R.id.download_exp).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                activity.setResult(1);
+
                 /*
                 1. 将文件下载到本地
                 2. 下载的图片信息存储到数据库中
