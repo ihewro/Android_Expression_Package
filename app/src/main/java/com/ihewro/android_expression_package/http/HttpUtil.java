@@ -95,7 +95,7 @@ public class HttpUtil {
 
         Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
         WebImageInterface request = retrofit.create(WebImageInterface.class);
-        Call<List<Expression>> call = request.getDirDetail(dirId,dirName,1,pageSize);
+        Call<List<Expression>> call = request.getDirDetail(dirId,dirName,page,pageSize);
 
         call.enqueue(callback);
     }

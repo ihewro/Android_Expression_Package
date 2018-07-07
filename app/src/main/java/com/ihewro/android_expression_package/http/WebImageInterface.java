@@ -23,7 +23,7 @@ import retrofit2.http.Url;
  */
 public interface WebImageInterface {
     @GET("expFolderList.php")
-    public Call<ExpressionFolderList> getDirList();
+    public Call<ExpressionFolderList> getDirList(@Query("page") int page, @Query("pageSize") int pageSize);
 
     @GET("expFolderDetail.php")
     public Call<List<Expression>> getDirDetail(@Query("dir") int dir, @Query("dirName")String dirName,@Query("page") int page, @Query("pageSize") int pageSize);

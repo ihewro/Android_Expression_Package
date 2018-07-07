@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
@@ -44,6 +46,9 @@ public class ShopActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
+
+    private int currentPage = 1;
+    private int totalCount = 0;
 
     //适配器
     private ExpShopRecyclerViewAdapter adapter;
@@ -94,40 +99,84 @@ public class ShopActivity extends AppCompatActivity {
     /**
      * 请求数据
      */
-    private void requestData(){
+    private void requestData(final int page){
+        currentPage = page;
+        if (currentPage > 1 && (currentPage-1) * 10 > totalCount){
+            refreshLayout.finishLoadMoreWithNoMoreData();//没有更多数据了,显示不能加载更多提示
+        }else {
+            Retrofit retrofit = HttpUtil.getRetrofit(20,20,20);
+            WebImageInterface request = retrofit.create(WebImageInterface.class);
+            Call<ExpressionFolderList> call = request.getDirList(currentPage,10);
 
-        Retrofit retrofit = HttpUtil.getRetrofit(20,20,20);
-        WebImageInterface request = retrofit.create(WebImageInterface.class);
-        Call<ExpressionFolderList> call = request.getDirList();
+            call.enqueue(new Callback<ExpressionFolderList>() {
+                @Override
+                public void onResponse(Call<ExpressionFolderList> call, final Response<ExpressionFolderList> response) {
+                    if (response.isSuccessful()){
+                        Toasty.success(UIUtil.getContext(), "请求成功", Toast.LENGTH_SHORT, true).show();
 
-        call.enqueue(new Callback<ExpressionFolderList>() {
-            @Override
-            public void onResponse(Call<ExpressionFolderList> call, Response<ExpressionFolderList> response) {
-                if (response.isSuccessful()){
-                    Toasty.success(UIUtil.getContext(), "请求成功", Toast.LENGTH_SHORT, true).show();
-                    adapter.setNewData(response.body().getExpressionFolderList());
-                    refreshLayout.finishRefresh();
-                }else {
-                    Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
-                    refreshLayout.finishRefresh();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (currentPage == 1){
+                                    expressionFolderList.clear();
+                                }
+                                expressionFolderList.addAll(response.body().getExpressionFolderList());
+
+                                ShopActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (currentPage == 1){//上拉刷新
+                                            adapter.setNewData(response.body().getExpressionFolderList());
+                                            totalCount  = response.body().getCount();
+                                            refreshLayout.finishRefresh();
+                                        }else {//下拉更多
+                                            adapter.addData(response.body().getExpressionFolderList());
+                                            refreshLayout.finishLoadMore();
+                                        }
+
+                                        currentPage ++ ;
+                                    }
+                                });
+                            }
+                        }).start();
+                    }else {
+                        Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
+
+                        if (page == 1){
+                            refreshLayout.finishRefresh(false);
+                        }else {
+                            refreshLayout.finishLoadMore(false);
+                        }
+                    }
+
                 }
 
-            }
-
-            @Override
-            public void onFailure(Call<ExpressionFolderList> call, Throwable t) {
-                Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
-                ALog.d(t.toString());
-                refreshLayout.finishRefresh();
-            }
-        });
+                @Override
+                public void onFailure(Call<ExpressionFolderList> call, Throwable t) {
+                    Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
+                    ALog.d(t.toString());
+                    if (page == 1){
+                        refreshLayout.finishRefresh(false);
+                    }else {
+                        refreshLayout.finishLoadMore(false);
+                    }
+                }
+            });
+        }
     }
 
     public void initListener() {
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                requestData();
+                requestData(1);
+            }
+        });
+
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                requestData(currentPage);
             }
         });
     }

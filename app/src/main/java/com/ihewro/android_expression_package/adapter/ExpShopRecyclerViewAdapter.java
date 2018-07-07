@@ -123,7 +123,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExpWebFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir(),item.getName());
+                    ExpWebFolderDetailActivity.actionStart(UIUtil.getContext(),item.getDir(),item.getName(),item.getCount());
                 }
             });
 

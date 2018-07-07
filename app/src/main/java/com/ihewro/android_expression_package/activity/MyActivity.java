@@ -77,7 +77,8 @@ public class MyActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
-
+        refreshLayout.setEnableLoadMore(false);
+        refreshLayout.setEnableRefresh(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT);
