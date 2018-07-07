@@ -27,7 +27,7 @@
             android:id="@+id/refreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="45dp">
+            android:layout_above="@id/meta">
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
@@ -36,43 +36,79 @@
                 android:background="#fff"/>
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
-        <RelativeLayout
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
+        <FrameLayout
+            android:id="@+id/meta"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:background="#fafafa">
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/owner_name"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/header"/>
+            android:layout_alignParentBottom="true">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="今晚月光很美"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/owner_name"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:text="下载全套"
-                android:background="@drawable/bg_download"/>
-        </RelativeLayout>
+                android:background="#fafafa">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/owner_name"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/header"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今晚月光很美"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/owner_name"/>
+
+                <TextView
+                    android:id="@+id/download_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:text="下载全套"
+                    android:background="@drawable/bg_download"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/select_add"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:background="#fafafa">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="全选"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:text="确认添加"
+                    android:textColor="@color/blue_trans"/>
+            </RelativeLayout>
+        </FrameLayout>
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

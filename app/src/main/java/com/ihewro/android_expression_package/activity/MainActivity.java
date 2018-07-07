@@ -32,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.amitshekhar.DebugDB;
 import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
@@ -52,9 +54,12 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
+import com.ihewro.android_expression_package.callback.RemoveCacheListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
+import com.ihewro.android_expression_package.task.RemoveCacheTask;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
+import com.ihewro.android_expression_package.util.DataCleanManager;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -73,6 +78,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import org.litepal.LitePal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     private ViewPagerAdapter adapter;
 
+    private SecondaryDrawerItem removeCache;
+
     /**
      * 由启动页面启动主活动
      *
@@ -161,11 +169,14 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
         getOne(refreshItem);
 
+        //获取缓存大小
+        setCacheSize();
+
 
     }
 
 
-    private void initListener(){
+    private void initListener() {
         addExp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,9 +187,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         oneText.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                android.content.ClipboardManager clipboardManager = (android.content.ClipboardManager)MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipboardManager clipboardManager = (android.content.ClipboardManager) MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
                 clipboardManager.setPrimaryClip(ClipData.newPlainText(null, oneText.getText()));
-                Toasty.success(MainActivity.this,"复制成功",Toast.LENGTH_SHORT).show();
+                Toasty.success(MainActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -307,23 +318,24 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                     }
                 })
                 .build();
-
+        removeCache = new SecondaryDrawerItem().withName("清除缓存").withIcon(GoogleMaterial.Icon.gmd_delete).withSelectable(false);
 
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
                 .withFullscreen(true)
+                .withSelectedItem(-1)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("我的主页").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1),//1
-                        new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart),//2
-                        new SecondaryDrawerItem().withName("表情管理").withIcon(GoogleMaterial.Icon.gmd_photo_library),//3
-                        new SecondaryDrawerItem().withName("清除缓存").withIcon(GoogleMaterial.Icon.gmd_delete),//4
-                        new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app),//5
+                        new SecondaryDrawerItem().withName("我的主页").withIcon(GoogleMaterial.Icon.gmd_home).withSelectable(false),//1
+                        new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart).withSelectable(false),//2
+                        new SecondaryDrawerItem().withName("表情管理").withIcon(GoogleMaterial.Icon.gmd_photo_library).withSelectable(false),//3
+                        removeCache,//4
+                        new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app).withSelectable(false),//5
                         new DividerDrawerItem(),//6
-                        new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo),//7
-                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite),//8
-                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment)//9
+                        new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo).withSelectable(false),//7
+                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withSelectable(false),//8
+                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment).withSelectable(false)//9
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -339,6 +351,26 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 MyActivity.actionStart(MainActivity.this);
                                 break;
                             case 4://清除缓存
+                                MaterialDialog dialog;
+
+
+                                new MaterialDialog.Builder(MainActivity.this)
+                                        .title("操作通知")
+                                        .content("浏览网络信息或带来一些本地缓存，你可以选择清理他们，但再次访问需要重新下载，确定清理吗？")
+                                        .positiveText("确定")
+                                        .negativeText("先留着吧，手机空间有的是")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                new RemoveCacheTask(MainActivity.this, new RemoveCacheListener() {
+                                                    @Override
+                                                    public void onFinish() {
+                                                        setCacheSize();
+                                                    }
+                                                }).execute();
+                                            }
+                                        })
+                                        .show();
 
                                 break;
                             case 5://退出应用
@@ -353,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 try {
                                     startActivity(goToMarket);
                                 } catch (ActivityNotFoundException e) {
-                                    Toasty.error(MainActivity.this,"无法启动应用市场，请重试",Toast.LENGTH_SHORT).show();
+                                    Toasty.error(MainActivity.this, "无法启动应用市场，请重试", Toast.LENGTH_SHORT).show();
                                 }
                                 break;
                             case 9://捐赠
@@ -401,8 +433,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     }
 
-    private void updateData(){
-        expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+    private void updateData() {
+        expressionFolderList = LitePal.findAll(ExpressionFolder.class, true);
     }
 
 
@@ -410,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
      * 初始化TabLayout 数据
      */
     private void initTabLayout(boolean isUpdate) {
-        setViewPager(viewPager,isUpdate);
+        setViewPager(viewPager, isUpdate);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
@@ -420,8 +452,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     /**
      * 设置ViewPager
      */
-    private void setViewPager(ViewPager viewPager,boolean isUpdate) {
-        if (isUpdate){
+    private void setViewPager(ViewPager viewPager, boolean isUpdate) {
+        if (isUpdate) {
             viewPager.removeAllViewsInLayout();
         }
         ALog.d("表情包的数目" + expressionFolderList.size());
@@ -519,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //这里使用一个ImageView设置成MenuItem的ActionView，这样我们就可以使用这个ImageView显示旋转动画了
         ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.item_refresh_menu, null);
         refreshActionView.setImageResource(R.drawable.logo);
-        refreshActionView.setPadding(10,10,10,10);
+        refreshActionView.setPadding(10, 10, 10, 10);
         item.setActionView(refreshActionView);
 
         Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
@@ -556,7 +588,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
 
     private void getOne(MenuItem item) {
-        if (item != null){
+        if (item != null) {
             //刷新头图信息
             showRefreshAnimation(item);
         }
@@ -592,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 }
             });
         } else {
-            setOneUI(LitePal.findFirst(OneDetailList.class,true));
+            setOneUI(LitePal.findFirst(OneDetailList.class, true));
         }
 
     }
@@ -623,9 +655,9 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
             @Override
             public void onClick(View v) {
 
-                Expression expression = new Expression(2,oneDetailLists.getDate().substring(0,9) + (oneItem - 1) + ".jpg",oneDetailList.get(oneItem - 1).getImgUrl(),"头图");
-                ExpImageDialog expImageDialog =  new ExpImageDialog.Builder(MainActivity.this)
-                        .setContext(MainActivity.this,null)
+                Expression expression = new Expression(2, oneDetailLists.getDate().substring(0, 10) + (oneItem - 1) + ".jpg", oneDetailList.get(oneItem - 1).getImgUrl(), "头图");
+                ExpImageDialog expImageDialog = new ExpImageDialog.Builder(MainActivity.this)
+                        .setContext(MainActivity.this, null)
                         .build();
                 expImageDialog.setImageData(expression);
                 expImageDialog.show();
@@ -670,13 +702,37 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         super.onActivityResult(requestCode, resultCode, data);
         ALog.d("requestCode" + requestCode + "|" + "resultCode" + resultCode);
 
-        if (requestCode == 1 && resultCode == 1){//从表情商店返回 TODO:没有更新布局
+        if (requestCode == 1 && resultCode == 1) {//从表情商店返回 TODO:没有更新布局
             updateData();
             initTabLayout(true);
-        }else if (requestCode == 2 && resultCode == 1){//从我的表情管理返回
+        } else if (requestCode == 2 && resultCode == 1) {//从我的表情管理返回
             updateData();
             initTabLayout(true);
         }
+
+    }
+
+    private void setCacheSize() {
+        //获得应用内部缓存(/data/data/com.example.androidclearcache/cache)
+        final File file = new File(getCacheDir().getPath());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final String cacheSize = DataCleanManager.getCacheSize(file);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ALog.d("cahceSize",cacheSize);
+                            removeCache.withDescription(cacheSize);
+                            result.updateItem(removeCache);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 }

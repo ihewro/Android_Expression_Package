@@ -4,12 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.blankj.ALog;
@@ -25,7 +26,6 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,6 +52,8 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.owner_name)
     CircleImageView ownerName;
+    @BindView(R.id.select_add)
+    RelativeLayout selectAdd;
     private ExpImageDialog expressionDialog;
     View notDataView;
 
@@ -64,11 +66,21 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     int currentPage = 0;
     int totalCount = 0;
 
-    public static void actionStart(Context activity, int dir,String dirName,int totalCount){
-        Intent intent = new Intent(activity,ExpWebFolderDetailActivity.class);
-        intent.putExtra("dir",dir);
-        intent.putExtra("dirName",dirName);
-        intent.putExtra("count",totalCount);
+    /**
+     * 是否显示checkbox
+     */
+    private boolean isShowCheck = false;
+    /**
+     * 记录选中的checkbox
+     */
+    private List<String> checkList = new ArrayList<>();
+
+
+    public static void actionStart(Context activity, int dir, String dirName, int totalCount) {
+        Intent intent = new Intent(activity, ExpWebFolderDetailActivity.class);
+        intent.putExtra("dir", dir);
+        intent.putExtra("dirName", dirName);
+        intent.putExtra("count", totalCount);
         activity.startActivity(intent);
     }
 
@@ -89,10 +101,10 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
 
     private void initData() {
-        if (getIntent()!=null){
-            dirId = getIntent().getIntExtra("dir",0);
+        if (getIntent() != null) {
+            dirId = getIntent().getIntExtra("dir", 0);
             dirName = getIntent().getStringExtra("dirName");
-            totalCount = getIntent().getIntExtra("count",0);
+            totalCount = getIntent().getIntExtra("count", 0);
         }
     }
 
@@ -105,33 +117,33 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
         toolbar.setTitle(dirName);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
-        GridLayoutManager gridLayoutManager =  new GridLayoutManager(this,4);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
+        adapter = new ExpressionListAdapter(R.layout.item_expression, expressionList);
         recyclerView.setAdapter(adapter);
 
-        expressionDialog  = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this,null)
+        expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
+                .setContext(this, null)
                 .build();
     }
 
 
-    private void requestData(final int page){
+    private void requestData(final int page) {
         currentPage = page;
-        if (page>1 && (page-1)*50 >totalCount){
+        if (page > 1 && (page - 1) * 50 > totalCount) {
             refreshLayout.finishLoadMoreWithNoMoreData();//没有更多数据了,显示不能加载更多提示
-            ALog.d("当前页数page",currentPage);
-            ALog.d("pageSize",expressionList.size());
-        }else {
-            HttpUtil.getExpressionList(dirId,page,50,dirName, new Callback<List<Expression>>() {
+            ALog.d("当前页数page", currentPage);
+            ALog.d("pageSize", expressionList.size());
+        } else {
+            HttpUtil.getExpressionList(dirId, page, 50, dirName, new Callback<List<Expression>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Expression>> call, @NonNull final Response<List<Expression>> response) {
-                    if (response.isSuccessful()){
-                        Toasty.success(UIUtil.getContext(),"请求成功", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful()) {
+                        Toasty.success(UIUtil.getContext(), "请求成功", Toast.LENGTH_SHORT).show();
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                if (page == 1){//如果是上拉刷新，则需要新清空数据
+                                if (page == 1) {//如果是上拉刷新，则需要新清空数据
                                     expressionList.clear();
                                 }
                                 expressionList.addAll(response.body());
@@ -139,29 +151,29 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                                 ExpWebFolderDetailActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (page==1){//上拉刷新数据
-                                            if (response.body().size() == 0 || response.body() == null){//显示空布局
+                                        if (page == 1) {//上拉刷新数据
+                                            if (response.body().size() == 0 || response.body() == null) {//显示空布局
                                                 adapter.setNewData(null);
                                                 adapter.setEmptyView(notDataView);
-                                            }else {
+                                            } else {
                                                 adapter.setNewData(response.body());
                                             }
                                             refreshLayout.finishRefresh(true);
-                                        }else {//下拉增加数据
+                                        } else {//下拉增加数据
                                             adapter.addData(response.body());
                                             refreshLayout.finishLoadMore(true);
                                             ALog.d("增加数据当前的页数" + currentPage);
                                         }
-                                        currentPage ++ ;
+                                        currentPage++;
                                     }
                                 });
                             }
                         }).start();
-                    }else {
-                        Toasty.success(UIUtil.getContext(),"请求失败", Toast.LENGTH_SHORT).show();
-                        if (page == 1){
+                    } else {
+                        Toasty.success(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT).show();
+                        if (page == 1) {
                             refreshLayout.finishRefresh(false);
-                        }else {
+                        } else {
                             refreshLayout.finishLoadMore(false);
                         }
                     }
@@ -169,11 +181,11 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(@NonNull Call<List<Expression>> call, @NonNull Throwable t) {
-                    Toasty.success(UIUtil.getContext(),"请求失败", Toast.LENGTH_SHORT).show();
+                    Toasty.success(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT).show();
                     refreshLayout.finishRefresh(false);
-                    if (page == 1){
+                    if (page == 1) {
                         refreshLayout.finishRefresh(false);
-                    }else {
+                    } else {
                         refreshLayout.finishLoadMore(false);
                     }
                 }
@@ -182,6 +194,16 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     }
 
     private void initListener() {
+
+        selectAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //执行下载操作
+                Toast.makeText(ExpWebFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
@@ -194,13 +216,46 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                 requestData(currentPage);
             }
         });
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+
+        //点击监听
+        adapter.setOnItemClickListener(new ExpressionListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                currentPosition = position;
-                Expression expression = expressionList.get(position);
-                expressionDialog.setImageData(expression);
-                expressionDialog.show();
+
+                if (isShowCheck) {//如果是在多选的状态
+                    CheckBox checkBox = view.findViewById(R.id.cb_item);
+                    checkBox.setChecked(!checkBox.isChecked());//多选项设置为相反的状态
+
+                    if (checkList.contains(String.valueOf(position))) {
+                        checkList.remove(String.valueOf(position));
+                    } else {
+                        checkList.add(String.valueOf(position));
+                    }
+                } else {
+                    currentPosition = position;
+                    Expression expression = expressionList.get(position);
+                    expressionDialog.setImageData(expression);
+                    expressionDialog.show();
+                }
+            }
+        });
+        //长按监听
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                adapter = ((ExpressionListAdapter) adapter);
+                if (isShowCheck) {
+                    selectAdd.setVisibility(View.GONE);
+                    ((ExpressionListAdapter) adapter).setShowCheckBox(false);
+                    adapter.notifyDataSetChanged();
+                    checkList.clear();
+                } else {
+                    ((ExpressionListAdapter) adapter).setShowCheckBox(true);
+                    adapter.notifyDataSetChanged();
+                    selectAdd.setVisibility(View.VISIBLE);
+                }
+                isShowCheck = !isShowCheck;
+                return false;
             }
         });
     }
