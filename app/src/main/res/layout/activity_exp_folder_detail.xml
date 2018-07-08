@@ -76,7 +76,7 @@
                     android:paddingBottom="3dp"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
-                    android:text="下载全套"
+                    android:text="批量添加"
                     android:background="@drawable/bg_download"/>
             </RelativeLayout>
 
@@ -92,6 +92,7 @@
                 android:background="#fafafa">
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@id/select_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -101,6 +102,16 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="全选"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:text="按返回键可以退出选择模式"/>
 
                 <TextView
                     android:id="@+id/select_add_button"

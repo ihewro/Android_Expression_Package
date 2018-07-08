@@ -1,5 +1,7 @@
 package com.ihewro.android_expression_package.activity;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.animation.BaseAnimation;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
@@ -88,7 +91,15 @@ public class MyActivity extends BaseActivity {
         refreshLayout.setEnableRefresh(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
-        adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_LEFT);
+        adapter.openLoadAnimation(new BaseAnimation() {
+            @Override
+            public Animator[] getAnimators(View view) {
+                return new Animator[]{
+                        ObjectAnimator.ofFloat(view, "scaleY", 1, 1.1f, 1),
+                        ObjectAnimator.ofFloat(view, "scaleX", 1, 1.1f, 1)
+                };
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 

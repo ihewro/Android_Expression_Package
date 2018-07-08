@@ -207,6 +207,13 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
     private void initListener() {
 
+        downloadAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContraryCheck();
+            }
+        });
+
         selectAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -285,18 +292,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                adapter = ((ExpressionListAdapter) adapter);
-                if (isShowCheck) {
-                    selectAdd.setVisibility(View.GONE);
-                    ((ExpressionListAdapter) adapter).setShowCheckBox(false);
-                    adapter.notifyDataSetChanged();
-                    checkList.clear();
-                } else {
-                    ((ExpressionListAdapter) adapter).setShowCheckBox(true);
-                    adapter.notifyDataSetChanged();
-                    selectAdd.setVisibility(View.VISIBLE);
-                }
-                isShowCheck = !isShowCheck;
+                setContraryCheck();
                 return false;
             }
         });
@@ -332,15 +328,26 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (isShowCheck){
-            selectAdd.setVisibility(View.GONE);
-            adapter.setShowCheckBox(false);
-            adapter.notifyDataSetChanged();
-            checkList.clear();
-            isShowCheck = !isShowCheck;
+            setContraryCheck();
         }else {
             finish();
         }
     }
+
+    public void setContraryCheck() {
+        if (isShowCheck) {//取消批量
+            selectAdd.setVisibility(View.GONE);
+            ((ExpressionListAdapter) adapter).setShowCheckBox(false);
+            adapter.notifyDataSetChanged();
+            checkList.clear();
+        } else {//显示批量
+            ((ExpressionListAdapter) adapter).setShowCheckBox(true);
+            adapter.notifyDataSetChanged();
+            selectAdd.setVisibility(View.VISIBLE);
+        }
+        isShowCheck = !isShowCheck;
+    }
+
 
     @Override
     protected void onDestroy() {

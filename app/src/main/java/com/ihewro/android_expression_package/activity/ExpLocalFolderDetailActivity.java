@@ -24,9 +24,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
 import org.litepal.LitePal;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +56,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     TextView selectDeleteButton;
     @BindView(R.id.select_delete)
     RelativeLayout selectDelete;
+    @BindView(R.id.to_select)
+    TextView toSelect;
 
 
     private ExpImageDialog expressionDialog;
@@ -81,7 +81,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     Comparator<Integer> cmp = new Comparator<Integer>() {
         public int compare(Integer i1, Integer i2) {
-            return i2-i1;
+            return i2 - i1;
         }
     };
 
@@ -89,7 +89,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         Intent intent = new Intent(activity, ExpLocalFolderDetailActivity.class);
         intent.putExtra("id", dirId);
         intent.putExtra("folderName", dirName);
-        activity.startActivityForResult(intent,1);
+        activity.startActivityForResult(intent, 1);
     }
 
     @Override
@@ -152,6 +152,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     private void initListener() {
 
+        toSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContraryCheck();
+            }
+        });
 
         selectDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,7 +173,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                                 return Integer.parseInt(o2) - Integer.parseInt(o1);
                             }
                         });
-                        for (int i =0;i<checkList.size();i++){
+                        for (int i = 0; i < checkList.size(); i++) {
                             deleteExpList.add(expressionList.get(Integer.parseInt(checkList.get(i))));
                         }
                         runOnUiThread(new Runnable() {
@@ -177,12 +183,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                                 new DeleteImageTask(false, deleteExpList, dirName, new TaskListener() {
                                     @Override
                                     public void onFinish(Boolean result) {
-                                        Toasty.success(ExpLocalFolderDetailActivity.this,"删除成功", Toast.LENGTH_SHORT).show();
-                                        for (int i =0;i<checkList.size();i++){
+                                        Toasty.success(ExpLocalFolderDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                                        for (int i = 0; i < checkList.size(); i++) {
                                             adapter.remove(Integer.parseInt(checkList.get(i)));
                                         }
                                         adapter.notifyDataSetChanged();
-                                        setHideCheck();
+                                        setContraryCheck();
                                     }
                                 }).execute();
 
@@ -232,18 +238,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                adapter = ((ExpressionListAdapter) adapter);
-                if (isShowCheck) {
-                    selectDelete.setVisibility(View.GONE);
-                    ((ExpressionListAdapter) adapter).setShowCheckBox(false);
-                    adapter.notifyDataSetChanged();
-                    checkList.clear();
-                } else {
-                    ((ExpressionListAdapter) adapter).setShowCheckBox(true);
-                    adapter.notifyDataSetChanged();
-                    selectDelete.setVisibility(View.VISIBLE);
-                }
-                isShowCheck = !isShowCheck;
+                setContraryCheck();
                 return false;
             }
         });
@@ -252,7 +247,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     /**
      * 让所有的表情都在选中的状态
      */
-    private void setAdapterAllSelected(){
+    private void setAdapterAllSelected() {
         //选中所有的表情
         adapter.setAllCheckboxNotSelected();
         selectAll.setText("取消全选");
@@ -267,7 +262,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     /**
      * 取消所有表情的选中状态
      */
-    private void setAdapterAllNotSelected(){
+    private void setAdapterAllNotSelected() {
         selectAll.setText("全选");
         selectAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -279,20 +274,24 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (isShowCheck){
-            setHideCheck();
-        }else {
+        if (isShowCheck) {
+            setContraryCheck();
+        } else {
             finish();
         }
     }
 
-    public void setHideCheck(){
-        if (isShowCheck){
+    public void setContraryCheck() {
+        if (isShowCheck) {//取消批量
             selectDelete.setVisibility(View.GONE);
-            adapter.setShowCheckBox(false);
+            ((ExpressionListAdapter) adapter).setShowCheckBox(false);
             adapter.notifyDataSetChanged();
             checkList.clear();
-            isShowCheck = !isShowCheck;
+        } else {//显示批量
+            ((ExpressionListAdapter) adapter).setShowCheckBox(true);
+            adapter.notifyDataSetChanged();
+            selectDelete.setVisibility(View.VISIBLE);
         }
+        isShowCheck = !isShowCheck;
     }
 }
