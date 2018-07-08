@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package.http;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolderList;
 import com.ihewro.android_expression_package.bean.OneDetailList;
+import com.ihewro.android_expression_package.bean.Version;
 
 import java.util.List;
 
@@ -30,8 +31,11 @@ public interface WebImageInterface {
 
 
     @GET
-    Call<ResponseBody> downloadWebExp(@Url String fileUrl);
+    Call<ResponseBody> downloadWebUrl(@Url String fileUrl);
 
     @GET("one.php")
     Call<OneDetailList> getOnes();
+
+    @GET("getAndroidLatestVersion.php")
+    Call<Version> getAndroidLatestVersion(@Query("versionCode")int versionCode);
 }

@@ -2,7 +2,6 @@ package com.ihewro.android_expression_package.task;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
@@ -143,7 +142,7 @@ public class DownloadImageTask  {
                 //对每个下载地址都进行进度条的监听
                 if (!isStopDown){
                     ProgressManager.getInstance().addResponseListener(expFolderAllExpList.get(i).getUrl(), getDownloadListener());
-                    Call<ResponseBody> call2 = request.downloadWebExp(expFolderAllExpList.get(i).getUrl());
+                    Call<ResponseBody> call2 = request.downloadWebUrl(expFolderAllExpList.get(i).getUrl());
                     final int finalI = i;
                     call2.enqueue(new Callback<ResponseBody>() {//执行下载
                         @Override

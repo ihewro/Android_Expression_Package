@@ -59,7 +59,9 @@ import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
+import com.ihewro.android_expression_package.task.CheckUpdateTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
+import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
 import com.ihewro.android_expression_package.util.ThemeHelper;
@@ -341,7 +343,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                         new DividerDrawerItem(),//6
                         new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo).withSelectable(false),//7
                         new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withSelectable(false),//8
-                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment).withSelectable(false)//9
+                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment).withSelectable(false),//9
+                        new SecondaryDrawerItem().withName("检查更新").withIcon(GoogleMaterial.Icon.gmd_system_update_alt).withSelectable(false).withDescription("v" + APKVersionCodeUtils.getVerName(MainActivity.this) + "(" + APKVersionCodeUtils.getVersionCode(MainActivity.this) + ")")//10
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -393,6 +396,10 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 break;
                             case 9://捐赠
                                 MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechat).build());
+                                break;
+
+                            case 10://检查更新
+                                new CheckUpdateTask(MainActivity.this).execute();
                                 break;
                         }
 
