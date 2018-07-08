@@ -1,7 +1,6 @@
 package com.ihewro.android_expression_package.adapter;
 
 import android.app.Activity;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -15,38 +14,24 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.activity.ExpWebFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
-import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.task.DownloadImageTask;
-import com.ihewro.android_expression_package.util.DateUtil;
-import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
-import org.litepal.LitePal;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import es.dmoral.toasty.Toasty;
-import me.jessyan.progressmanager.ProgressListener;
-import me.jessyan.progressmanager.ProgressManager;
-import me.jessyan.progressmanager.body.ProgressInfo;
-import okhttp3.ResponseBody;
 import pl.droidsonroids.gif.GifImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * <pre>
@@ -95,7 +80,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
 
         int imageViewArray[] = new int[]{R.id.image_1,R.id.image_2,R.id.image_3,R.id.image_4,R.id.image_5};
 
-        if (item.getName().contains("密码") || item.getName().contains("污污污")){
+        if (item.getName().contains("密码") || item.getName().contains("污污")){
             helper.getView(R.id.download_exp).setVisibility(View.GONE);//先隐藏，答对问题才能显示该按钮
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -120,6 +105,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             }
 
             for (int i =0;i<num;i++){
+                helper.getView(imageViewArray[i]).setVisibility(View.VISIBLE);
                 UIUtil.setImageToImageView(2,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
             }
             //如果表情包数目小于5，则剩余的表情占位不显示
@@ -128,12 +114,20 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                 helper.getView(R.id.fl_image_5).setVisibility(View.INVISIBLE);
             }
 
+            if (item.getCount() == 0){
+                helper.getView(imageViewArray[0]).setVisibility(View.VISIBLE);
+                ((ImageView)helper.getView(imageViewArray[0])).setImageResource(R.drawable.empty);
+                helper.getView(imageViewArray[0]).setPadding(20,20,20,20);
+            }
+
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ExpWebFolderDetailActivity.actionStart(activity,item.getDir(),item.getName(),item.getCount());
                 }
             });
+
+
 
         }
 

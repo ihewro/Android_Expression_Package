@@ -179,7 +179,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
                                 new DeleteImageTask(false, deleteExpList, dirName, new TaskListener() {
                                     @Override
                                     public void onFinish(Boolean result) {

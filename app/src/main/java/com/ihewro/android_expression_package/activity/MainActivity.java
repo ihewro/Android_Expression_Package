@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                         break;
 
                                     case 130:
-                                        ToastUtil.showMessageShort("去找你我聊天吧，用我的表情包，哈哈哈哈哈");
+                                        ToastUtil.showMessageShort("去找我聊天吧，用我的表情包，哈哈哈哈哈");
                                         break;
 
                                     case 140:
