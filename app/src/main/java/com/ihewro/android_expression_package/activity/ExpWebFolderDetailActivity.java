@@ -228,6 +228,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 new DownloadImageTask(addExpList,dirName,checkList.size(),ExpWebFolderDetailActivity.this).execute();
+                                setContraryCheck();
                             }
                         });
                     }
