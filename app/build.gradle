@@ -134,6 +134,7 @@ dependencies {
     //数据库监视
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 
+    compile 'org.greenrobot:eventbus:3.1.1'
 
 
 }

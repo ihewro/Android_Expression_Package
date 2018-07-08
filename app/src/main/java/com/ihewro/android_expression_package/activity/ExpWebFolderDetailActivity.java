@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.ALog;
@@ -54,6 +56,12 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     CircleImageView ownerName;
     @BindView(R.id.select_add)
     RelativeLayout selectAdd;
+    @BindView(R.id.download_all)
+    TextView downloadAll;
+    @BindView(R.id.select_all)
+    TextView selectAll;
+    @BindView(R.id.select_add_button)
+    TextView selectAddButton;
     private ExpImageDialog expressionDialog;
     View notDataView;
 
@@ -76,12 +84,12 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     private List<String> checkList = new ArrayList<>();
 
 
-    public static void actionStart(Context activity, int dir, String dirName, int totalCount) {
+    public static void actionStart(Activity activity, int dir, String dirName, int totalCount) {
         Intent intent = new Intent(activity, ExpWebFolderDetailActivity.class);
         intent.putExtra("dir", dir);
         intent.putExtra("dirName", dirName);
         intent.putExtra("count", totalCount);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent,1);
     }
 
     @Override
@@ -195,14 +203,30 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
     private void initListener() {
 
-        selectAdd.setOnClickListener(new View.OnClickListener() {
+        selectAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //执行下载操作
                 Toast.makeText(ExpWebFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
 
+                setResult(1);
             }
         });
+
+        selectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAdapterAllSelected();
+                selectAll.setText("取消全选");
+                selectAll.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setAdapterAllNotSelected();
+                    }
+                });
+            }
+        });
+
 
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -259,4 +283,32 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             }
         });
     }
+
+
+    /**
+     * 让所有的表情都在选中的状态
+     */
+    private void setAdapterAllSelected(){
+        selectAll.setText("取消全选");
+        selectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAdapterAllNotSelected();
+            }
+        });
+    }
+
+    /**
+     * 取消所有表情的选中状态
+     */
+    private void setAdapterAllNotSelected(){
+        selectAll.setText("全选");
+        selectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAdapterAllSelected();
+            }
+        });
+    }
+
 }

@@ -96,4 +96,12 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
         this.showCheckBox = showCheckBox;
     }
 
+
+    public void setAllCheckboxSelected(){
+
+    }
+
+    public void setAllCheckboxNotSelected(){
+
+    }
 }

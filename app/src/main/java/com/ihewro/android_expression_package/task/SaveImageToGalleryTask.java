@@ -9,9 +9,12 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.util.FileUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 
@@ -38,6 +41,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
 
     @Override
     protected Boolean doInBackground(Expression... expressions) {
+        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         Expression expression = expressions[0];
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         if (expression.getStatus() == 1){//sd卡图片
@@ -65,6 +69,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
         }else {//未知来源图片
             return false;
         }
+
     }
 
     @Override

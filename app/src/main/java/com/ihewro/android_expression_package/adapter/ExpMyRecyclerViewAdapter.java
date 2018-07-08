@@ -15,6 +15,8 @@ import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.activity.ExpLocalFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
@@ -81,24 +83,14 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                new Thread(new Runnable() {
+                                new DeleteImageTask(true, item.getName(), new TaskListener() {
                                     @Override
-                                    public void run() {
-                                        //删除文件夹
-                                        FileUtil.delFolder(GlobalConfig.appDirPath + item.getName());
-                                        //删除数据库的内容
-                                        LitePal.deleteAll(ExpressionFolder.class,"name = ?" ,item.getName());
-                                        activity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
-                                                remove(helper.getAdapterPosition());
-                                                notifyDataSetChanged();
-                                                activity.setResult(1);
-                                            }
-                                        });
+                                    public void onFinish(Boolean result) {
+                                        Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
+                                        remove(helper.getAdapterPosition());
+                                        notifyDataSetChanged();
                                     }
-                                }).start();
+                                }).execute();
 
                             }
                         })

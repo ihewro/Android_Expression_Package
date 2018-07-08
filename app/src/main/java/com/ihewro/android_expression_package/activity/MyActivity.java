@@ -115,11 +115,6 @@ public class MyActivity extends BaseActivity {
      * 监听事件
      */
     private void initListener() {
-        /*adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-            }
-        });*/
     }
 
 
@@ -153,7 +148,6 @@ public class MyActivity extends BaseActivity {
                                     //更新RecyclerView 布局
                                     initData();
 
-                                    setResult(1);
                                 }
 
                                 @Override
@@ -192,7 +186,6 @@ public class MyActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
 }

@@ -82,7 +82,6 @@
 
             <RelativeLayout
                 android:id="@+id/select_add"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
@@ -92,11 +91,18 @@
                 android:background="#fafafa">
 
                 <TextView
+                    android:id="@id/select_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="全选"/>
 
                 <TextView
+                    android:id="@+id/select_add_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
@@ -106,6 +112,8 @@
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
                     android:text="确认添加"
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:textColor="@color/blue_trans"/>
             </RelativeLayout>
         </FrameLayout>

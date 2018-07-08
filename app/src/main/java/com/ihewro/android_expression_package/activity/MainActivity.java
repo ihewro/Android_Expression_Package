@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AppOpsManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
@@ -50,6 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
@@ -76,6 +78,9 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
 import java.io.File;
@@ -152,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
+        EventBus.getDefault().register(this);
 
         //初始化数据
         initData();
@@ -352,8 +358,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 break;
                             case 4://清除缓存
                                 MaterialDialog dialog;
-
-
                                 new MaterialDialog.Builder(MainActivity.this)
                                         .title("操作通知")
                                         .content("浏览网络信息或带来一些本地缓存，你可以选择清理他们，但再次访问需要重新下载，确定清理吗？")
@@ -371,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                             }
                                         })
                                         .show();
-
                                 break;
                             case 5://退出应用
                                 finish();
@@ -397,7 +400,24 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                     }
                 })
                 .withSavedInstance(savedInstanceState)
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        setCacheSize();
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+                })
                 .build();
+
 
 
         //初始化TabLayout
@@ -631,7 +651,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
 
     private void setOneUI(final OneDetailList oneDetailLists) {
         final List<OneDetail> oneDetailList = oneDetailLists.getOneDetailList();
-        OneDetail oneDetail = oneDetailList.get(oneItem % oneDetailList.size());
+        final int currentItem = oneItem % oneDetailList.size();
+        OneDetail oneDetail = oneDetailList.get(currentItem);
         oneText.setText(oneDetail.getText());
         ProgressManager.getInstance().addResponseListener(oneDetail.getImgUrl(), getGlideListener());//监听glide进度，加载完毕后，取消动画
 
@@ -655,7 +676,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
             @Override
             public void onClick(View v) {
 
-                Expression expression = new Expression(2, oneDetailLists.getDate().substring(0, 10) + (oneItem - 1) + ".jpg", oneDetailList.get(oneItem - 1).getImgUrl(), "头图");
+                Expression expression = new Expression(2, oneDetailLists.getDate().substring(0, 10) + (currentItem) + ".jpg", oneDetailList.get(currentItem).getImgUrl(), "头图");
                 ExpImageDialog expImageDialog = new ExpImageDialog.Builder(MainActivity.this)
                         .setContext(MainActivity.this, null)
                         .build();
@@ -697,20 +718,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        ALog.d("requestCode" + requestCode + "|" + "resultCode" + resultCode);
-
-        if (requestCode == 1 && resultCode == 1) {//从表情商店返回 TODO:没有更新布局
-            updateData();
-            initTabLayout(true);
-        } else if (requestCode == 2 && resultCode == 1) {//从我的表情管理返回
-            updateData();
-            initTabLayout(true);
-        }
-
-    }
 
     private void setCacheSize() {
         //获得应用内部缓存(/data/data/com.example.androidclearcache/cache)
@@ -734,5 +741,21 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
             }
         }).start();
 
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void refreshUI(EventMessage eventBusMessage){
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)){
+            ALog.d("更新首页布局");
+            updateData();
+            initTabLayout(true);
+        }
     }
 }

@@ -4,11 +4,13 @@ import android.os.AsyncTask;
 
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
 
 import java.io.File;
@@ -84,7 +86,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                 }
             }
         }
-
+        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         return true;
     }
 
