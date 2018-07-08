@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
@@ -168,7 +167,10 @@ public class CheckUpdateTask {
 
     private void installApk(Version version){
         final File file = new File(GlobalConfig.appDirPath + version.getLatestCode()+".apk");//apk文件以versioncode命名
-//        chmod777(file);/**/
+
+        file.setExecutable(true);
+        file.setReadable(true);
+        file.setWritable(true);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         // 由于没有在Activity环境下启动Activity,设置下面的标签

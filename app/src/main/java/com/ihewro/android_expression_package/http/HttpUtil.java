@@ -8,10 +8,19 @@ import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.OneDetailList;
+import com.ihewro.android_expression_package.util.HttpsUtil;
+import com.ihewro.android_expression_package.util.Tls12SocketFactory;
 import com.ihewro.android_expression_package.util.UIUtil;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 
 import me.jessyan.progressmanager.ProgressManager;
 import okhttp3.OkHttpClient;
@@ -49,12 +58,39 @@ public class HttpUtil {
         });
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-        OkHttpClient client = ProgressManager.getInstance().with(new OkHttpClient.Builder()
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
                 .readTimeout(readTimeout, TimeUnit.SECONDS)//设置读取超时时间
                 .writeTimeout(writeTimeout,TimeUnit.SECONDS)//设置写的超时时间
-                .connectTimeout(connectTimeout,TimeUnit.SECONDS)//设置连接超时时间
-        ).build();
+                .connectTimeout(connectTimeout,TimeUnit.SECONDS)
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });//设置连接超时时间
+
+
+
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("TLS");
+            try {
+                sslContext.init(null, null, null);
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        SSLSocketFactory socketFactory = new Tls12SocketFactory(sslContext.getSocketFactory());
+        builder.sslSocketFactory(socketFactory,new HttpsUtil.UnSafeTrustManager());
+
+
+        OkHttpClient client = ProgressManager.getInstance().with(builder).build();
+
 
         return client;
     }

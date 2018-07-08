@@ -433,8 +433,8 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
         //设置沉浸式状态栏
         //StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
-        layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
-                layoutParams.rightMargin, layoutParams.bottomMargin);
+        /*layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
+                layoutParams.rightMargin, layoutParams.bottomMargin);*/
 
 
     }
