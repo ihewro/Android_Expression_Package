@@ -20,6 +20,7 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.ShareUtil;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -140,6 +141,7 @@ public class ExpImageDialog extends MaterialDialog{
                     public void onFinish(Boolean result) {
                         if (result){
                             Toasty.success(UIUtil.getContext(),"已保存到" +GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(), Toast.LENGTH_SHORT).show();
+                            FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                         }else {
                             Toasty.error(activity,"保存失败，请检查是否允许应用获取存储权限",Toast.LENGTH_SHORT).show();
                         }
@@ -156,6 +158,7 @@ public class ExpImageDialog extends MaterialDialog{
                     @Override
                     public void onFinish(Boolean result) {
                         if (result){
+                            FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             File filePath = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             Log.e("filepath",filePath.getAbsolutePath());
                             Intent shareIntent = new Intent();
@@ -183,6 +186,7 @@ public class ExpImageDialog extends MaterialDialog{
                     @Override
                     public void onFinish(Boolean result) {
                         if (result){
+                            FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             File filePath = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             Log.e("filepath", filePath.getAbsolutePath());
                             Intent shareIntent = new Intent();
@@ -208,6 +212,7 @@ public class ExpImageDialog extends MaterialDialog{
                     @Override
                     public void onFinish(Boolean result) {
                         if (result){
+                            FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             File filePath = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                             Log.e("filepath", filePath.getAbsolutePath());
                             Intent shareIntent = new Intent();
@@ -229,6 +234,7 @@ public class ExpImageDialog extends MaterialDialog{
         love.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                 ((ImageView)love).setImageDrawable(new IconicsDrawable(activity)
                         .icon(GoogleMaterial.Icon.gmd_favorite)
                         .color(Color.RED)

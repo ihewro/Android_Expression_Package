@@ -15,7 +15,6 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.DateUtil;
-import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -182,7 +181,7 @@ public class DownloadImageTask  {
 
 
                                 //更新图片库
-                                FileUtil.updateMediaStore(activity,file.getAbsolutePath());
+                                //FileUtil.updateMediaStore(activity,file.getAbsolutePath());
 
                                 //如果全部下载完成，进度条框提示下载完成。
                                 if (downloadCount >= downloadAllCount){

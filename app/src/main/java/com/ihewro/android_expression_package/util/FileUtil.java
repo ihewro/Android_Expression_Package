@@ -1,29 +1,16 @@
 package com.ihewro.android_expression_package.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 
 import com.blankj.ALog;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestOptions;
-import com.ihewro.android_expression_package.GlobalConfig;
-import com.ihewro.android_expression_package.bean.Expression;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-
-import okio.BufferedSink;
-import okio.BufferedSource;
-import okio.Okio;
 
 /**
  * <pre>
@@ -51,7 +38,7 @@ public class FileUtil {
      */
     public static void updateMediaStore(final Context context, final String path) {
         //版本号的判断  4.4为分水岭，发送广播更新媒体库
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.OnScanCompletedListener() {
                 public void onScanCompleted(String path, Uri uri) {
                     Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -64,7 +51,12 @@ public class FileUtil {
             String relationDir = file.getParent();
             File file1 = new File(relationDir);
             context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.fromFile(file1.getAbsoluteFile())));
-        }
+        }*/
+
+        //保存图片后发送广播通知更新数据库
+        Uri uri = Uri.fromFile(new File(path));
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+
         //Toast.makeText(UIUtil.getContext(),"图库更新成功",Toast.LENGTH_SHORT).show();
     }
 

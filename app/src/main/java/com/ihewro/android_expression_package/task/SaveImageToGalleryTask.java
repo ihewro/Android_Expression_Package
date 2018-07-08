@@ -1,6 +1,5 @@
 package com.ihewro.android_expression_package.task;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 
