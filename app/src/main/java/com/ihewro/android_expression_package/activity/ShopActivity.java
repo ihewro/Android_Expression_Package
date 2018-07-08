@@ -55,6 +55,7 @@ public class ShopActivity extends AppCompatActivity {
 
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
 
+    private Call<ExpressionFolderList> call;
     public static void actionStart(Activity context) {
         Intent intent = new Intent(context, ShopActivity.class);
         context.startActivityForResult(intent, 1);
@@ -106,7 +107,7 @@ public class ShopActivity extends AppCompatActivity {
         }else {
             Retrofit retrofit = HttpUtil.getRetrofit(20,20,20);
             WebImageInterface request = retrofit.create(WebImageInterface.class);
-            Call<ExpressionFolderList> call = request.getDirList(currentPage,10);
+            call = request.getDirList(currentPage,10);
 
             call.enqueue(new Callback<ExpressionFolderList>() {
                 @Override
@@ -140,8 +141,7 @@ public class ShopActivity extends AppCompatActivity {
                             }
                         }).start();
                     }else {
-                        Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
-
+                        Toasty.error(ShopActivity.this, "请求失败", Toast.LENGTH_SHORT, true).show();
                         if (page == 1){
                             refreshLayout.finishRefresh(false);
                         }else {
@@ -153,7 +153,7 @@ public class ShopActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<ExpressionFolderList> call, Throwable t) {
-                    Toasty.error(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT, true).show();
+                    Toasty.info(UIUtil.getContext(), "请求失败或取消请求", Toast.LENGTH_SHORT, true).show();
                     ALog.d(t.toString());
                     if (page == 1){
                         refreshLayout.finishRefresh(false);
@@ -204,4 +204,11 @@ public class ShopActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (call!=null){
+            call.cancel();
+        }
+    }
 }

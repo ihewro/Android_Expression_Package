@@ -1,6 +1,7 @@
 package com.ihewro.android_expression_package.task;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -65,7 +66,7 @@ public class DownloadImageTask  {
     private Activity activity;
 
     private boolean isExistInFolder = false;//需要下载的当前图片是否存在目录中
-
+    private boolean isStopDown = false;//是否停止下载
     public DownloadImageTask() {
 
     }
@@ -89,6 +90,15 @@ public class DownloadImageTask  {
     }
 
     public void execute(){
+
+        downloadAllDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                ALog.d("下载进行中的对话框取消");
+                isStopDown = true;
+            }
+        });
+
         downloadAllDialog.show();
 
         downloadAllCount = expFolderAllExpList.size();
@@ -131,72 +141,79 @@ public class DownloadImageTask  {
 
             for (int i = 0;i<expFolderAllExpList.size();i++){
                 //对每个下载地址都进行进度条的监听
-                ProgressManager.getInstance().addResponseListener(expFolderAllExpList.get(i).getUrl(), getDownloadListener());
-                Call<ResponseBody> call2 = request.downloadWebExp(expFolderAllExpList.get(i).getUrl());
-                final int finalI = i;
-                call2.enqueue(new Callback<ResponseBody>() {//执行下载
-                    @Override
-                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (!isStopDown){
+                    ProgressManager.getInstance().addResponseListener(expFolderAllExpList.get(i).getUrl(), getDownloadListener());
+                    Call<ResponseBody> call2 = request.downloadWebExp(expFolderAllExpList.get(i).getUrl());
+                    final int finalI = i;
+                    call2.enqueue(new Callback<ResponseBody>() {//执行下载
+                        @Override
+                        public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
 
-                        try {
+                            try {
 
-                            File file = new File( dirFile.getAbsoluteFile()  + "/" + expFolderAllExpList.get(finalI).getName());
-                            ALog.d(file.getAbsolutePath());
-                            downloadCount++;
+                                File file = new File( dirFile.getAbsoluteFile()  + "/" + expFolderAllExpList.get(finalI).getName());
+                                ALog.d(file.getAbsolutePath());
+                                downloadCount++;
 
-                            //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
-                            isExistInFolder = false;
-                            List<Expression> temp = LitePal.where("name = ?",expFolderAllExpList.get(finalI).getName()).find(Expression.class);
-                            if (temp.size()>0){//找到记录了
-                                isExistInFolder = true;
+                                //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
+                                isExistInFolder = false;
+                                List<Expression> temp = LitePal.where("name = ?",expFolderAllExpList.get(finalI).getName()).find(Expression.class);
+                                if (temp.size()>0){//找到记录了
+                                    isExistInFolder = true;
+                                }
+
+                                if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
+                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
+                                    expression.save();
+                                    //更新数据中该目录的关联数据
+                                    ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                    expressionFolder.setCount(expressionFolder.getCount() + 1);
+                                    expressionFolder.getExpressionList().add(expression);
+                                    expressionFolder.save();
+                                }
+
+                                //写入文件
+                                assert response.body() != null;
+                                InputStream is = response.body().byteStream();
+                                FileOutputStream fos = new FileOutputStream(file);
+                                byte[] bytes = UIUtil.InputStreamTOByte(is);
+                                fos.write(bytes);
+                                fos.flush();
+                                fos.close();
+
+
+                                //更新图片库
+                                FileUtil.updateMediaStore(activity,file.getAbsolutePath());
+
+                                //如果全部下载完成，进度条框提示下载完成。
+                                if (downloadCount >= downloadAllCount){
+                                    downloadAllDialog.setProgress(downloadAllCount);
+                                    downloadAllDialog.setContent("下载完成");
+                                    EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                                }
+
+                            } catch (java.io.IOException e) {
+                                e.printStackTrace();
                             }
 
-                            if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
-                                expression.save();
-                                //更新数据中该目录的关联数据
-                                ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
-                                expressionFolder.setCount(expressionFolder.getCount() + 1);
-                                expressionFolder.getExpressionList().add(expression);
-                                expressionFolder.save();
-                            }
-
-                            //写入文件
-                            assert response.body() != null;
-                            InputStream is = response.body().byteStream();
-                            FileOutputStream fos = new FileOutputStream(file);
-                            byte[] bytes = UIUtil.InputStreamTOByte(is);
-                            fos.write(bytes);
-                            fos.flush();
-                            fos.close();
-
-
-                            //更新图片库
-                            FileUtil.updateMediaStore(activity,file.getAbsolutePath());
-
-                            //如果全部下载完成，进度条框提示下载完成。
-                            if (downloadCount >= downloadAllCount){
-                                downloadAllDialog.setProgress(downloadAllCount);
-                                downloadAllDialog.setContent("下载完成");
-                            }
-
-                        } catch (java.io.IOException e) {
-                            e.printStackTrace();
                         }
 
-                    }
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            //一般情况下是不可能下载失败的
+                            //某个文件下载失败
+                            Toasty.error(activity,expFolderAllExpList.get(finalI).getName() +"文件下载失败", Toast.LENGTH_SHORT).show();
+                            downloadCount++;//同样也需要加一，否则进度条就不对了
+                        }
+                    });
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        //一般情况下是不可能下载失败的
-                        //某个文件下载失败
-                        Toasty.error(activity,expFolderAllExpList.get(finalI).getName() +"文件下载失败", Toast.LENGTH_SHORT).show();
-                        downloadCount++;//同样也需要加一，否则进度条就不对了
-                    }
-                });
+                }else {//TODO: 这个中止下载好像不起作用
+                    downloadAllDialog.dismiss();
+                    Toasty.info(activity,"已经中止下载",Toast.LENGTH_SHORT).show();
+                    break;
+                }
 
             }
-            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         }
     }
 

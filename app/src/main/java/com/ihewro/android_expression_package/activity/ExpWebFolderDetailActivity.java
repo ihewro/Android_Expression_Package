@@ -40,6 +40,7 @@ import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 /**
@@ -74,6 +75,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     int currentPosition = 0;
     int currentPage = 0;
     int totalCount = 0;
+    Call<List<Expression>> call;
 
     /**
      * 是否显示checkbox
@@ -145,7 +147,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             ALog.d("当前页数page", currentPage);
             ALog.d("pageSize", expressionList.size());
         } else {
-            HttpUtil.getExpressionList(dirId, page, 50, dirName, new Callback<List<Expression>>() {
+            call = HttpUtil.getExpressionList(dirId, page, 50, dirName, new Callback<List<Expression>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Expression>> call, @NonNull final Response<List<Expression>> response) {
                     if (response.isSuccessful()) {
@@ -180,7 +182,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                             }
                         }).start();
                     } else {
-                        Toasty.success(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT).show();
+                        Toasty.error(ExpWebFolderDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
                         if (page == 1) {
                             refreshLayout.finishRefresh(false);
                         } else {
@@ -191,7 +193,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(@NonNull Call<List<Expression>> call, @NonNull Throwable t) {
-                    Toasty.success(UIUtil.getContext(), "请求失败", Toast.LENGTH_SHORT).show();
+                    Toasty.info(ExpWebFolderDetailActivity.this, "请求失败或取消请求", Toast.LENGTH_SHORT).show();
                     refreshLayout.finishRefresh(false);
                     if (page == 1) {
                         refreshLayout.finishRefresh(false);
@@ -340,4 +342,11 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (call!=null){
+            call.cancel();
+        }
+    }
 }

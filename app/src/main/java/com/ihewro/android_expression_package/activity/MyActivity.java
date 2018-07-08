@@ -19,16 +19,21 @@ import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,6 +66,8 @@ public class MyActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
         ButterKnife.bind(this);
+
+        EventBus.getDefault().register(this);
 
         initData();
 
@@ -118,6 +125,13 @@ public class MyActivity extends BaseActivity {
     private void initListener() {
     }
 
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -188,5 +202,13 @@ public class MyActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void refreshUI(EventMessage eventBusMessage){
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)){
+            ALog.d("更新首页布局");
+            initData();
+        }
+    }
 
 }

@@ -91,13 +91,15 @@ public class HttpUtil {
     }
 
 
-    public static void getExpressionList(int dirId, int page, int pageSize,String dirName, Callback<List<Expression>> callback){
+    public static Call<List<Expression>> getExpressionList(int dirId, int page, int pageSize,String dirName, Callback<List<Expression>> callback){
 
         Retrofit retrofit = HttpUtil.getRetrofit(10,10,10);
         WebImageInterface request = retrofit.create(WebImageInterface.class);
         Call<List<Expression>> call = request.getDirDetail(dirId,dirName,page,pageSize);
 
         call.enqueue(callback);
+
+        return call;
     }
 
     public static Call<OneDetailList> getOnes (Callback<OneDetailList> callback){

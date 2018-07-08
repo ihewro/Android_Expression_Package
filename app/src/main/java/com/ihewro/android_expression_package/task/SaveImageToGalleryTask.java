@@ -41,7 +41,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
 
     @Override
     protected Boolean doInBackground(Expression... expressions) {
-        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         Expression expression = expressions[0];
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         if (expression.getStatus() == 1){//sd卡图片
@@ -65,6 +64,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                 e.printStackTrace();
             }
             MyDataBase.addExpressionRecord(expression);
+            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
             return result;
         }else {//未知来源图片
             return false;
