@@ -54,8 +54,12 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
         helper.setText(R.id.add_time,item.getCreateTime());
         int min = UIUtil.getMinInt(item.getExpressionList().size(),5);
         int imageViewArray[] = new int[]{R.id.image_1,R.id.image_2,R.id.image_3,R.id.image_4,R.id.image_5};
-
+        ALog.d("显示图片数目",min);
         for (int i =0;i<min;i++){
+            helper.getView(imageViewArray[i]).setVisibility(View.VISIBLE);
+            if (min == 5){
+                helper.getView(R.id.fl_image_5).setVisibility(View.VISIBLE);
+            }
             UIUtil.setImageToImageView(1,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
         }
         //如果表情包数目小于5，则剩余的表情占位不显示
@@ -75,7 +79,7 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
         helper.getView(R.id.delete_exp).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                new MaterialDialog.Builder(activity)
                         .title("操作提示")
                         .content("确认删除该表情包吗，你可以通过表情商店再次下载")
                         .positiveText("好")

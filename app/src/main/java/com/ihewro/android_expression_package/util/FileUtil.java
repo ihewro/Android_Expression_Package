@@ -39,10 +39,9 @@ public class FileUtil {
     /**
      * 从图片库中删除图片
      */
-    public static void deleteImageFromGallery(File file){
-        String filePath =file.getAbsolutePath();
-        file.delete();
-        updateMediaStore(UIUtil.getContext(),filePath);
+    public static void deleteImageFromGallery(String file){
+        new File(file).delete();
+        updateMediaStore(UIUtil.getContext(),file);
     }
 
     /**

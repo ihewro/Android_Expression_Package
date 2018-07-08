@@ -97,6 +97,7 @@ public class MyActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        ALog.d("listSize",expressionFolderList.size());
                         if (expressionFolderList.size() == 0){
                             adapter.setNewData(null);
                             adapter.setEmptyView(notDataView);

@@ -17,17 +17,24 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
 import org.litepal.LitePal;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.dmoral.toasty.Toasty;
 
 
 /**
@@ -69,6 +76,14 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
      * 记录选中的checkbox
      */
     private List<String> checkList = new ArrayList<>();
+    List<Expression> deleteExpList = new ArrayList<>();
+
+
+    Comparator<Integer> cmp = new Comparator<Integer>() {
+        public int compare(Integer i1, Integer i2) {
+            return i2-i1;
+        }
+    };
 
     public static void actionStart(Activity activity, int dirId, String dirName) {
         Intent intent = new Intent(activity, ExpLocalFolderDetailActivity.class);
@@ -97,7 +112,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         }
 
         toolbar.setTitle(dirName);
-
+        refreshLayout.setEnableRefresh(false);
+        refreshLayout.setEnableLoadMore(false);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(R.layout.item_expression, expressionList);
@@ -140,9 +156,40 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         selectDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //执行下载操作
-                Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+                //执行删除操作
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        deleteExpList.clear();
+                        Collections.sort(checkList, new Comparator<String>() {
+                            @Override
+                            public int compare(String o1, String o2) {
+                                return Integer.parseInt(o2) - Integer.parseInt(o1);
+                            }
+                        });
+                        for (int i =0;i<checkList.size();i++){
+                            deleteExpList.add(expressionList.get(Integer.parseInt(checkList.get(i))));
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+                                new DeleteImageTask(false, deleteExpList, dirName, new TaskListener() {
+                                    @Override
+                                    public void onFinish(Boolean result) {
+                                        Toasty.success(ExpLocalFolderDetailActivity.this,"删除成功", Toast.LENGTH_SHORT).show();
+                                        for (int i =0;i<checkList.size();i++){
+                                            adapter.remove(Integer.parseInt(checkList.get(i)));
+                                        }
+                                        adapter.notifyDataSetChanged();
+                                        setHideCheck();
+                                    }
+                                }).execute();
 
+                            }
+                        });
+                    }
+                }).start();
             }
         });
 
@@ -228,5 +275,24 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                 setAdapterAllSelected();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isShowCheck){
+            setHideCheck();
+        }else {
+            finish();
+        }
+    }
+
+    public void setHideCheck(){
+        if (isShowCheck){
+            selectDelete.setVisibility(View.GONE);
+            adapter.setShowCheckBox(false);
+            adapter.notifyDataSetChanged();
+            checkList.clear();
+            isShowCheck = !isShowCheck;
+        }
     }
 }

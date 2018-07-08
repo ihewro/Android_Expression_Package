@@ -64,6 +64,7 @@ public class DownloadImageTask  {
     private int count;
     private Activity activity;
 
+    private boolean isExistInFolder = false;//需要下载的当前图片是否存在目录中
 
     public DownloadImageTask() {
 
@@ -97,7 +98,7 @@ public class DownloadImageTask  {
             downloadAllDialog.dismiss();
         }else {
             final File dirFile = new File(Environment.getExternalStorageDirectory() + "/" + GlobalConfig.storageFolderName + "/" +folderName);
-            if (!dirFile.exists()){
+            if (!dirFile.exists()){//如果目录不存在，先创建一个目录
                 dirFile.mkdir();
             }
             //数据库中添加目录信息,添加之前需要查询数据库中是否已经存在该表情包，如果存在的话，需要更新
@@ -106,19 +107,19 @@ public class DownloadImageTask  {
             expressionFolder = null;
 
             expressionFolderList.clear();;
-            expressionFolderList = LitePal.where("name = ? and exist = ?",folderName,"1").find(ExpressionFolder.class);
+            expressionFolderList = LitePal.where("name = ? and exist = ?",folderName,"1").find(ExpressionFolder.class,true);
 
             if (expressionFolderList.size()>0){//这里按照我的逻辑，大小肯定是1的，如果不是，就抛出错误提示吧，因为表情包的文件名称肯定是唯一的。
 
                 //如果存在的话，需要更新
                 expressionFolder = expressionFolderList.get(0);
                 ALog.d(expressionFolder);
-                expressionFolder.setCount(0);
+                //expressionFolder.setCount(0);
                 expressionFolder.setUpdateTime(DateUtil.getNowDateStr());
                 expressionFolder.save();
 
                 //需要删除该目录对应的表情列表，然后再更新，否则就重复了
-                LitePal.deleteAll(Expression.class,"foldername = ?", expressionFolder.getName());
+                //LitePal.deleteAll(Expression.class,"foldername = ?", expressionFolder.getName());
 
             }else {
                 expressionFolder = new ExpressionFolder(1,0,folderName,null,null, DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),-1);
@@ -143,15 +144,32 @@ public class DownloadImageTask  {
                             ALog.d(file.getAbsolutePath());
                             downloadCount++;
 
-                            //下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                            Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
-                            expression.save();
+                            //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
+                            isExistInFolder = false;
+                            List<Expression> temp = LitePal.where("name = ?",expFolderAllExpList.get(finalI).getName()).find(Expression.class);
+                            if (temp.size()>0){//找到记录了
+                                isExistInFolder = true;
+                            }
 
-                            //更新数据中该目录的关联数据
-                            ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
-                            expressionFolder.setCount(downloadCount);
-                            expressionFolder.getExpressionList().add(expression);
-                            expressionFolder.save();
+                            if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
+                                Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
+                                expression.save();
+                                //更新数据中该目录的关联数据
+                                ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                expressionFolder.setCount(expressionFolder.getCount() + 1);
+                                expressionFolder.getExpressionList().add(expression);
+                                expressionFolder.save();
+                            }
+
+                            //写入文件
+                            assert response.body() != null;
+                            InputStream is = response.body().byteStream();
+                            FileOutputStream fos = new FileOutputStream(file);
+                            byte[] bytes = UIUtil.InputStreamTOByte(is);
+                            fos.write(bytes);
+                            fos.flush();
+                            fos.close();
+
 
                             //更新图片库
                             FileUtil.updateMediaStore(activity,file.getAbsolutePath());
@@ -161,13 +179,7 @@ public class DownloadImageTask  {
                                 downloadAllDialog.setProgress(downloadAllCount);
                                 downloadAllDialog.setContent("下载完成");
                             }
-                            assert response.body() != null;
-                            InputStream is = response.body().byteStream();
-                            FileOutputStream fos = new FileOutputStream(file);
-                            byte[] bytes = UIUtil.InputStreamTOByte(is);
-                            fos.write(bytes);
-                            fos.flush();
-                            fos.close();
+
                         } catch (java.io.IOException e) {
                             e.printStackTrace();
                         }

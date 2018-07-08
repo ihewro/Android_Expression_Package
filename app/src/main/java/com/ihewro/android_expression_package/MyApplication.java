@@ -10,6 +10,7 @@ import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.activity.ErrorActivity;
 import com.ihewro.android_expression_package.activity.MainActivity;
+import com.ihewro.android_expression_package.activity.WelcomeActivity;
 import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.mikepenz.iconics.context.IconicsLayoutInflater2;
 import com.scwang.smartrefresh.header.FlyRefreshHeader;
@@ -109,7 +110,7 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
                 .trackActivities(true) //default: false
                 .minTimeBetweenCrashesMs(3000) //default: 3000
                 //.errorDrawable(R.drawable.ic_custom_drawable) //default: bug image
-                .restartActivity(MainActivity.class) //default: null (your app's launch activity)
+                .restartActivity(WelcomeActivity.class) //default: null (your app's launch activity)
                 .errorActivity(ErrorActivity.class) //default: null (default error activity)
                 .eventListener(null) //default: null
                 .apply();

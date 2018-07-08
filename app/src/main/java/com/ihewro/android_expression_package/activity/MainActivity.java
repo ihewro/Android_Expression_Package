@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName("我的主页").withIcon(GoogleMaterial.Icon.gmd_home).withSelectable(false),//1
                         new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart).withSelectable(false),//2
-                        new SecondaryDrawerItem().withName("表情管理").withIcon(GoogleMaterial.Icon.gmd_photo_library).withSelectable(false),//3
+                        new SecondaryDrawerItem().withName("我的表情").withIcon(GoogleMaterial.Icon.gmd_photo_library).withSelectable(false),//3
                         removeCache,//4
                         new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app).withSelectable(false),//5
                         new DividerDrawerItem(),//6

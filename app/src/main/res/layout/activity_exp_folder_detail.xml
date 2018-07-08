@@ -88,6 +88,7 @@
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
+                android:visibility="gone"
                 android:background="#fafafa">
 
                 <TextView

@@ -21,6 +21,7 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.http.HttpUtil;
+import com.ihewro.android_expression_package.task.DownloadImageTask;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -82,6 +83,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
      * 记录选中的checkbox
      */
     private List<String> checkList = new ArrayList<>();
+    private List<Expression> addExpList = new ArrayList<>();
 
 
     public static void actionStart(Activity activity, int dir, String dirName, int totalCount) {
@@ -208,7 +210,21 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             public void onClick(View v) {
                 //执行下载操作
                 Toast.makeText(ExpWebFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
-
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addExpList.clear();
+                        for (int i =0;i<checkList.size();i++){
+                            addExpList.add(expressionList.get(Integer.parseInt(checkList.get(i))));
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new DownloadImageTask(addExpList,dirName,checkList.size(),ExpWebFolderDetailActivity.this).execute();
+                            }
+                        });
+                    }
+                }).start();
                 setResult(1);
             }
         });
@@ -309,6 +325,19 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                 setAdapterAllSelected();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isShowCheck){
+            selectAdd.setVisibility(View.GONE);
+            adapter.setShowCheckBox(false);
+            adapter.notifyDataSetChanged();
+            checkList.clear();
+            isShowCheck = !isShowCheck;
+        }else {
+            finish();
+        }
     }
 
 }

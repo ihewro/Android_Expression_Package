@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.task;
 
 import android.os.AsyncTask;
 
+import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -12,6 +13,7 @@ import com.ihewro.android_expression_package.util.FileUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -59,14 +61,17 @@ public class DeleteImageTask extends AsyncTask<Void,Void,Boolean>{
             LitePal.deleteAll(ExpressionFolder.class,"name = ?" ,folderName);
         }else {//删除部分文件
             for (int i =0;i<expressionList.size();i++){
+                FileUtil.deleteImageFromGallery(expressionList.get(i).getUrl());
+                ALog.d("表情名称为" + expressionList.get(i).getName());
                 LitePal.deleteAll(Expression.class,"name = ?",expressionList.get(i).getName());
                 //修改对应目录的数目
-                List<ExpressionFolder> tempExpFolders = LitePal.where("foldername = ? and exist = ?",folderName, String.valueOf(1)).find(ExpressionFolder.class);
+                List<ExpressionFolder> tempExpFolders = LitePal.where("name = ? and exist = ?",folderName, String.valueOf(1)).find(ExpressionFolder.class,true);
 
                 if (tempExpFolders.get(0).getCount() == 1){//如果删除该表情，目录为空，直接把目录删掉
                     tempExpFolders.get(0).delete();
                 }else {
                     tempExpFolders.get(0).setCount(tempExpFolders.get(0).getCount() - 1);
+                    tempExpFolders.get(0).getExpressionList().remove(expressionList.get(i));
                     tempExpFolders.get(0).save();
                 }
             }
