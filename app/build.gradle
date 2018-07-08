@@ -44,8 +44,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    //bilibili 多主题框架
-    compile 'com.bilibili:magicasakura:0.1.8@aar'
+
+    compile 'com.android.support:cardview-v7:26.+'
 
     //侧边栏
     implementation("com.mikepenz:materialdrawer:6.0.7@aar") {
@@ -55,8 +55,6 @@ dependencies {
     //recyclerView
     implementation "com.android.support:recyclerview-v7:26.1.0"
 
-    //搜索
-    compile 'com.github.arimorty:floatingsearchview:2.1.1'
 
     //简单修改状态栏，使其沉浸
     compile 'com.jaeger.statusbarutil:library:1.5.0'
@@ -75,10 +73,7 @@ dependencies {
     implementation "com.mikepenz:iconics-core:3.0.3@aar"
     implementation "com.mikepenz:iconics-views:3.0.3@aar"
     compile 'com.mikepenz:google-material-typeface:3.0.1.2.original@aar' //Google Material Icons
-    compile 'com.mikepenz:fontawesome-typeface:5.0.6.0@aar'     //FontAwesome
 
-    //获取图片主色调
-    compile 'com.android.support:palette-v7:26.+'
 
     //dialog
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
@@ -90,13 +85,9 @@ dependencies {
     //网络请求
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
-    compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'//打印请求信息
     compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
 
-    //io读取与写入
-    implementation 'com.squareup.okio:okio:1.14.1'
 
     //toast
     implementation 'com.github.GrenderG:Toasty:1.3.0'

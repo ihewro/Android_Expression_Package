@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +19,6 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
-import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.animation.BaseAnimation;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
@@ -26,6 +26,7 @@ import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
+import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
@@ -41,8 +42,9 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MyActivity extends BaseActivity {
+public class MyActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks{
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -155,57 +157,12 @@ public class MyActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.re_update){
             //重新同步数据库
-            new MaterialDialog.Builder(this)
-                    .title("操作通知")
-                    .content("您确定需要重新同步数据吗？一般本地表情包数据显示不正常才需要执行此操作。\n并且执行此操作会丢失表情包作者的头像和名称（不影响具体使用）。")
-                    .positiveText("朕确定")
-                    .negativeText("我只是点着玩的，快关掉快关掉！")
-                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
-
-                                private MaterialDialog updateLoadingDialog;
-
-                                @Override
-                                public void onFinished() {
-                                    updateLoadingDialog.setContent("终于同步完成");
-                                    Toasty.success(MyActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
-                                    //更新RecyclerView 布局
-                                    initData();
-
-                                }
-
-                                @Override
-                                public void onProgress(int progress,int max) {
-                                    if (max > 0){
-                                        if (!updateLoadingDialog.isShowing()){
-                                            updateLoadingDialog.setMaxProgress(max);
-                                            updateLoadingDialog.show();
-                                            ALog.d("有点问题");
-                                        }
-
-                                        if (progress > 0){
-                                            updateLoadingDialog.setProgress(progress);
-                                        }
-
-                                    }
-                                }
-
-                                @Override
-                                public void onStart() {
-                                    updateLoadingDialog = new MaterialDialog.Builder(MyActivity.this)
-                                            .title("正在同步信息")
-                                            .content("陛下，耐心等下……（同步过程）")
-                                            .progress(false, 0, true)
-                                            .build();
-
-                                }
-                            });
-                            task.execute();
-                        }
-                    })
-                    .show();
+            String[] notPermission = CheckPermissionUtils.checkPermission(UIUtil.getContext());
+            if (notPermission.length != 0) {//需要的权限没有全部被运行
+                ActivityCompat.requestPermissions(this, notPermission, 100);
+            }else {
+                updateDatabase();
+            }
 
         }else if (item.getItemId() == android.R.id.home) {
             finish();
@@ -220,6 +177,81 @@ public class MyActivity extends BaseActivity {
             ALog.d("更新首页布局");
             initData();
         }
+    }
+
+    private void updateDatabase(){
+        new MaterialDialog.Builder(this)
+                .title("操作通知")
+                .content("您确定需要重新同步数据吗？一般本地表情包数据显示不正常才需要执行此操作。\n并且执行此操作会丢失表情包作者的头像和名称（不影响具体使用）。")
+                .positiveText("朕确定")
+                .negativeText("我只是点着玩的，快关掉快关掉！")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
+
+                            private MaterialDialog updateLoadingDialog;
+
+                            @Override
+                            public void onFinished() {
+                                updateLoadingDialog.setContent("终于同步完成");
+                                Toasty.success(MyActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
+                                //更新RecyclerView 布局
+                                initData();
+
+                            }
+
+                            @Override
+                            public void onProgress(int progress,int max) {
+                                if (max > 0){
+                                    if (!updateLoadingDialog.isShowing()){
+                                        updateLoadingDialog.setMaxProgress(max);
+                                        updateLoadingDialog.show();
+                                        ALog.d("有点问题");
+                                    }
+
+                                    if (progress > 0){
+                                        updateLoadingDialog.setProgress(progress);
+                                    }
+
+                                }
+                            }
+
+                            @Override
+                            public void onStart() {
+                                updateLoadingDialog = new MaterialDialog.Builder(MyActivity.this)
+                                        .title("正在同步信息")
+                                        .content("陛下，耐心等下……（同步过程）")
+                                        .progress(false, 0, true)
+                                        .build();
+
+                            }
+                        });
+                        task.execute();
+                    }
+                })
+                .show();
+
+    }
+
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+        //权限被申请成功
+        Toast.makeText(UIUtil.getContext(), "权限申请成功，愉快使用表情宝宝吧😁", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+        // 权限被拒绝
+        Toast.makeText(UIUtil.getContext(), "权限没有被通过，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
     }
 
 }

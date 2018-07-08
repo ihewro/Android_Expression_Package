@@ -67,25 +67,23 @@
                 app:iiv_icon="faw_weixin"
                 android:visibility="gone"/>
 
-            <com.mikepenz.iconics.view.IconicsImageView
+            <ImageView
                 android:id="@+id/weChat_share"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:padding="10dp"
+                android:src="@drawable/wechat"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                app:iiv_color="@color/text_secondary_dark"
-                app:iiv_icon="faw_weixin"/>
+                android:clickable="true"/>
 
-            <com.mikepenz.iconics.view.IconicsImageView
+            <ImageView
                 android:id="@+id/qq_share"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:padding="10dp"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                app:iiv_color="@color/text_secondary_dark"
-                app:iiv_icon="faw_qq"/>
+                android:src="@drawable/qq"
+                android:clickable="true"/>
 
             <com.mikepenz.iconics.view.IconicsImageView
                 android:id="@+id/love"

@@ -2,15 +2,12 @@ package com.ihewro.android_expression_package.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AppOpsManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,7 +16,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,8 +31,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.amitshekhar.DebugDB;
-import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
@@ -64,10 +58,8 @@ import com.ihewro.android_expression_package.task.RemoveCacheTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
-import com.ihewro.android_expression_package.util.ThemeHelper;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
-import com.ihewro.android_expression_package.view.CardPickerDialog;
 import com.ihewro.android_expression_package.view.CustomImageView;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -106,7 +98,7 @@ import retrofit2.Response;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 import static java.lang.Thread.sleep;
 
-public class MainActivity extends AppCompatActivity implements CardPickerDialog.ClickListener, EasyPermissions.PermissionCallbacks {
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -395,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
                                 }
                                 break;
                             case 9://捐赠
-                                MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechat).build());
+                                MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechatpay).build());
                                 break;
 
                             case 10://检查更新
@@ -517,41 +509,6 @@ public class MainActivity extends AppCompatActivity implements CardPickerDialog.
     }
 
 
-    @Override
-    public void onConfirm(int currentTheme) {
-        if (ThemeHelper.getTheme(MainActivity.this) != currentTheme) {
-            ThemeHelper.setTheme(MainActivity.this, currentTheme);
-            ThemeUtils.refreshUI(MainActivity.this, new ThemeUtils.ExtraRefreshable() {
-                        @Override
-                        public void refreshGlobal(Activity activity) {
-                            //for global setting, just do once
-                            if (Build.VERSION.SDK_INT >= 21) {
-                                final MainActivity context = MainActivity.this;
-                                ActivityManager.TaskDescription taskDescription =
-                                        new ActivityManager.TaskDescription(null, null,
-                                                ThemeUtils.getThemeAttrColor(context, android.R.attr.colorPrimary));
-                                setTaskDescription(taskDescription);
-                            }
-                        }
-
-                        @Override
-                        public void refreshSpecificView(View view) {
-                            //TODO: will do this for each traversal
-
-                            tabLayout.setBackgroundColor(ThemeUtils.getThemeAttrColor(MainActivity.this, android.R.attr.colorPrimary));
-                            /*List<IDrawerItem> iDrawerItems = result.getOriginalDrawerItems();
-                            for (int i =0; i < iDrawerItems.size(); i++){
-                                PrimaryDrawerItem item = (PrimaryDrawerItem)iDrawerItems.get(i);
-                                item.withSelectedColor(android.R.attr.colorPrimary);
-                            }*/
-                            result.closeDrawer();
-                        }
-
-
-                    }
-            );
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

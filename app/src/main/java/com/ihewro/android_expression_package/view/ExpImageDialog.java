@@ -20,7 +20,6 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
-import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.ShareUtil;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -142,7 +141,7 @@ public class ExpImageDialog extends MaterialDialog{
                         if (result){
                             Toasty.success(UIUtil.getContext(),"已保存到" +GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(), Toast.LENGTH_SHORT).show();
                         }else {
-                            Toasty.error(activity,"保存失败，请联系作者",Toast.LENGTH_SHORT).show();
+                            Toasty.error(activity,"保存失败，请检查是否允许应用获取存储权限",Toast.LENGTH_SHORT).show();
                         }
                     }
                 },activity).execute(expression);

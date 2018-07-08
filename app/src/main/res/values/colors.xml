@@ -90,4 +90,5 @@
     <color name="page_indicator_dark_selected">#ff333333</color>
     <color name="selected_comment_background">#ffffffff</color>
     <color name="error">#ffdd2c00</color>
+    <color name="black">#000000</color>
 </resources>

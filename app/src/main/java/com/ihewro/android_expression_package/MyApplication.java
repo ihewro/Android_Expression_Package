@@ -1,21 +1,10 @@
 package com.ihewro.android_expression_package;
 
-import android.app.Application;
 import android.content.Context;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.v4.view.LayoutInflaterCompat;
 
-import com.bilibili.magicasakura.utils.ThemeUtils;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.activity.ErrorActivity;
-import com.ihewro.android_expression_package.activity.MainActivity;
 import com.ihewro.android_expression_package.activity.WelcomeActivity;
-import com.ihewro.android_expression_package.util.ThemeHelper;
-import com.mikepenz.iconics.context.IconicsLayoutInflater2;
-import com.scwang.smartrefresh.header.FlyRefreshHeader;
-import com.scwang.smartrefresh.header.FunGameBattleCityHeader;
-import com.scwang.smartrefresh.header.PhoenixHeader;
 import com.scwang.smartrefresh.header.TaurusHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshFooterCreator;
@@ -24,10 +13,7 @@ import com.scwang.smartrefresh.layout.api.RefreshFooter;
 import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
-import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.footer.FalsifyFooter;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 
 import org.litepal.LitePalApplication;
 
@@ -43,7 +29,7 @@ import cat.ereza.customactivityoncrash.config.CaocConfig;
  *     version: 1.0
  * </pre>
  */
-public class MyApplication extends LitePalApplication implements ThemeUtils.switchColor{
+public class MyApplication extends LitePalApplication{
 
     private static Context mContext;
 
@@ -94,7 +80,6 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
     public void onCreate() {
         super.onCreate();
         mContext = this;
-        ThemeUtils.setSwitchColor(this);
         initALog();
         initErrorHandle();
     }
@@ -116,76 +101,5 @@ public class MyApplication extends LitePalApplication implements ThemeUtils.swit
                 .apply();
     }
 
-    @Override
-    public int replaceColorById(Context context, @ColorRes int colorId) {
-        if (ThemeHelper.isDefaultTheme(context)) {
-            return context.getResources().getColor(colorId);
-        }
-        String theme = getTheme(context);
-        if (theme != null) {
-            colorId = getThemeColorId(context, colorId, theme);
-        }
-        return context.getResources().getColor(colorId);
-    }
 
-    @Override
-    public int replaceColor(Context context, @ColorInt int originColor) {
-        if (ThemeHelper.isDefaultTheme(context)) {
-            return originColor;
-        }
-        String theme = getTheme(context);
-        int colorId = -1;
-
-        if (theme != null) {
-            colorId = getThemeColor(context, originColor, theme);
-        }
-        return colorId != -1 ? getResources().getColor(colorId) : originColor;
-    }
-
-    private String getTheme(Context context) {
-        if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_STORM) {
-            return "blue";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_HOPE) {
-            return "purple";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_WOOD) {
-            return "green";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_LIGHT) {
-            return "green_light";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_THUNDER) {
-            return "yellow";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_SAND) {
-            return "orange";
-        } else if (ThemeHelper.getTheme(context) == ThemeHelper.CARD_FIREY) {
-            return "red";
-        }
-        return null;
-    }
-
-    private
-    @ColorRes
-    int getThemeColorId(Context context, int colorId, String theme) {
-        switch (colorId) {
-            case R.color.theme_color_primary:
-                return context.getResources().getIdentifier(theme, "color", getPackageName());
-            case R.color.theme_color_primary_dark:
-                return context.getResources().getIdentifier(theme + "_dark", "color", getPackageName());
-            case R.color.theme_color_primary_trans:
-                return context.getResources().getIdentifier(theme + "_trans", "color", getPackageName());
-        }
-        return colorId;
-    }
-
-    private
-    @ColorRes
-    int getThemeColor(Context context, int color, String theme) {
-        switch (color) {
-            case 0xfffb7299:
-                return context.getResources().getIdentifier(theme, "color", getPackageName());
-            case 0xffb85671:
-                return context.getResources().getIdentifier(theme + "_dark", "color", getPackageName());
-            case 0x99f0486c:
-                return context.getResources().getIdentifier(theme + "_trans", "color", getPackageName());
-        }
-        return -1;
-    }
 }
