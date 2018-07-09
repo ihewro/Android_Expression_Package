@@ -1,10 +1,13 @@
 package com.ihewro.android_expression_package.task;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
@@ -20,6 +23,7 @@ import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import es.dmoral.toasty.Toasty;
@@ -32,6 +36,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static java.lang.Thread.sleep;
+
 /**
  * <pre>
  *     author : hewro
@@ -42,11 +48,14 @@ import retrofit2.Retrofit;
  * </pre>
  */
 public class CheckUpdateTask {
+    private  PackageManager packageManager;
     private Activity activity;
 
+    private Version version;
     private MaterialDialog downloadDialog;
-    public CheckUpdateTask(Activity activity) {
+    public CheckUpdateTask(Activity activity, PackageManager packageManager) {
         this.activity = activity;
+        this.packageManager =  packageManager;
     }
 
 
@@ -77,7 +86,8 @@ public class CheckUpdateTask {
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         //下载新的版本
                                         dialog.dismiss();
-                                        downloadApk(response.body());
+                                        version = response.body();
+                                        downloadApk();
                                     }
                                 })
                                 .show();
@@ -102,7 +112,7 @@ public class CheckUpdateTask {
     }
 
 
-    private void downloadApk(final Version version){
+    private void downloadApk(){
 
         String filePath = GlobalConfig.appDirPath;
         File dir = new File(filePath);
@@ -138,8 +148,7 @@ public class CheckUpdateTask {
                             } catch (java.io.IOException e) {
                                 e.printStackTrace();
                             }
-                            installApk(version);
-
+                            installApk();
                         }else {
 
                         }
@@ -158,35 +167,56 @@ public class CheckUpdateTask {
                 activity.startActivity(intent);
             }
         }else {
-            installApk(version);//直接安装即可
+            installApk();//直接安装即可
         }
 
 
     }
 
 
-    private void installApk(Version version){
+    public void installApk(){
+        boolean flag = false;//是否可以按照
+        if (Build.VERSION.SDK_INT >= 26) {
+            flag = packageManager.canRequestPackageInstalls();
+        }else {
+            flag = true;
+        }
+
+        if (!flag){//请求安装未知应用来源的权限
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, 124);
+        }else {
+            realInstallApk();
+        }
+    }
+
+    public void realInstallApk(){
         final File file = new File(GlobalConfig.appDirPath + version.getLatestCode()+".apk");//apk文件以versioncode命名
 
-        file.setExecutable(true);
-        file.setReadable(true);
-        file.setWritable(true);
+        ALog.d("安装包地址" + file.getAbsolutePath());
 
+        try {
+            Runtime.getRuntime().exec("chmod 777 " + file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         // 由于没有在Activity环境下启动Activity,设置下面的标签
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if(Build.VERSION.SDK_INT>=24) { //判读版本是否在7.0以上
             //参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
             Uri apkUri =
-                    FileProvider.getUriForFile(activity, UIUtil.getContext().getPackageName() + ".fileprovider", file);
+                    FileProvider.getUriForFile(activity, "com.ihewro.android_expression_package.fileprovider", file);
             //添加这一句表示对目标应用临时授权该Uri所代表的文件
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            ALog.d("启动安装apk");
         }else{
             intent.setDataAndType(Uri.fromFile(file),
                     "application/vnd.android.package-archive");
         }
+        Toasty.info(activity,"正在为您安装最新apk",Toast.LENGTH_LONG).show();
         activity.startActivity(intent);
+
     }
 
     /**

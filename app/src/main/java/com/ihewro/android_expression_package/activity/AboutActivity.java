@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.ToastUtil;
 
 import java.io.IOException;
@@ -60,6 +61,8 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);
+
+        textView2.setText("v" + APKVersionCodeUtils.getVerName(this));
 
         mMediaPlayer = new MediaPlayer();
 

@@ -6,10 +6,19 @@ android {
         applicationId "com.ihewro.android_expression_package"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 201807091
-        versionName "2.2"
+        versionCode 201807093
+        versionName "2.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            v2SigningEnabled false
+        }
+    }
+
+
+
     buildTypes {
         release {
             minifyEnabled false
@@ -30,6 +39,8 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
+
+
 }
 
 dependencies {

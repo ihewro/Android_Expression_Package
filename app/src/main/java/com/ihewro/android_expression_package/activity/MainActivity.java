@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -138,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private ViewPagerAdapter adapter;
 
     private SecondaryDrawerItem removeCache;
+    private CheckUpdateTask checkUpdateTask;
 
     private boolean isFirst;//是否是首次打开app
 
@@ -272,20 +275,54 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        if (requestCode == 124){
+            //请求安装未知应用
+            new MaterialDialog.Builder(this)
+                    .title("权限申请")
+                    .content("即将前往设置界面，在设置界面先选择表情宝宝app，然后选中“允许安装应用”开关")
+                    .positiveText("确定")
+                    .negativeText("那不安装了")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                dialog.dismiss();
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                                startActivityForResult(intent, 125);
+                            }else {
+                                dialog.dismiss();
+                                Toasty.info(MainActivity.this,"出现了一处逻辑错误，请反馈给作者，感谢",Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    })
+                    .show();
+        }else {
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        }
     }
+
+
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
-        //权限被申请成功
-        Toast.makeText(UIUtil.getContext(), "权限申请成功，愉快使用表情宝宝吧😁", Toast.LENGTH_SHORT).show();
+        if (requestCode == 100){
+            //权限被申请成功
+            Toasty.success(UIUtil.getContext(), "权限申请成功，愉快使用表情宝宝吧😁", Toast.LENGTH_SHORT).show();
+        }else if (requestCode == 124){
+            checkUpdateTask.installApk();
+        }
 
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // 权限被拒绝
-        Toast.makeText(UIUtil.getContext(), "权限没有被通过，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
+        if (requestCode == 100){
+            Toasty.error(UIUtil.getContext(), "存储权限是本应用的基本权限，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
+        }else if (requestCode == 124){
+            Toasty.error(UIUtil.getContext(), "android 8.0必须获取此权限才能完成安装", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -458,7 +495,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                 break;
 
                             case 10://检查更新
-                                new CheckUpdateTask(MainActivity.this).execute();
+                                checkUpdateTask = new CheckUpdateTask(MainActivity.this,getPackageManager());
+                                checkUpdateTask.execute();
                                 break;
                         }
 
@@ -488,12 +526,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         //初始化TabLayout
         initTabLayout(false);
-
-        //设置沉浸式状态栏
-        //StatusBarUtil.setTranslucentForImageViewInFragment(this, toolbar);
-        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) mainItem.getLayoutParams();
-        /*layoutParams.setMargins(layoutParams.leftMargin, -(UIUtil.getStatusBarHeight(this)),
-                layoutParams.rightMargin, layoutParams.bottomMargin);*/
 
 
     }
@@ -799,4 +831,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 125){
+            checkUpdateTask.installApk();
+        }
+    }
 }
