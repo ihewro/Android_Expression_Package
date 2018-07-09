@@ -228,6 +228,7 @@ public class DownloadImageTask  {
 
                 double temp = (downloadCount * 100 + progressInfo.getPercent()*1.0)/(downloadAllCount *100);
                 downloadAllDialog.setProgress((int) ((temp) * (downloadAllCount -1)));
+                downloadAllDialog.show();
             }
 
             @Override

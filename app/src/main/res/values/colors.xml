@@ -91,4 +91,6 @@
     <color name="selected_comment_background">#ffffffff</color>
     <color name="error">#ffdd2c00</color>
     <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="shadow">#cc222222</color>
 </resources>

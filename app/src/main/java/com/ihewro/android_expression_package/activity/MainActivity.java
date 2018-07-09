@@ -19,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.MyDataBase;
+import com.ihewro.android_expression_package.MySharePreference;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ViewPagerAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
@@ -62,6 +64,7 @@ import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CustomImageView;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
+import com.ihewro.android_expression_package.view.GuideView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -116,6 +119,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     TextView oneText;
     @BindView(R.id.add_exp)
     ImageView addExp;
+    private GuideView guideRefreshView;
+    private GuideView guideAddView;
+
 
     private Drawer result;
     private AccountHeader headerResult;
@@ -126,12 +132,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private int clickTimes = 0;
 
     private MenuItem refreshItem;
+    private ImageView refreshView;
 
     private int oneItem = 0;//one的序号
 
     private ViewPagerAdapter adapter;
 
     private SecondaryDrawerItem removeCache;
+
+    private boolean isFirst;//是否是首次打开app
 
     /**
      * 由启动页面启动主活动
@@ -166,12 +175,71 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //监听器
         initListener();
 
-
-        getOne(refreshItem);
+        if (!isFirst){
+            getOne(refreshItem);
+        }
 
         //获取缓存大小
         setCacheSize();
 
+
+
+    }
+
+    private void initGuideView(){
+        View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);
+        guideRefreshView = GuideView.Builder
+                .newInstance(this)
+                .setTargetView(refreshItem.getActionView())//设置目标
+                .setCustomGuideView(customView)
+                .setDirction(GuideView.Direction.LEFT_BOTTOM)
+                .setShape(GuideView.MyShape.CIRCULAR)   // 设置圆形显示区域，
+                .setBgColor(getResources().getColor(R.color.shadow))
+                .setOnclickListener(new GuideView.OnClickCallback() {
+                    @Override
+                    public void onClickedGuideView() {
+                        getOne(refreshItem);
+                        guideRefreshView.hide();
+                        initGuideAddView();
+                    }
+                })
+                .build();
+
+        guideRefreshView.show();
+    }
+
+
+    private void initGuideAddView(){
+
+        result.getRecyclerView().post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                View customView = LayoutInflater.from(MainActivity.this).inflate(R.layout.guide_view, null);
+                ((TextView)customView.findViewById(R.id.textView5)).setText("点击可以下载网络上热门表情包，不断更新！");
+                guideAddView = GuideView.Builder
+                        .newInstance(MainActivity.this)
+                        .setTargetView(addExp)//设置目标
+                        .setCustomGuideView(customView)
+                        .setDirction(GuideView.Direction.LEFT_BOTTOM)
+                        .setShape(GuideView.MyShape.CIRCULAR)   // 设置圆形显示区域，
+                        .setBgColor(getResources().getColor(R.color.shadow))
+                        .setOnclickListener(new GuideView.OnClickCallback() {
+                            @Override
+                            public void onClickedGuideView() {
+                                guideAddView.hide();
+                                Toasty.info(MainActivity.this,"侧边栏还有一些更多有趣的功能入口，程序还有一些彩蛋等你发现",Toast.LENGTH_SHORT).show();
+                                result.openDrawer();
+                            }
+                        })
+                        .build();
+
+                guideAddView.show();
+            }
+        });
+
+        MySharePreference.setIsFistEnter(this);
 
     }
 
@@ -438,6 +506,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      */
     private void initData() {
 
+        //TODO: 读取sharePreference查看是否是首次进入app
+        isFirst = MySharePreference.getIsFirstEnter(this);
         if (getIntent() != null) {
             try {
                 String jsonString = getIntent().getStringExtra("data");
@@ -514,6 +584,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         refreshItem = menu.findItem(R.id.refresh);
+        showRefreshAnimation(refreshItem);
+        if(isFirst){
+            initGuideView();
+        }
         return true;
     }
 
@@ -533,9 +607,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         refreshItem = item;
 
         //这里使用一个ImageView设置成MenuItem的ActionView，这样我们就可以使用这个ImageView显示旋转动画了
-        ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.item_refresh_menu, null);
-        refreshActionView.setImageResource(R.drawable.logo);
-        refreshActionView.setPadding(10, 10, 10, 10);
+        View refreshActionView = getLayoutInflater().inflate(R.layout.item_refresh_menu, null);
+
         item.setActionView(refreshActionView);
 
         Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
@@ -545,29 +618,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @SuppressLint("NewApi")
     private void hideRefreshAnimation() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    sleep(1700);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (refreshItem != null) {
-                            View view = refreshItem.getActionView();
-                            if (view != null) {
-                                view.clearAnimation();
-                                refreshItem.setActionView(null);
-                            }
-                        }
-                    }
-                });
+        if (refreshItem != null) {
+            View view = refreshItem.getActionView();
+            if (view != null) {
+                view.clearAnimation();
+                refreshItem.setActionView(null);
             }
-        }).start();
+        }
     }
 
 
@@ -626,7 +683,23 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         topImage.setImageDrawable(resource);
-                        hideRefreshAnimation();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    sleep(1500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        hideRefreshAnimation();
+                                    }
+                                });
+                            }
+                        }).start();
                     }
 
                     @Override
