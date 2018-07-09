@@ -8,6 +8,7 @@ import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
 
 import com.ihewro.android_expression_package.activity.MainActivity;
+import com.ihewro.android_expression_package.activity.WelcomeActivity;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class QuickService extends TileService {
@@ -17,7 +18,7 @@ public class QuickService extends TileService {
     @Override
     public void onClick() {
         super.onClick();
-        Intent intent = new Intent(this,MainActivity.class);
+        Intent intent = new Intent(this,WelcomeActivity.class);
         startActivityAndCollapse(intent);
     }
 

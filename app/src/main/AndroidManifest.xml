@@ -26,7 +26,7 @@
             android:name=".QuickService"
             android:enabled="true"
             android:exported="true"
-            android:icon="@drawable/love"
+            android:icon="@drawable/logo"
             android:label="表情宝"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
