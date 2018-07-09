@@ -746,12 +746,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onBackPressed() {
 
-        long currentTime = System.currentTimeMillis();
-        if ((currentTime - startTime) >= 2000) {
-            Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
-            startTime = currentTime;
-        } else {
-            finish();
+        if (result.isDrawerOpen()){
+            result.closeDrawer();
+        }else {
+            long currentTime = System.currentTimeMillis();
+            if ((currentTime - startTime) >= 2000) {
+                Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
+                startTime = currentTime;
+            } else {
+                finish();
+            }
         }
     }
 
@@ -795,4 +799,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             initTabLayout(true);
         }
     }
+
+
 }

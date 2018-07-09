@@ -41,7 +41,7 @@
 
 ## 应用截图
 
-<img style="width:40%" src="https://www.ihewro.com/usr/uploads/2018/04/931349469.png" style="border:none">
+![](https://ws1.sinaimg.cn/large/006tKfTcly1ft3mxxsqjuj30u01hcgs1.jpg)
 
 
 

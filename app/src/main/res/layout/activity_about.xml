@@ -81,7 +81,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:textSize="13dp"
-        android:text="©️2018 北京化工大学 计科1501 何炜 版权所有"
+        android:text="©️2018 版权所有 今晚的月光那么美，你说是的"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

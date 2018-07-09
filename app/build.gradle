@@ -114,7 +114,7 @@ dependencies {
     implementation 'me.jessyan:progressmanager:1.5.0'
 
     //捐赠
-    compile 'com.canking.minipay:minipay:1.0.2'
+    compile 'com.canking.minipay:minipay:1.0.5'
     compile 'cn.gavinliu.android.lib:ShapedImageView:0.8.5'
 
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
