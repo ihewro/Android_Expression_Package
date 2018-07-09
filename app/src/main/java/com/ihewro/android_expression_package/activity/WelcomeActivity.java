@@ -23,9 +23,6 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcom);
         ButterKnife.bind(this);
-        Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        imageView.setAnimation(rotateAnimation);
-        imageView.startAnimation(rotateAnimation);
 
         new GetExpFolderDataTask(new GetExpFolderDataListener() {
             @Override

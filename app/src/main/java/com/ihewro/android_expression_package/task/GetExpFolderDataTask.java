@@ -96,7 +96,7 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
             while (!getOnes){
                 ALog.d("getones",getOnes);
                 endTime = System.currentTimeMillis();
-                if (endTime - beginTime > 1000){//最大容忍度为1.2s，1.2秒还没有请求就歇着吧，用户不然就要关闭应用了
+                if (endTime - beginTime > 800){//最大容忍度为1.2s，1.2秒还没有请求就歇着吧，用户不然就要关闭应用了
                     if (call!=null){
                         //请求超时了
                         ALog.d("请求超时了");
@@ -110,8 +110,8 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
 
             endTime = System.currentTimeMillis();
             long diff = endTime - beginTime;//执行的毫秒数
-            if (diff <1000){//再让他睡会，否则启动页面都看不清
-                sleep(1000-diff);
+            if (diff <800){//再让他睡会，否则启动页面都看不清
+                sleep(800-diff);
             }
             return jsonString;
         } catch (JsonProcessingException | InterruptedException e) {
