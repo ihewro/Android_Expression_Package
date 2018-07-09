@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <pl.droidsonroids.gif.GifImageView
+            <ImageView
                 android:id="@+id/image_1"
                 android:layout_weight="1"
                 android:layout_height="70dp"
@@ -56,7 +56,7 @@
                 android:scaleType="centerCrop"
                 android:layout_width="0dp" />
 
-            <pl.droidsonroids.gif.GifImageView
+            <ImageView
                 android:id="@+id/image_2"
                 android:layout_weight="1"
                 android:layout_height="70dp"
@@ -65,7 +65,7 @@
                 android:scaleType="centerCrop"
                 android:layout_width="0dp" />
 
-            <pl.droidsonroids.gif.GifImageView
+            <ImageView
                 android:id="@+id/image_3"
                 android:layout_weight="1"
                 android:layout_height="70dp"
@@ -74,7 +74,7 @@
                 android:scaleType="centerCrop"
                 android:layout_width="0dp" />
 
-            <pl.droidsonroids.gif.GifImageView
+            <ImageView
                 android:id="@+id/image_4"
                 android:layout_weight="1"
                 android:layout_height="70dp"
@@ -90,7 +90,7 @@
                 android:layout_height="70dp">
 
 
-                <pl.droidsonroids.gif.GifImageView
+                <ImageView
                     android:id="@+id/image_5"
                     android:layout_height="70dp"
                     android:src="@drawable/header"

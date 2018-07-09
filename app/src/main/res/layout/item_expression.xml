@@ -9,12 +9,12 @@
     android:clickable="true"
     android:background="?attr/selectableItemBackground">
 
-<pl.droidsonroids.gif.GifImageView
+<ImageView
     android:id="@+id/iv_expression"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:src="@drawable/bg"
-    android:scaleType="centerCrop"/>
+    android:scaleType="fitCenter"/>
 
     <CheckBox
         android:id="@+id/cb_item"

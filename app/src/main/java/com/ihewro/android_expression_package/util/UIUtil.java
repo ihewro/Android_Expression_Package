@@ -28,8 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import pl.droidsonroids.gif.GifDrawable;
-import pl.droidsonroids.gif.GifImageView;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -107,12 +105,10 @@ public class UIUtil {
     }
 
 
-    public static void setImageToImageView(int status, String url, GifImageView imageView){
+    public static void setImageToImageView(int status, String url, ImageView imageView){
         RequestOptions options = new RequestOptions()
-                .centerCrop()
                 .placeholder(R.drawable.loading)
-                .error(R.drawable.fail)
-                .disallowHardwareConfig();
+                .error(R.drawable.fail);
 
         switch (status){
             case 1://存储在sd卡中

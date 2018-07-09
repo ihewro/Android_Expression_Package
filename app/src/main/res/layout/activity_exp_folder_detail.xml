@@ -50,21 +50,23 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:background="#fafafa">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/owner_name"
+                <com.ihewro.android_expression_package.view.AvatarImageView
+                    android:id="@+id/owner_avatar"
                     android:layout_centerVertical="true"
                     android:layout_alignParentLeft="true"
                     android:layout_width="30dp"
+                    android:scaleType="centerCrop"
                     android:layout_height="30dp"
                     android:src="@drawable/header"/>
 
                 <TextView
+                    android:id="@+id/owner_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="今晚月光很美"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@id/owner_name"/>
+                    android:layout_toRightOf="@id/owner_avatar"/>
 
                 <TextView
                     android:id="@+id/download_all"

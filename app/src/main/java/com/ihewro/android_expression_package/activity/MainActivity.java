@@ -89,7 +89,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import me.jessyan.progressmanager.ProgressListener;
 import me.jessyan.progressmanager.ProgressManager;
 import me.jessyan.progressmanager.body.ProgressInfo;
@@ -678,7 +677,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         ProgressManager.getInstance().addResponseListener(oneDetail.getImgUrl(), getGlideListener());//监听glide进度，加载完毕后，取消动画
 
         Glide.with(this).load(oneDetail.getImgUrl())
-                .apply(bitmapTransform(new MultiTransformation(new CenterCrop(), new RoundedCornersTransformation(35, 0))))
                 .into(new SimpleTarget<Drawable>() {
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {

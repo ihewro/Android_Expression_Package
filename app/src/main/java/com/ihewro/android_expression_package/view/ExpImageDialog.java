@@ -30,7 +30,6 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.io.File;
 
 import es.dmoral.toasty.Toasty;
-import pl.droidsonroids.gif.GifImageView;
 
 /**
  * <pre>
@@ -45,7 +44,7 @@ public class ExpImageDialog extends MaterialDialog{
 
 
     //自定义布局
-    private GifImageView ivExpression;
+    private ImageView ivExpression;
     private TextView tvExpression;
     private View save;
     private View share;

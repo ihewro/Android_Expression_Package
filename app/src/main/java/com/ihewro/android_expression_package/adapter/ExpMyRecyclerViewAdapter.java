@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,7 +28,6 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import okhttp3.internal.Util;
-import pl.droidsonroids.gif.GifImageView;
 
 /**
  * <pre>
@@ -60,7 +60,7 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
             if (min == 5){
                 helper.getView(R.id.fl_image_5).setVisibility(View.VISIBLE);
             }
-            UIUtil.setImageToImageView(1,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
+            UIUtil.setImageToImageView(1,item.getExpressionList().get(i).getUrl(), (ImageView) helper.getView(imageViewArray[i]));
         }
         //如果表情包数目小于5，则剩余的表情占位不显示
         for (int j = min; j < 5; j++){

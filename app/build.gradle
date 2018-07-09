@@ -6,8 +6,8 @@ android {
         applicationId "com.ihewro.android_expression_package"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 201807081
-        versionName "2.1"
+        versionCode 201807091
+        versionName "2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -92,14 +92,10 @@ dependencies {
     //toast
     implementation 'com.github.GrenderG:Toasty:1.3.0'
 
-    //圆形头像
-    compile 'de.hdodenhof:circleimageview:2.1.0'
 
     //简化运行时申请权限的代码
     compile 'pub.devrel:easypermissions:1.0.1'
 
-    //显示gif的框架
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
 
     //滚动布局的第三方框架
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.36'
@@ -117,7 +113,6 @@ dependencies {
     compile 'com.canking.minipay:minipay:1.0.5'
     compile 'cn.gavinliu.android.lib:ShapedImageView:0.8.5'
 
-    implementation 'jp.wasabeef:glide-transformations:3.3.0'
 
     //全局错误异常捕捉
     compile 'cat.ereza:customactivityoncrash:2.2.0'

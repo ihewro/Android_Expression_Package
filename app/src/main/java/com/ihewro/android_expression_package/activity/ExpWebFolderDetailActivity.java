@@ -22,6 +22,7 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.DownloadImageTask;
 import com.ihewro.android_expression_package.util.UIUtil;
+import com.ihewro.android_expression_package.view.AvatarImageView;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -34,7 +35,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,7 +53,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.owner_name)
-    CircleImageView ownerName;
+    TextView ownerName;
     @BindView(R.id.select_add)
     RelativeLayout selectAdd;
     @BindView(R.id.download_all)
@@ -62,9 +62,14 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     TextView selectAll;
     @BindView(R.id.select_add_button)
     TextView selectAddButton;
+    @BindView(R.id.owner_avatar)
+    AvatarImageView ownerAvatar;
     private ExpImageDialog expressionDialog;
     View notDataView;
 
+
+    private String ownerNameString = "";
+    private String ownerAvatarString = "";
 
     private int dirId = 0;
     private String dirName;
@@ -86,12 +91,14 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     private List<Expression> addExpList = new ArrayList<>();
 
 
-    public static void actionStart(Activity activity, int dir, String dirName, int totalCount) {
+    public static void actionStart(Activity activity, int dir, String dirName, int totalCount, String ownerName, String ownerAvatar) {
         Intent intent = new Intent(activity, ExpWebFolderDetailActivity.class);
         intent.putExtra("dir", dir);
         intent.putExtra("dirName", dirName);
         intent.putExtra("count", totalCount);
-        activity.startActivityForResult(intent,1);
+        intent.putExtra("ownerName", ownerName);
+        intent.putExtra("ownerAvatar", ownerAvatar);
+        activity.startActivityForResult(intent, 1);
     }
 
     @Override
@@ -115,6 +122,9 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             dirId = getIntent().getIntExtra("dir", 0);
             dirName = getIntent().getStringExtra("dirName");
             totalCount = getIntent().getIntExtra("count", 0);
+            ownerNameString = getIntent().getStringExtra("ownerName");
+            ownerAvatarString = getIntent().getStringExtra("ownerAvatar");
+
         }
     }
 
@@ -124,6 +134,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
 
         toolbar.setTitle(dirName);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
@@ -135,6 +146,9 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
                 .setContext(this, null)
                 .build();
+
+        ownerName.setText(ownerNameString);
+        UIUtil.setImageToImageView(2,ownerAvatarString,ownerAvatar);
     }
 
 
@@ -221,13 +235,13 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                     @Override
                     public void run() {
                         addExpList.clear();
-                        for (int i =0;i<checkList.size();i++){
+                        for (int i = 0; i < checkList.size(); i++) {
                             addExpList.add(expressionList.get(Integer.parseInt(checkList.get(i))));
                         }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                new DownloadImageTask(addExpList,dirName,checkList.size(),ExpWebFolderDetailActivity.this).execute();
+                                new DownloadImageTask(addExpList, dirName, checkList.size(), ExpWebFolderDetailActivity.this).execute();
                                 setContraryCheck();
                             }
                         });
@@ -301,7 +315,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     /**
      * 让所有的表情都在选中的状态
      */
-    private void setAdapterAllSelected(){
+    private void setAdapterAllSelected() {
         selectAll.setText("取消全选");
         selectAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -314,7 +328,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     /**
      * 取消所有表情的选中状态
      */
-    private void setAdapterAllNotSelected(){
+    private void setAdapterAllNotSelected() {
         selectAll.setText("全选");
         selectAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -326,9 +340,9 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (isShowCheck){
+        if (isShowCheck) {
             setContraryCheck();
-        }else {
+        } else {
             finish();
         }
     }
@@ -351,7 +365,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (call!=null){
+        if (call != null) {
             call.cancel();
         }
     }

@@ -5,6 +5,7 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -14,7 +15,6 @@ import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.util.List;
 
-import pl.droidsonroids.gif.GifImageView;
 
 /**
  * <pre>
@@ -54,7 +54,7 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
         final CheckBox checkBox = helper.getView(R.id.cb_item);
         checkBox.setTag(helper.getAdapterPosition());
-        UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (GifImageView) helper.getView(R.id.iv_expression));
+        UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (ImageView) helper.getView(R.id.iv_expression));
         //判断当前checkbox的状态
         if (showCheckBox) {
             helper.getView(R.id.cb_item).setVisibility(View.VISIBLE);
@@ -85,7 +85,7 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
     public static class IViewHolder extends BaseViewHolder{
 
-        GifImageView IvExpression;
+        ImageView IvExpression;
 
         public IViewHolder(View itemView) {
             super(itemView);

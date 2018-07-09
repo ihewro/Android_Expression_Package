@@ -28,7 +28,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import es.dmoral.toasty.Toasty;
-import pl.droidsonroids.gif.GifImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,6 +73,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
 
     @Override
     protected void convert(BaseViewHolder helper, final ExpressionFolder item) {
+        UIUtil.setImageToImageView(2,item.getOwnerAvatar(), (ImageView) helper.getView(R.id.owner_avatar));
         helper.setText(R.id.exp_name,item.getName());
         helper.setText(R.id.exp_num,item.getCount() + "+");
         helper.setText(R.id.owner_name,item.getOwner());
@@ -106,7 +106,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
 
             for (int i =0;i<num;i++){
                 helper.getView(imageViewArray[i]).setVisibility(View.VISIBLE);
-                UIUtil.setImageToImageView(2,item.getExpressionList().get(i).getUrl(), (GifImageView) helper.getView(imageViewArray[i]));
+                UIUtil.setImageToImageView(2,item.getExpressionList().get(i).getUrl(), (ImageView) helper.getView(imageViewArray[i]));
             }
             //如果表情包数目小于5，则剩余的表情占位不显示
             for (int j = num;j< 5; j++){
@@ -123,7 +123,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ExpWebFolderDetailActivity.actionStart(activity,item.getDir(),item.getName(),item.getCount());
+                    ExpWebFolderDetailActivity.actionStart(activity,item.getDir(),item.getName(),item.getCount(),item.getOwner(),item.getOwnerAvatar());
                 }
             });
 
@@ -204,7 +204,7 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                         // Do something
                         if (Objects.equals(dialog.getInputEditText().getText().toString(), "1998")){
                             Toasty.success(activity,"密码正确😏",Toast.LENGTH_SHORT).show();
-                            ExpWebFolderDetailActivity.actionStart(activity,item.getDir(),item.getName(),item.getCount());
+                            ExpWebFolderDetailActivity.actionStart(activity,item.getDir(),item.getName(),item.getCount(),item.getOwner(),item.getOwnerAvatar());
                         }else {
                             ALog.d(dialog.getInputEditText().getText());
                             Toasty.error(activity,"密码错误😏",Toast.LENGTH_SHORT).show();
