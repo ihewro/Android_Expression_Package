@@ -154,12 +154,12 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
 
     private void requestData(final int page) {
         currentPage = page;
-        if (page > 1 && (page - 1) * 50 > totalCount) {
+        if (page > 1 && (page - 1) * 30 > totalCount) {
             refreshLayout.finishLoadMoreWithNoMoreData();//没有更多数据了,显示不能加载更多提示
             ALog.d("当前页数page", currentPage);
             ALog.d("pageSize", expressionList.size());
         } else {
-            call = HttpUtil.getExpressionList(dirId, page, 50, dirName, new Callback<List<Expression>>() {
+            call = HttpUtil.getExpressionList(dirId, page, 30, dirName, new Callback<List<Expression>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Expression>> call, @NonNull final Response<List<Expression>> response) {
                     if (response.isSuccessful()) {
