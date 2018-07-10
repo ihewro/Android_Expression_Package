@@ -41,7 +41,7 @@ public class ExpressionContentFragment extends Fragment {
     Unbinder unbinder;
 
     private ExpressionListAdapter adapter;
-    private List<Expression> expressionList;
+    private List<Expression> expressionList = new ArrayList<>();
     private ExpImageDialog expressionDialog;
     private int currentPosition = -1;
     View notDataView;
@@ -83,8 +83,12 @@ public class ExpressionContentFragment extends Fragment {
         GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),4);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-
-        initExpressionData();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                initExpressionData();
+            }
+        }).start();
 
         adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
         recyclerView.setAdapter(adapter);
@@ -123,6 +127,14 @@ public class ExpressionContentFragment extends Fragment {
                 JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Expression.class);
                 expressionList = mapper.readValue(jsonString, javaType);
                 ALog.d("list",expressionList.size());
+                if (getActivity()!=null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.setNewData(expressionList);
+                        }
+                    });
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

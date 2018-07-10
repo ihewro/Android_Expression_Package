@@ -1,20 +1,23 @@
 package com.ihewro.android_expression_package.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,19 +28,21 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.baidu.ocr.sdk.OCR;
+import com.baidu.ocr.sdk.OnResultListener;
+import com.baidu.ocr.sdk.exception.OCRError;
+import com.baidu.ocr.sdk.model.AccessToken;
 import com.blankj.ALog;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.MultiTransformation;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
@@ -55,15 +60,15 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
-import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
-import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
+import com.ihewro.android_expression_package.util.DataUtil;
+import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CustomImageView;
@@ -101,7 +106,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
@@ -122,6 +126,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     TextView oneText;
     @BindView(R.id.add_exp)
     ImageView addExp;
+    @BindView(R.id.fab_search)
+    FloatingActionButton fabSearch;
+    @BindView(R.id.appbar)
+    AppBarLayout appbar;
+    @BindView(R.id.search_input)
+    EditText searchInput;
     private GuideView guideRefreshView;
     private GuideView guideAddView;
 
@@ -145,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private CheckUpdateTask checkUpdateTask;
 
     private boolean isFirst;//是否是首次打开app
-
+    private boolean isSearching;//是否打开了搜索功能
     /**
      * 由启动页面启动主活动
      *
@@ -179,62 +189,44 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //监听器
         initListener();
 
-        if (!isFirst){
+        if (!isFirst) {
             getOne(refreshItem);
         }
 
         //获取缓存大小
         setCacheSize();
 
+        initAccessTokenWithAkSk();
 
 
     }
 
 
-/*
-    private void updateDatabase(){
-        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
-
-            private MaterialDialog updateLoadingDialog;
-
+    /**
+     * 用明文ak，sk初始化
+     */
+    private void initAccessTokenWithAkSk() {
+        OCR.getInstance(this).initAccessTokenWithAkSk(new OnResultListener<AccessToken>() {
             @Override
-            public void onFinished() {
-                updateLoadingDialog.setContent("终于同步完成");
-                //更新RecyclerView 布局
+            public void onResult(AccessToken result) {
+                String token = result.getAccessToken();
             }
 
             @Override
-            public void onProgress(int progress, int max) {
-                if (max > 0) {
-                    if (!updateLoadingDialog.isShowing()) {
-                        updateLoadingDialog.setMaxProgress(max);
-                        updateLoadingDialog.show();
+            public void onError(OCRError error) {
+                error.printStackTrace();
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toasty.info(MainActivity.this, "获取百度文字识别接口失败").show();
                     }
-
-                    if (progress > 0) {
-                        updateLoadingDialog.setProgress(progress);
-                    }
-
-                }
+                });
             }
-
-            @Override
-            public void onStart() {
-                updateLoadingDialog = new MaterialDialog.Builder(MainActivity.this)
-                        .title("正在同步信息")
-                        .content("发生了一个错误，我们为您重新同步数据库信息，这可能会解决该问题。")
-                        .progress(false, 0, true)
-                        .build();
-
-            }
-        });
-        task.execute();
-
-        initData();
+        }, getApplicationContext(), "6AsWoPOwdFEn5G17glMkGFVd", "014yBWxaRMBaQRnZD5Brg83sAzujGNOK");
     }
-*/
 
-    private void initGuideView(){
+
+    private void initGuideView() {
         View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);
         guideRefreshView = GuideView.Builder
                 .newInstance(this)
@@ -257,15 +249,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
-    private void initGuideAddView(){
+    private void initGuideAddView() {
 
-        result.getRecyclerView().post(new Runnable()
-        {
+        result.getRecyclerView().post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 View customView = LayoutInflater.from(MainActivity.this).inflate(R.layout.guide_view, null);
-                ((TextView)customView.findViewById(R.id.textView5)).setText("点击可以下载网络上热门表情包，不断更新！");
+                ((TextView) customView.findViewById(R.id.textView5)).setText("点击可以下载网络上热门表情包，不断更新！");
                 guideAddView = GuideView.Builder
                         .newInstance(MainActivity.this)
                         .setTargetView(addExp)//设置目标
@@ -277,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             @Override
                             public void onClickedGuideView() {
                                 guideAddView.hide();
-                                Toasty.info(MainActivity.this,"侧边栏还有一些更多有趣的功能入口，程序还有一些彩蛋等你发现",Toast.LENGTH_SHORT).show();
+                                Toasty.info(MainActivity.this, "侧边栏还有一些更多有趣的功能入口，程序还有一些彩蛋等你发现", Toast.LENGTH_SHORT).show();
                                 result.openDrawer();
                             }
                         })
@@ -293,6 +283,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
     private void initListener() {
+
+        fabSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSearching = true;
+                searchInput.setVisibility(View.VISIBLE);
+                if (!Objects.equals(searchInput.getText().toString(), "")){
+                   ResultActivity.actionStart(MainActivity.this,searchInput.getText().toString());
+                }
+
+            }
+        });
         addExp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         oneText.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                android.content.ClipboardManager clipboardManager = (android.content.ClipboardManager) MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipboardManager clipboardManager = (ClipboardManager) MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
                 clipboardManager.setPrimaryClip(ClipData.newPlainText(null, oneText.getText()));
                 Toasty.success(MainActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
                 return false;
@@ -321,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 124){
+        if (requestCode == 124) {
             //请求安装未知应用
             new MaterialDialog.Builder(this)
                     .title("权限申请")
@@ -331,31 +333,30 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 dialog.dismiss();
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
                                 startActivityForResult(intent, 125);
-                            }else {
+                            } else {
                                 dialog.dismiss();
-                                Toasty.info(MainActivity.this,"出现了一处逻辑错误，请反馈给作者，感谢",Toast.LENGTH_SHORT).show();
+                                Toasty.info(MainActivity.this, "出现了一处逻辑错误，请反馈给作者，感谢", Toast.LENGTH_SHORT).show();
 
                             }
                         }
                     })
                     .show();
-        }else {
+        } else {
             EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
         }
     }
 
 
-
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
-        if (requestCode == 100){
+        if (requestCode == 100) {
             //权限被申请成功
             Toasty.success(UIUtil.getContext(), "权限申请成功，愉快使用表情宝宝吧😁", Toast.LENGTH_SHORT).show();
-        }else if (requestCode == 124){
+        } else if (requestCode == 124) {
             checkUpdateTask.installApk();
         }
 
@@ -364,9 +365,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // 权限被拒绝
-        if (requestCode == 100){
+        if (requestCode == 100) {
             Toasty.error(UIUtil.getContext(), "存储权限是本应用的基本权限，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
-        }else if (requestCode == 124){
+        } else if (requestCode == 124) {
             Toasty.error(UIUtil.getContext(), "android 8.0必须获取此权限才能完成安装", Toast.LENGTH_SHORT).show();
         }
     }
@@ -541,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                 break;
 
                             case 10://检查更新
-                                checkUpdateTask = new CheckUpdateTask(MainActivity.this,getPackageManager());
+                                checkUpdateTask = new CheckUpdateTask(MainActivity.this, getPackageManager());
                                 checkUpdateTask.execute();
                                 break;
                         }
@@ -567,7 +568,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                 })
                 .build();
-
 
 
         //初始化TabLayout
@@ -611,8 +611,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setViewPager(viewPager, isUpdate);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-
+        viewPager.setOffscreenPageLimit(3);//参数为预加载数量，系统最小值为1。慎用！预加载数量过多低端机子受不了
     }
+
 
 
     /**
@@ -626,12 +627,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //碎片列表
         List<String> pageTitleList = new ArrayList<>();
         List<Fragment> fragmentList = new ArrayList<>();
+
         if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
             fragmentList.add(ExpressionContentFragment.fragmentInstant("", "默认"));
             pageTitleList.add("默认");
         } else {
             for (int i = 0; i < expressionFolderList.size(); i++) {
-                if (expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null) {
+                if ((expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null)) {
                     //过滤掉空文件夹
                     ALog.d("该表情包的表情数目为0");
                 } else {
@@ -656,13 +658,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         refreshItem = menu.findItem(R.id.refresh);
         showRefreshAnimation(refreshItem);
-        if(isFirst){
+        if (isFirst) {
             initGuideView();
         }
         return true;
@@ -822,15 +823,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onBackPressed() {
 
-        if (result.isDrawerOpen()){
-            result.closeDrawer();
+        if (isSearching){
+            searchInput.setVisibility(View.GONE);
+            isSearching = false;
+            searchInput.setText("");
         }else {
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - startTime) >= 2000) {
-                Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
-                startTime = currentTime;
+            if (result.isDrawerOpen()) {
+                result.closeDrawer();
             } else {
-                finish();
+                long currentTime = System.currentTimeMillis();
+                if ((currentTime - startTime) >= 2000) {
+                    Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
+                    startTime = currentTime;
+                } else {
+                    finish();
+                }
             }
         }
     }
@@ -847,7 +854,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ALog.d("cahceSize",cacheSize);
+                            ALog.d("cahceSize", cacheSize);
                             removeCache.withDescription(cacheSize);
                             result.updateItem(removeCache);
                         }
@@ -868,8 +875,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void refreshUI(EventMessage eventBusMessage){
-        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)){
+    public void refreshUI(EventMessage eventBusMessage) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)) {
             ALog.d("更新首页布局");
             updateData();
             initTabLayout(true);
@@ -881,7 +888,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 125){
+        if (requestCode == 125) {
             checkUpdateTask.installApk();
         }
     }

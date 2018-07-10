@@ -29,7 +29,7 @@ public class ErrorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_error);
         ButterKnife.bind(this);
 
-        updateDatabase();
+//        updateDatabase();
 
         initListener();
     }

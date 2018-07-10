@@ -23,6 +23,8 @@ public class Expression extends LitePalSupport{
     private String url;//图片路径或者图片地址
     private String folderName;//目录的名称
     private ExpressionFolder expressionFolder;
+    private String description;//图片描述
+    private int desStatus;//是否有图片描述，1为有，0为无
 
 
     public Expression() {
@@ -92,5 +94,21 @@ public class Expression extends LitePalSupport{
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getDesStatus() {
+        return desStatus;
+    }
+
+    public void setDesStatus(int desStatus) {
+        this.desStatus = desStatus;
     }
 }

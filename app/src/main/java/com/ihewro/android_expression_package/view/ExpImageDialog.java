@@ -10,13 +10,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.baidu.ocr.sdk.OCR;
+import com.baidu.ocr.sdk.OnResultListener;
+import com.baidu.ocr.sdk.exception.OCRError;
+import com.baidu.ocr.sdk.model.GeneralBasicParams;
+import com.baidu.ocr.sdk.model.GeneralResult;
+import com.baidu.ocr.sdk.model.WordSimple;
+import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
@@ -27,7 +36,11 @@ import com.ihewro.android_expression_package.util.UIUtil;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import org.greenrobot.eventbus.EventBus;
+import org.litepal.LitePal;
+
 import java.io.File;
+import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
@@ -52,6 +65,10 @@ public class ExpImageDialog extends MaterialDialog{
     private View weChatShare;
     private View qqShare;//qq分享
     private View love;//输出一句撩人的话
+    private View inputView;
+    private EditText inputText;
+    private View getAuto;
+    private View saveToDatabase;
 
     private final Builder builder;
     private Activity activity;//显示该对话框的活动
@@ -100,8 +117,13 @@ public class ExpImageDialog extends MaterialDialog{
      * 更新对话框的界面数据
      */
     private void updateUI(){
-        if (expression.getStatus() != 2){//不是网络图片，将保存按钮取消掉
-            save.setVisibility(View.VISIBLE);
+        if (expression.getStatus() == 1){//不是网络图片，将保存按钮取消掉
+            inputView.setVisibility(View.VISIBLE);
+            if (expression.getDesStatus() == 1){
+                inputText.setText(expression.getDescription());
+            }else {
+                inputText.setText("");
+            }
         }
         UIUtil.setImageToImageView(expression.getStatus(),expression.getUrl(),ivExpression);
         tvExpression.setText(expression.getName());
@@ -126,6 +148,12 @@ public class ExpImageDialog extends MaterialDialog{
         weChatShare = view.findViewById(R.id.weChat_share);
         qqShare = view.findViewById(R.id.qq_share);
         love = view.findViewById(R.id.love);
+
+        inputView = view.findViewById(R.id.input_view);
+        inputText = view.findViewById(R.id.input_text);
+
+        getAuto = view.findViewById(R.id.auto_get);
+        saveToDatabase = view.findViewById(R.id.save_to_database);
 
     }
 
@@ -243,6 +271,64 @@ public class ExpImageDialog extends MaterialDialog{
             }
         });
 
+        getAuto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GeneralBasicParams param = new GeneralBasicParams();
+                param.setDetectDirection(true);
+                param.setImageFile(new File(expression.getUrl()));
+                final MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                        .progress(true, 0)
+                        .progressIndeterminateStyle(true)
+                        .show();
+                OCR.getInstance(activity).recognizeGeneralBasic(param, new OnResultListener<GeneralResult>() {
+                    @Override
+                    public void onResult(GeneralResult result) {
+                        StringBuilder sb = new StringBuilder();
+                        for (WordSimple wordSimple : result.getWordList()) {
+                            WordSimple word = wordSimple;
+                            sb.append(word.getWords());
+                            sb.append("\n");
+                        }
+                        sb.deleteCharAt(sb.length() - 1);
+                        inputText.setText(sb);
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(OCRError error) {
+                        Toasty.error(activity,error.getMessage()).show();
+                        dialog.dismiss();
+                        ALog.d(error.getMessage());
+                    }
+                });
+            }
+        });
+
+        saveToDatabase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //保存表情描述到数据库中
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<Expression> expressionList = LitePal.where("name = ?",expression.getName()).find(Expression.class,true);
+                        expressionList.get(0).setDescription(inputText.getText().toString());
+                        expressionList.get(0).setDesStatus(1);
+                        expressionList.get(0).save();
+                        //发个消息让首页更新数据
+//                        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toasty.success(activity,"保存表情描述成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+
     }
 
     public static class Builder extends MaterialDialog.Builder {
@@ -263,7 +349,7 @@ public class ExpImageDialog extends MaterialDialog{
 
         @Override
         public ExpImageDialog build() {
-            this.customView(R.layout.item_show_expression, true);
+            this.customView(R.layout.item_show_expression, false);
             return new ExpImageDialog(this);
         }
     }
