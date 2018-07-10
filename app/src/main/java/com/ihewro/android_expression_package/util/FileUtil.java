@@ -79,7 +79,9 @@ public class FileUtil {
                 temp = new File(path + File.separator + tempList[i]);
             }
             if (temp.isFile()) {
+                String tempPath = temp.getAbsolutePath();
                 temp.delete();
+                updateMediaStore(UIUtil.getContext(),tempPath);
             }
             if (temp.isDirectory()) {
                 delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件

@@ -1,6 +1,11 @@
 package com.ihewro.android_expression_package.task;
 
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
@@ -9,6 +14,7 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
@@ -59,6 +65,7 @@ public class DeleteImageTask extends AsyncTask<Void,Void,Boolean>{
             FileUtil.delFolder(GlobalConfig.appDirPath + folderName);
             //删除数据库的内容
             LitePal.deleteAll(ExpressionFolder.class,"name = ?" ,folderName);
+
         }else {//删除部分文件
             for (int i =0;i<expressionList.size();i++){
                 FileUtil.deleteImageFromGallery(expressionList.get(i).getUrl());
