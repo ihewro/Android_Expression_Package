@@ -114,12 +114,12 @@ public class ShopActivity extends AppCompatActivity {
      */
     private void requestData(final int page){
         currentPage = page;
-        if (currentPage > 1 && (currentPage-1) * 10 > totalCount){
+        if (currentPage > 1 && (currentPage-1) * 3 > totalCount){
             refreshLayout.finishLoadMoreWithNoMoreData();//没有更多数据了,显示不能加载更多提示
         }else {
             Retrofit retrofit = HttpUtil.getRetrofit(20,20,20);
             WebImageInterface request = retrofit.create(WebImageInterface.class);
-            call = request.getDirList(currentPage,10);
+            call = request.getDirList(currentPage,3);
 
             call.enqueue(new Callback<ExpressionFolderList>() {
                 @Override
