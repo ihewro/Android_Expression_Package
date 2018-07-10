@@ -116,6 +116,7 @@ public class FileUtil {
             copyFileToTarget(origin,origin+"copy");
             deleteImageFromGallery(origin);
             copyFileToTarget(origin+"copy",target);
+            deleteImageFromGallery(origin+"copy");
             return true;
         }else {
             return copyFileToTarget(new File(origin),new File(target));
