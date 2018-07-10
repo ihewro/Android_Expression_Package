@@ -64,6 +64,8 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
             }
             MyDataBase.addExpressionRecord(expression);
             EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+
+
             return result;
         }else {//未知来源图片
             return false;

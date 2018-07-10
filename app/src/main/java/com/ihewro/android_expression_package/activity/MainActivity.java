@@ -55,10 +55,12 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
+import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
+import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
@@ -187,6 +189,50 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
     }
+
+
+/*
+    private void updateDatabase(){
+        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
+
+            private MaterialDialog updateLoadingDialog;
+
+            @Override
+            public void onFinished() {
+                updateLoadingDialog.setContent("终于同步完成");
+                //更新RecyclerView 布局
+            }
+
+            @Override
+            public void onProgress(int progress, int max) {
+                if (max > 0) {
+                    if (!updateLoadingDialog.isShowing()) {
+                        updateLoadingDialog.setMaxProgress(max);
+                        updateLoadingDialog.show();
+                    }
+
+                    if (progress > 0) {
+                        updateLoadingDialog.setProgress(progress);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onStart() {
+                updateLoadingDialog = new MaterialDialog.Builder(MainActivity.this)
+                        .title("正在同步信息")
+                        .content("发生了一个错误，我们为您重新同步数据库信息，这可能会解决该问题。")
+                        .progress(false, 0, true)
+                        .build();
+
+            }
+        });
+        task.execute();
+
+        initData();
+    }
+*/
 
     private void initGuideView(){
         View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);

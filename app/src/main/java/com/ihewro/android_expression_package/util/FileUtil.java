@@ -1,16 +1,29 @@
 package com.ihewro.android_expression_package.util;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 
 import com.blankj.ALog;
+import com.canking.minipay.MiniPayUtils;
+import com.ihewro.android_expression_package.R;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Objects;
+
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
 /**
  * <pre>
@@ -37,27 +50,8 @@ public class FileUtil {
      * @param path
      */
     public static void updateMediaStore(final Context context, final String path) {
-        //版本号的判断  4.4为分水岭，发送广播更新媒体库
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                public void onScanCompleted(String path, Uri uri) {
-                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    mediaScanIntent.setData(uri);
-                    context.sendBroadcast(mediaScanIntent);
-                }
-            });
-        } else {
-            File file = new File(path);
-            String relationDir = file.getParent();
-            File file1 = new File(relationDir);
-            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.fromFile(file1.getAbsoluteFile())));
-        }*/
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(path))));
 
-        //保存图片后发送广播通知更新数据库
-        Uri uri = Uri.fromFile(new File(path));
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-
-        //Toast.makeText(UIUtil.getContext(),"图库更新成功",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -116,7 +110,10 @@ public class FileUtil {
 
 
     public static boolean copyFileToTarget(String origin,String target){
-        if (Objects.equals(origin, target)){//如果路径相同，直接返回true,否则会发生crash，因为一个文件不能打开的同时边读边写
+        if (Objects.equals(origin,target)){
+            copyFileToTarget(origin,origin+"copy");
+            deleteImageFromGallery(origin);
+            copyFileToTarget(origin+"copy",target);
             return true;
         }else {
             return copyFileToTarget(new File(origin),new File(target));
