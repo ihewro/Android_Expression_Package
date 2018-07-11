@@ -25,7 +25,7 @@ public class Expression extends LitePalSupport{
     private ExpressionFolder expressionFolder;
     private String description;//图片描述
     private int desStatus;//是否有图片描述，1为有，0为无
-    private byte[] image;//图片内容，二进制存储
+    private Image image;//图片内容，二进制存储
 
 
     public Expression() {
@@ -48,7 +48,8 @@ public class Expression extends LitePalSupport{
         this.expressionFolder = expressionFolder;
     }
 
-    public Expression(int status, String name, String url, String folderName,ExpressionFolder expressionFolder,byte[] image) {
+
+    public Expression(int status, String name, String url, String folderName,ExpressionFolder expressionFolder,Image image) {
         this.status = status;
         this.name = name;
         this.url = url;
@@ -122,11 +123,11 @@ public class Expression extends LitePalSupport{
         this.desStatus = desStatus;
     }
 
-    public byte[] getImage() {
+    public Image getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(Image image) {
         this.image = image;
     }
 }

@@ -31,7 +31,7 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onFinish(String jsonString) {
                 finish();
-                MainActivity.actionStart(WelcomeActivity.this, jsonString);
+                MainActivity.actionStart(WelcomeActivity.this);
             }
         }).execute();
 

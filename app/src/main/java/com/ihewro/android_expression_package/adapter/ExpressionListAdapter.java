@@ -13,6 +13,8 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;
 
+import org.litepal.LitePal;
+
 import java.util.List;
 
 
@@ -59,10 +61,11 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
         }else {
             helper.getView(R.id.notice).setVisibility(View.GONE);
         }
+        item = LitePal.find(Expression.class,item.getId());
+        UIUtil.setImageToImageView(item, (ImageView) helper.getView(R.id.iv_expression));
 
         final CheckBox checkBox = helper.getView(R.id.cb_item);
         checkBox.setTag(helper.getAdapterPosition());
-        UIUtil.setImageToImageView(item, (ImageView) helper.getView(R.id.iv_expression));
         //判断当前checkbox的状态
         if (showCheckBox) {
             helper.getView(R.id.cb_item).setVisibility(View.VISIBLE);

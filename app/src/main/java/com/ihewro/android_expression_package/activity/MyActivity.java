@@ -118,7 +118,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
