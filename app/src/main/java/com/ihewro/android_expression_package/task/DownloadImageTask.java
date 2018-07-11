@@ -150,26 +150,6 @@ public class DownloadImageTask  {
                             try {
 
                                 File file = new File( dirFile.getAbsoluteFile()  + "/" + expFolderAllExpList.get(finalI).getName());
-                                ALog.d(file.getAbsolutePath());
-                                downloadCount++;
-
-                                //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
-                                isExistInFolder = false;
-                                List<Expression> temp = LitePal.where("name = ?",expFolderAllExpList.get(finalI).getName()).find(Expression.class);
-                                if (temp.size()>0){//找到记录了
-                                    isExistInFolder = true;
-                                }
-
-                                if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
-                                    expression.save();
-                                    //更新数据中该目录的关联数据
-                                    ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
-                                    expressionFolder.setCount(expressionFolder.getCount() + 1);
-                                    expressionFolder.getExpressionList().add(expression);
-                                    expressionFolder.save();
-                                }
-
                                 //写入文件
                                 assert response.body() != null;
                                 InputStream is = response.body().byteStream();
@@ -178,6 +158,27 @@ public class DownloadImageTask  {
                                 fos.write(bytes);
                                 fos.flush();
                                 fos.close();
+
+                                ALog.d(file.getAbsolutePath());
+                                downloadCount++;
+
+                                //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
+                                isExistInFolder = false;
+                                List<Expression> temp = LitePal.where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
+                                if (temp.size()>0){//找到记录了
+                                    isExistInFolder = true;
+                                }
+
+                                if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
+                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
+                                    new GetExpDesTask(activity,false).execute(expression);
+                                    expression.save();
+                                    //更新数据中该目录的关联数据
+                                    ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                    expressionFolder.setCount(expressionFolder.getCount() + 1);
+                                    expressionFolder.getExpressionList().add(expression);
+                                    expressionFolder.save();
+                                }
 
 
                                 //更新图片库

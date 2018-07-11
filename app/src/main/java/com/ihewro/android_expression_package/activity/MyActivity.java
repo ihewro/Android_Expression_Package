@@ -52,7 +52,6 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
-
     View notDataView;
 
     //适配器
@@ -182,7 +181,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     private void updateDatabase(){
         new MaterialDialog.Builder(this)
                 .title("操作通知")
-                .content("您确定需要重新同步数据吗？一般本地表情包数据显示不正常才需要执行此操作。\n并且执行此操作会丢失表情包作者的头像和名称（不影响具体使用）。")
+                .content("同步数据的过程会再次扫描你的真实表情包目录\n在这个过程中会自动的为您图片文字识别，添加表情描述（如果添加失败，可以稍后手动添加）")
                 .positiveText("朕确定")
                 .negativeText("我只是点着玩的，快关掉快关掉！")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {

@@ -79,9 +79,7 @@ public class ExpImageDialog extends MaterialDialog{
 
     private String[] loves = new String[]{
             "每次看到你的时候 我都觉得 呀我要流鼻血啦 可是 我从来没留过鼻血 我只会流眼泪",
-            "给喜欢的人发撩人表情包吧✨",
             "你可知 你是我青春年少时义无反顾的梦",
-            "给喜欢的人发撩人表情包吧✨",
             "请记住我",
             "时间将它磨得退色，又被岁月添上新的柔光，以至于如今的我再已无法辨别当时的心情。那就当是一见钟情吧。",
             "晚来天欲雪，能饮一杯无。",
@@ -124,6 +122,8 @@ public class ExpImageDialog extends MaterialDialog{
             }else {
                 inputText.setText("");
             }
+        }else {
+            inputView.setVisibility(View.GONE);
         }
         UIUtil.setImageToImageView(expression.getStatus(),expression.getUrl(),ivExpression);
         tvExpression.setText(expression.getName());
@@ -319,7 +319,7 @@ public class ExpImageDialog extends MaterialDialog{
                         expressionList.get(0).setDescription(inputText.getText().toString());
                         expressionList.get(0).save();
                         //发个消息让首页更新数据
-//                        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                        EventBus.getDefault().post(new EventMessage(EventMessage.DESCRIPTION_SAVE,inputText.getText().toString(),expression.getFolderName()));
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

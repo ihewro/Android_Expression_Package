@@ -114,35 +114,32 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/search_input"
         android:layout_width="match_parent"
+        android:background="@drawable/rect_gray"
         android:layout_height="wrap_content"
+        android:inputType="text"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingStart="15dp"
+        android:layout_marginEnd="90dp"
+        android:visibility="gone"
+        android:tooltipText="输入关键字搜索，按返回键关闭搜索"
         android:layout_gravity="end|bottom"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/search_input"
-            android:layout_width="0dp"
-            android:layout_weight="5"
-            android:background="@drawable/rect_gray"
-            android:layout_height="match_parent"
-            android:inputType="text"
-            android:visibility="gone"
-            android:layout_marginBottom="25dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginLeft="10dp"
-            android:paddingLeft="15dp"
-            android:layout_gravity="end|bottom"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_search"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_search_black_24dp" />
+        tools:targetApi="o" />
 
 
-    </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_margin="16dp"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_search_black_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

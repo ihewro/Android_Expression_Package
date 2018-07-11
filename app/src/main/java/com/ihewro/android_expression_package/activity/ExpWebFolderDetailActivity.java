@@ -140,7 +140,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(R.layout.item_expression, expressionList);
+        adapter = new ExpressionListAdapter( expressionList,false);
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))

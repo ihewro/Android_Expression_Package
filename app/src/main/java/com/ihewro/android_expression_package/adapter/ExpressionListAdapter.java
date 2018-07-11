@@ -34,6 +34,8 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
      */
     private boolean showCheckBox = false;
 
+    private boolean showNotDes = false;
+
     /**
      * 防止Checkbox错乱 做setTag  getTag操作
      */
@@ -41,16 +43,22 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
     /**
      *
-     * @param layoutResId
      * @param data
      */
-    public ExpressionListAdapter(int layoutResId, @Nullable List<Expression> data) {
-        super(layoutResId, data);
+    public ExpressionListAdapter(@Nullable List<Expression> data,boolean showNotDes) {
+        super(R.layout.item_expression, data);
         expressionList = data;
+        this.showNotDes = showNotDes;
     }
 
     @Override
     protected void convert(final ExpressionListAdapter.IViewHolder helper, Expression item) {
+
+        if (showNotDes && item.getDesStatus() == 0){
+            helper.getView(R.id.notice).setVisibility(View.VISIBLE);
+        }else {
+            helper.getView(R.id.notice).setVisibility(View.GONE);
+        }
 
         final CheckBox checkBox = helper.getView(R.id.cb_item);
         checkBox.setTag(helper.getAdapterPosition());
@@ -95,6 +103,8 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
     public void setShowCheckBox(boolean showCheckBox) {
         this.showCheckBox = showCheckBox;
     }
+
+
 
 
     public void setAllCheckboxSelected(){

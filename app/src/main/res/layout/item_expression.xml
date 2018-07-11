@@ -9,12 +9,15 @@
     android:clickable="true"
     android:background="?attr/selectableItemBackground">
 
-<ImageView
-    android:id="@+id/iv_expression"
-    android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:src="@drawable/header"
-    android:scaleType="fitCenter"/>
+
+
+    <ImageView
+        android:id="@+id/iv_expression"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:src="@drawable/header"
+        android:scaleType="fitCenter"/>
+
 
     <CheckBox
         android:id="@+id/cb_item"
@@ -24,5 +27,11 @@
         android:clickable="false"
         tools:targetApi="lollipop" />
 
+    <ImageView
+        android:id="@+id/notice"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/ic_touch_app_black_24dp"
+        android:layout_gravity="top|right"/>
 
 </android.support.v7.widget.CardView>

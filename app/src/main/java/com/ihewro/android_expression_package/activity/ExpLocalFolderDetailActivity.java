@@ -16,12 +16,16 @@ import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
@@ -67,7 +71,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     private ExpressionListAdapter adapter;
     private int dirId;
     private String dirName;
-
+    private int clickPosition;
     /**
      * 是否显示checkbox
      */
@@ -77,7 +81,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
      */
     private List<String> checkList = new ArrayList<>();
     List<Expression> deleteExpList = new ArrayList<>();
-
+    GridLayoutManager gridLayoutManager;
 
     Comparator<Integer> cmp = new Comparator<Integer>() {
         public int compare(Integer i1, Integer i2) {
@@ -98,6 +102,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_exp_local_folder_detail);
         ButterKnife.bind(this);
 
+        EventBus.getDefault().register(this);
+
         initData();
 
         initView();
@@ -114,9 +120,9 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         toolbar.setTitle(dirName);
         refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadMore(false);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(R.layout.item_expression, expressionList);
+        adapter = new ExpressionListAdapter(expressionList,true);
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
@@ -215,9 +221,10 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
         //点击监听
         adapter.setOnItemClickListener(new ExpressionListAdapter.OnItemClickListener() {
+
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-
+                clickPosition = position;
                 if (isShowCheck) {//如果是在多选的状态
                     CheckBox checkBox = view.findViewById(R.id.cb_item);
                     checkBox.setChecked(!checkBox.isChecked());//多选项设置为相反的状态
@@ -284,14 +291,39 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     public void setContraryCheck() {
         if (isShowCheck) {//取消批量
             selectDelete.setVisibility(View.GONE);
-            ((ExpressionListAdapter) adapter).setShowCheckBox(false);
+            adapter.setShowCheckBox(false);
             adapter.notifyDataSetChanged();
             checkList.clear();
         } else {//显示批量
-            ((ExpressionListAdapter) adapter).setShowCheckBox(true);
+            adapter.setShowCheckBox(true);
             adapter.notifyDataSetChanged();
             selectDelete.setVisibility(View.VISIBLE);
         }
         isShowCheck = !isShowCheck;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refreshUI(final EventMessage eventBusMessage){
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ALog.d("更新布局" + clickPosition);
+                    ALog.d(eventBusMessage.toString());
+                    View view = gridLayoutManager.findViewByPosition(clickPosition).findViewById(R.id.notice);
+                    ALog.d(view);
+                    view.setVisibility(View.GONE);
+                    expressionList.get(clickPosition).setDesStatus(1);
+                    expressionList.get(clickPosition).setDescription(eventBusMessage.getMessage());
+                }
+            });
+        }
+    }
+
 }

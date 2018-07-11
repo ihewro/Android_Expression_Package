@@ -108,7 +108,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                                     existExpIdList.add(String.valueOf(expression.getId()));
                                     //判断是否有描述，没有的话需要获取描述
                                     if (expression.getDesStatus() == 0){
-                                        new GetExpDesTask(activity).execute(expression);
+                                        new GetExpDesTask(activity,true).execute(expression);
                                     }
 
                                 }
@@ -119,7 +119,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                                 expression.save();
                                 existExpIdList.add(String.valueOf(expression.getId()));
 
-                                new GetExpDesTask(activity).execute(expression);
+                                new GetExpDesTask(activity,true).execute(expression);
                                 currentFolderCount++;
                                 expressionFolder.setCount(currentFolderCount);
                                 expressionFolder.getExpressionList().add(expression);

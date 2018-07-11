@@ -32,6 +32,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,8 +68,6 @@ import com.ihewro.android_expression_package.task.RemoveCacheTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
-import com.ihewro.android_expression_package.util.DataUtil;
-import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CustomImageView;
@@ -156,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private boolean isFirst;//是否是首次打开app
     private boolean isSearching;//是否打开了搜索功能
+
     /**
      * 由启动页面启动主活动
      *
@@ -289,8 +289,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void onClick(View v) {
                 isSearching = true;
                 searchInput.setVisibility(View.VISIBLE);
-                if (!Objects.equals(searchInput.getText().toString(), "")){
-                   ResultActivity.actionStart(MainActivity.this,searchInput.getText().toString());
+                if (!Objects.equals(searchInput.getText().toString(), "")) {
+                    ResultActivity.actionStart(MainActivity.this, searchInput.getText().toString());
                 }
 
             }
@@ -615,7 +615,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
-
     /**
      * 设置ViewPager
      */
@@ -823,11 +822,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onBackPressed() {
 
-        if (isSearching){
+        if (isSearching) {
             searchInput.setVisibility(View.GONE);
             isSearching = false;
             searchInput.setText("");
-        }else {
+        } else {
             if (result.isDrawerOpen()) {
                 result.closeDrawer();
             } else {

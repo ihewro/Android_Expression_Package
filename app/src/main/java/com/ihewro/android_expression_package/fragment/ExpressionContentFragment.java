@@ -17,8 +17,13 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
+import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -45,6 +50,7 @@ public class ExpressionContentFragment extends Fragment {
     private ExpImageDialog expressionDialog;
     private int currentPosition = -1;
     View notDataView;
+    private String tabName;
 
 
     public static Fragment fragmentInstant(String data,String name){
@@ -68,6 +74,9 @@ public class ExpressionContentFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
 
+        EventBus.getDefault().register(this);
+
+
         //初始化弹出层相关信息
         initView();
 
@@ -90,7 +99,7 @@ public class ExpressionContentFragment extends Fragment {
             }
         }).start();
 
-        adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
+        adapter = new ExpressionListAdapter(expressionList,false);
         recyclerView.setAdapter(adapter);
 
         if (expressionList.size() == 0){
@@ -120,6 +129,7 @@ public class ExpressionContentFragment extends Fragment {
         assert bundle != null;
         try {
             String jsonString = bundle.getString("data");
+            tabName = bundle.getString("name");
             if (Objects.equals(jsonString, "")){
                 expressionList = new ArrayList<>();
             }else {
@@ -155,4 +165,18 @@ public class ExpressionContentFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refreshUI(EventMessage eventBusMessage) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)) {
+            ALog.d("怎么回事？");
+            if (Objects.equals(eventBusMessage.getMessage2(), tabName)){
+                ALog.d("更新首页布局");
+                expressionList.get(currentPosition).setDesStatus(1);
+                expressionList.get(currentPosition).setDescription(eventBusMessage.getMessage());
+            }
+        }
+    }
+
 }

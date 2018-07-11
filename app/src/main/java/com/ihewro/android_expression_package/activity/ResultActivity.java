@@ -85,11 +85,13 @@ public class ResultActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        toolbar.setTitle("搜索：" + searchText);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view2, (ViewGroup) recyclerView.getParent(), false);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(R.layout.item_expression,expressionList);
+        adapter = new ExpressionListAdapter(expressionList,false);
         recyclerView.setAdapter(adapter);
 
 
