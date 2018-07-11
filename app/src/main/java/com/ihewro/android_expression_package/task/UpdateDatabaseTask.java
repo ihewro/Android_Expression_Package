@@ -9,7 +9,6 @@ import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
-import com.ihewro.android_expression_package.bean.Image;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -130,7 +129,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                                 } catch (java.io.IOException e) {
                                     e.printStackTrace();
                                 }
-                                Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder,new Image(bytes));
+                                Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder,bytes);
                                 expression.save();
                                 existExpIdList.add(String.valueOf(expression.getId()));
 

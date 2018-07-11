@@ -5,7 +5,6 @@ import android.widget.Toast;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
-import com.ihewro.android_expression_package.bean.Image;
 import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
@@ -64,14 +63,14 @@ public class MyDataBase {
         InputStream is = null;
         byte[] bytes = null;
         try {
-            is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() +"/"+ expression.getName());
+            is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() + expression.getName());
             bytes = UIUtil.InputStreamTOByte(is);
             is.close();
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
 
-        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder,new Image(bytes));
+        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder,bytes);
         currentExpression.save();
 
 
@@ -114,18 +113,18 @@ public class MyDataBase {
 
     public static void saveExpImage(Expression expression,boolean isForce){
         if (expression.isSaved()){
-            if (isForce || (expression.getImage().getContent() == null || expression.getImage().getContent().length == 0)){
+            if (isForce || (expression.getImage() == null || expression.getImage().length == 0)){
                 InputStream is = null;
                 byte[] bytes = null;
                 try {
-                    is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() +"/" + expression.getName());
+                    is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() +"" + expression.getName());
                     bytes = UIUtil.InputStreamTOByte(is);
                     is.close();
                 } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
                 ALog.d(bytes);
-                expression.setImage(new Image(bytes));
+                expression.setImage(bytes);
                 expression.save();
             }
         }else {

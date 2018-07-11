@@ -119,7 +119,7 @@ public class UIUtil {
         switch (expression.getStatus()){
             case 1:
                 List<Expression>tempExpList = LitePal.where("name =? and foldername =?",expression.getName(),expression.getFolderName()).find(Expression.class);
-                Glide.with(UIUtil.getContext()).load(tempExpList.get(0).getImage().getContent()).apply(options).transition(withCrossFade()).into(imageView);
+                Glide.with(UIUtil.getContext()).load(tempExpList.get(0).getImage()).apply(options).transition(withCrossFade()).into(imageView);
                 break;
             case 2:
                 Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);

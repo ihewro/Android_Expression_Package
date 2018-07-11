@@ -70,7 +70,7 @@ public class DeleteImageTask extends AsyncTask<Void,Void,Boolean>{
             for (int i =0;i<expressionList.size();i++){
                 FileUtil.deleteImageFromGallery(expressionList.get(i).getUrl());
                 ALog.d("表情名称为" + expressionList.get(i).getName());
-                LitePal.deleteAll(Expression.class,"name = ?",expressionList.get(i).getName());
+                LitePal.deleteAll(Expression.class,"name = ? and foldername = ?",expressionList.get(i).getName(),expressionList.get(i).getFolderName());
                 //修改对应目录的数目
                 List<ExpressionFolder> tempExpFolders = LitePal.where("name = ? and exist = ?",folderName, String.valueOf(1)).find(ExpressionFolder.class,true);
 

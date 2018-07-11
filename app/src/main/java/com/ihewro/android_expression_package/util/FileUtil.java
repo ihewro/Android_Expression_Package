@@ -40,8 +40,11 @@ public class FileUtil {
      * 从图片库中删除图片
      */
     public static void deleteImageFromGallery(String file){
-        new File(file).delete();
-        updateMediaStore(UIUtil.getContext(),file);
+        File file1 = new File(file);
+        if (file1.exists() || file != ""){
+            new File(file).delete();
+            updateMediaStore(UIUtil.getContext(),file);
+        }
     }
 
     /**

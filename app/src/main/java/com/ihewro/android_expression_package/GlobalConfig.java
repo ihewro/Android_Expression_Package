@@ -19,5 +19,6 @@ public class GlobalConfig {
     public static final String serverUrl = "https://www.ihewro.com/exp/";
     public static final String getDirListUrl = serverUrl + "expFolderList.php";
     public static final String getDirDetailUrl = serverUrl + "expFolderDetail.php";
+    public static final String appShareOrSavePath = appDirPath + "应用默认文件夹/";//文件夹名称为
 
 }
