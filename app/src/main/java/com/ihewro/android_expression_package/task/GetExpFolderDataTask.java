@@ -87,11 +87,11 @@ public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
         }
 
         //获取表情包数据库信息
-        List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+        List<ExpressionFolder> expressionFolderList = LitePal.select().find(ExpressionFolder.class);
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonString = mapper.writeValueAsString(expressionFolderList);
-
+            ALog.d(jsonString);
             //循环等待前面的请求结束,如果没有网络请求的话，getOnes为true，不会执行这里的判断的
             while (!getOnes){
                 ALog.d("getones",getOnes);

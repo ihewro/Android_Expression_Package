@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.bean.Expression;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -104,6 +105,22 @@ public class UIUtil {
         return context.getResources().getDimensionPixelSize(resourceId);
     }
 
+    public static void setImageToImageView(Expression expression,ImageView imageView){
+
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.fail);
+
+        switch (expression.getStatus()){
+            case 1:
+                Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                break;
+            case 2:
+                Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
+                break;
+        }
+
+    }
 
     public static void setImageToImageView(int status, String url, ImageView imageView){
         RequestOptions options = new RequestOptions()

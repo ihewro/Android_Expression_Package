@@ -142,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Drawer result;
     private AccountHeader headerResult;
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
+    List<String> pageTitleList = new ArrayList<>();
+    List<Fragment> fragmentList = new ArrayList<>();
+
     //毫秒
     private long lastClickTime = -1;
     private long thisClickTime = -1;
@@ -647,41 +650,55 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     /**
      * 设置ViewPager
      */
-    private void setViewPager(ViewPager viewPager, boolean isUpdate) {
+    private void setViewPager(final ViewPager viewPager, boolean isUpdate) {
         if (isUpdate) {
             viewPager.removeAllViewsInLayout();
         }
         ALog.d("表情包的数目" + expressionFolderList.size());
-        //碎片列表
-        List<String> pageTitleList = new ArrayList<>();
-        List<Fragment> fragmentList = new ArrayList<>();
 
-        if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
-            fragmentList.add(ExpressionContentFragment.fragmentInstant("", "默认"));
-            pageTitleList.add("默认");
-        } else {
-            for (int i = 0; i < expressionFolderList.size(); i++) {
-                if ((expressionFolderList.get(i).getExpressionList().size() == 0 || expressionFolderList.get(i).getExpressionList() == null)) {
-                    //过滤掉空文件夹
-                    ALog.d("该表情包的表情数目为0");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //碎片列表
+                fragmentList.clear();
+                pageTitleList.clear();
+
+                if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
+                    fragmentList.add(ExpressionContentFragment.fragmentInstant("", "默认"));
+                    pageTitleList.add("默认");
                 } else {
-                    ALog.d("该表情包的表情数目为 " + expressionFolderList.get(i).getExpressionList().size());
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList());
-                        fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString, expressionFolderList.get(i).getName()));
-                        pageTitleList.add(expressionFolderList.get(i).getName());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
+                    for (int i = 0; i < expressionFolderList.size(); i++) {
+                        if ((expressionFolderList.get(i).getExpressionList(false).size() == 0 || expressionFolderList.get(i).getExpressionList(true) == null)) {
+                            //过滤掉空文件夹
+                            ALog.d("该表情包的表情数目为0");
+                        } else {
+                            ALog.d("该表情包的表情数目为 " + expressionFolderList.get(i).getExpressionList(true).size());
+                            try {
+                                ObjectMapper mapper = new ObjectMapper();
+                                String jsonString = mapper.writeValueAsString(expressionFolderList.get(i).getExpressionList(true));
+                                fragmentList.add(ExpressionContentFragment.fragmentInstant(jsonString, expressionFolderList.get(i).getName()));
+                                pageTitleList.add(expressionFolderList.get(i).getName());
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
+                        //新建适配器
+                        adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, pageTitleList);
+                        //设置ViewPager
+                        viewPager.setAdapter(adapter);
+                    }
+                });
             }
-        }
-        //新建适配器
-        adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, pageTitleList);
-        //设置ViewPager
-        viewPager.setAdapter(adapter);
+        }).start();
+
 
     }
 

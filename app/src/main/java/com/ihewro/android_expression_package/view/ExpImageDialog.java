@@ -125,7 +125,7 @@ public class ExpImageDialog extends MaterialDialog{
         }else {
             inputView.setVisibility(View.GONE);
         }
-        UIUtil.setImageToImageView(expression.getStatus(),expression.getUrl(),ivExpression);
+        UIUtil.setImageToImageView(expression,ivExpression);
         tvExpression.setText(expression.getName());
     }
 

@@ -77,6 +77,15 @@ public class ExpressionFolder extends LitePalSupport {
         }
     }
 
+
+    public List<Expression> getExpressionList(boolean data) {
+        if (!data){
+            return LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class,true);
+        }else {
+            return LitePal.where("foldername =?",name).find(Expression.class,true);//连图片数据也查询出来
+        }
+    }
+
     public void setExpressionList(List<Expression> expressionList) {
         this.expressionList = expressionList;
     }

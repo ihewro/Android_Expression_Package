@@ -5,11 +5,13 @@ import android.os.AsyncTask;
 
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
@@ -17,7 +19,10 @@ import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -66,8 +71,6 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
 
         publishProgress(0);
         List<String> existFolderIdList = new ArrayList<>();
-        //LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
-        //LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
         for (int i = 0;i < dir.length;i++){//app目录下面的每个目录分别进行扫描
             if (dir[i].isDirectory() && !Objects.equals(dir[i].getName(), "database")){//表情包目录//排除掉存放数据库备份的目录
                 File[] files = dir[i].listFiles();//目录下的所有文件
@@ -106,6 +109,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                                     Expression expression = tempExpList.get(0);
                                     isExistExp = true;
                                     expression.setExpressionFolder(expressionFolder);
+                                    MyDataBase.saveExpImage(expression,false);
                                     existExpIdList.add(String.valueOf(expression.getId()));
                                     //判断是否有描述，没有的话需要获取描述
                                     if (expression.getDesStatus() == 0){
@@ -116,7 +120,16 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                             }
                             if (!isExistExp){//表情中中没这个表情信息
                                 ALog.d("表情库中没这个表情信息" + files[j].getName());
-                                Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder);
+                                InputStream is = null;
+                                byte[] bytes = null;
+                                try {
+                                    is = new FileInputStream(files[j]);
+                                    bytes = UIUtil.InputStreamTOByte(is);
+                                    is.close();
+                                } catch (java.io.IOException e) {
+                                    e.printStackTrace();
+                                }
+                                Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder,bytes);
                                 expression.save();
                                 existExpIdList.add(String.valueOf(expression.getId()));
 

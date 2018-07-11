@@ -12,6 +12,8 @@ import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.litepal.LitePal;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +47,12 @@ public class MyDataBase {
             List<Expression> expressionList = LitePal.where("name = ? and foldername = ?",expression.getName(),expression.getFolderName()).find(Expression.class);
             if (expressionList.size() >0){//有该表情的信息就不用管了
                 expressionList.get(0).setExpressionFolder(expressionFolder);
+                saveExpImage(expression,false);
                 return true;
             }
             ALog.d("目录存在，但是表情不存在");
         }else if (expressionFolderList.size() <=0){//没有该目录信息
+
             expressionFolder = new ExpressionFolder(1,0,expression.getFolderName(),null,null, DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),-1);
             expressionFolder.save();
             ALog.d("目录和表情都没有的");
@@ -56,8 +60,19 @@ public class MyDataBase {
             return false;//这种错误几乎不会发生，除非数据库的错误严重错乱
         }
         //3. 把表情的信息存储进去,执行这里的时候有两种情况，一种是目录和表情都没有的。一种目录存在，但是表情不存在。
-        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder);
+        InputStream is = null;
+        byte[] bytes = null;
+        try {
+            is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() +"/"+ expression.getName());
+            bytes = UIUtil.InputStreamTOByte(is);
+            is.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder,bytes);
         currentExpression.save();
+
 
         expressionFolder.setCount(expressionFolder.getCount() + 1);
 
@@ -94,5 +109,26 @@ public class MyDataBase {
             ALog.d("需要重新请求ones数据");
         }
         return flag;
+    }
+
+    public static void saveExpImage(Expression expression,boolean isForce){
+        if (expression.isSaved()){
+            if (isForce || (expression.getImage() == null || expression.getImage().length == 0)){
+                InputStream is = null;
+                byte[] bytes = null;
+                try {
+                    is = new FileInputStream(GlobalConfig.appDirPath + expression.getFolderName() +"/" + expression.getName());
+                    bytes = UIUtil.InputStreamTOByte(is);
+                    is.close();
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                }
+                ALog.d(bytes);
+                expression.setImage(bytes);
+                expression.save();
+            }
+        }else {
+            ALog.d("expression 不是持久化对象");
+        }
     }
 }

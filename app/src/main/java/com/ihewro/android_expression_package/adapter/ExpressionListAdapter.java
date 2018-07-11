@@ -62,7 +62,7 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
         final CheckBox checkBox = helper.getView(R.id.cb_item);
         checkBox.setTag(helper.getAdapterPosition());
-        UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (ImageView) helper.getView(R.id.iv_expression));
+        UIUtil.setImageToImageView(item, (ImageView) helper.getView(R.id.iv_expression));
         //判断当前checkbox的状态
         if (showCheckBox) {
             helper.getView(R.id.cb_item).setVisibility(View.VISIBLE);

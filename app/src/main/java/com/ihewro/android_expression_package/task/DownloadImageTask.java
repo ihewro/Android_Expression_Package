@@ -170,7 +170,7 @@ public class DownloadImageTask  {
                                 }
 
                                 if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder);
+                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder,bytes);
                                     new GetExpDesTask(activity,false).execute(expression);
                                     expression.save();
                                     //更新数据中该目录的关联数据
