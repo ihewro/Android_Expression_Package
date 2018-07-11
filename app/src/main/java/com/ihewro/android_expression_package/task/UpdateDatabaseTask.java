@@ -109,7 +109,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                                     Expression expression = tempExpList.get(0);
                                     isExistExp = true;
                                     expression.setExpressionFolder(expressionFolder);
-                                    MyDataBase.saveExpImage(expression,false);
+                                    //MyDataBase.saveExpImage(expression,false);
                                     existExpIdList.add(String.valueOf(expression.getId()));
                                     //判断是否有描述，没有的话需要获取描述
                                     if (expression.getDesStatus() == 0){

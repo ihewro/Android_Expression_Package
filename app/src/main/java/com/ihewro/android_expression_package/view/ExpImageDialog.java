@@ -274,9 +274,11 @@ public class ExpImageDialog extends MaterialDialog{
         getAuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
                 GeneralBasicParams param = new GeneralBasicParams();
                 param.setDetectDirection(true);
-                param.setImageFile(new File(expression.getUrl()));
+                FileUtil.bytesSavedToFile(expression.getImage(),tempFile);
+                param.setImageFile(tempFile);
                 final MaterialDialog dialog = new MaterialDialog.Builder(activity)
                         .progress(true, 0)
                         .progressIndeterminateStyle(true)
@@ -295,6 +297,7 @@ public class ExpImageDialog extends MaterialDialog{
                         }
                         inputText.setText(sb);
                         dialog.dismiss();
+                        tempFile.delete();
                     }
 
                     @Override
@@ -302,6 +305,7 @@ public class ExpImageDialog extends MaterialDialog{
                         Toasty.error(activity,error.getMessage()).show();
                         dialog.dismiss();
                         ALog.d(error.getMessage());
+                        tempFile.delete();
                     }
                 });
             }

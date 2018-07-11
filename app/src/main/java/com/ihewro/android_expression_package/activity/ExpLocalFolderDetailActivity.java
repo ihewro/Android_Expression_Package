@@ -385,11 +385,11 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     if (data!=null){
                         List<String> addExpList = Matisse.obtainPathResult(data);
                         for (int i = 0; i < addExpList.size(); i++) {
-                            String fileName = new File(addExpList.get(i)).getName();
-                            FileUtil.copyFileToTarget(addExpList.get(i), GlobalConfig.appDirPath + dirName + "/" + fileName);//移动文件
+                            File tempFile = new File(addExpList.get(i));
+                            String fileName = tempFile.getName();
                             //保存之前先查看数据库中是否已经有了
-                            Expression expression = new Expression(1, fileName, GlobalConfig.appDirPath + dirName + "/" + fileName, dirName);
-                            MyDataBase.addExpressionRecord(expression);
+                            Expression expression = new Expression(1, fileName, "", dirName);
+                            MyDataBase.addExpressionRecord(expression,tempFile);
                         }
                         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         initData();

@@ -13,13 +13,16 @@ import android.provider.MediaStore;
 
 import com.blankj.ALog;
 import com.canking.minipay.MiniPayUtils;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
@@ -112,6 +115,28 @@ public class FileUtil {
     }
 
 
+    public static boolean bytesSavedToFile(byte[] bytes,String target){
+        return bytesSavedToFile(bytes,new File(target));
+    }
+
+    public static boolean bytesSavedToFile(byte[]bytes, File targetFile){
+        if (!targetFile.getParentFile().exists()){
+            targetFile.getParentFile().mkdir();
+        }
+
+        OutputStream output = null;
+        try {
+            output = new FileOutputStream(targetFile);
+            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
+            bufferedOutput.write(bytes);
+            output.close();
+            bufferedOutput.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
 
 
     public static boolean copyFileToTarget(String origin,String target){
@@ -161,6 +186,24 @@ public class FileUtil {
             }
             return true;
         }
+    }
+
+    public static byte[] fileToBytes(String file) {
+
+        return fileToBytes(new File(file));
+    }
+        public static byte[] fileToBytes(File file){
+        InputStream is = null;
+        byte[] bytes = null;
+        try {
+            is = new FileInputStream(file);
+            bytes = UIUtil.InputStreamTOByte(is);
+            is.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
     }
 
 }

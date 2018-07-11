@@ -181,11 +181,10 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                         @Override
                         public void onInput(MaterialDialog dialog, CharSequence input) {
                             // Do something
-                            File dirFile = new File(GlobalConfig.appDirPath + dialog.getInputEditText().getText().toString());
-                            if (dirFile.exists() && dirFile.isDirectory()){
-                                Toasty.error(MyActivity.this,"目录名称已存在，请更换").show();
+                            List<ExpressionFolder> temExpFolderList = LitePal.where("name = ?",dialog.getInputEditText().getText().toString()).find(ExpressionFolder.class);
+                            if (temExpFolderList.size()>0){
+                                Toasty.error(MyActivity.this,"目录名称已存在，请更换",Toast.LENGTH_SHORT).show();
                             }else {
-                                dirFile.mkdir();
                                 ExpressionFolder expressionFolder = new ExpressionFolder(1,0,dialog.getInputEditText().getText().toString(),null,null, DateUtil.getNowDateStr(),null,null,-1);
                                 expressionFolder.save();
                                 initData();

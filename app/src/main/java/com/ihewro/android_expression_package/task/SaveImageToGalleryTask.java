@@ -43,8 +43,8 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
         Expression expression = expressions[0];
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         if (expression.getStatus() == 1){//sd卡图片
-            result =  FileUtil.copyFileToTarget(expression.getUrl(),targetPath);
-            MyDataBase.addExpressionRecord(expression);
+            result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
+            //MyDataBase.addExpressionRecord(expression,expression.getImage());这里肯定是在数据库里面的
             return result;
         }else if (expression.getStatus() == 2){//网络来源的图片
             try {
@@ -53,8 +53,11 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                         .load(expression.getUrl())
                         .submit().get();
                 if(imageFile != null && imageFile.exists()){
-                    File targetFile = new File(targetPath);
-                    result = FileUtil.copyFileToTarget(imageFile,targetFile);
+                    MyDataBase.addExpressionRecord(expression,imageFile);
+                    EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+
+                   /* File targetFile = new File(targetPath);
+                    result = FileUtil.copyFileToTarget(imageFile,targetFile);*/
                 }else {
                     result = false;
                 }
@@ -62,9 +65,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                 result = false;
                 e.printStackTrace();
             }
-            MyDataBase.addExpressionRecord(expression);
-            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-
 
             return result;
         }else {//未知来源图片
