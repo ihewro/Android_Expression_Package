@@ -344,6 +344,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     view.setVisibility(View.GONE);
                     expressionList.get(clickPosition).setDesStatus(1);
                     expressionList.get(clickPosition).setDescription(eventBusMessage.getMessage());
+                    EventBus.getDefault().post(new EventMessage(EventMessage.LOCAL_DESCRIPTION_SAVE,eventBusMessage.getMessage(),eventBusMessage.getMessage2(),String.valueOf(clickPosition)));
+
                 }
             });
         }
@@ -380,16 +382,19 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    List<String> addExpList = Matisse.obtainPathResult(data);
-                    for (int i = 0; i < addExpList.size(); i++) {
-                        String fileName = new File(addExpList.get(i)).getName();
-                        FileUtil.copyFileToTarget(addExpList.get(i), GlobalConfig.appDirPath + dirName + "/" + fileName);//移动文件
-                        //保存之前先查看数据库中是否已经有了
-                        Expression expression = new Expression(1, fileName, GlobalConfig.appDirPath + dirName + "/" + fileName, dirName);
-                        MyDataBase.addExpressionRecord(expression);
+                    if (data!=null){
+                        List<String> addExpList = Matisse.obtainPathResult(data);
+                        for (int i = 0; i < addExpList.size(); i++) {
+                            String fileName = new File(addExpList.get(i)).getName();
+                            FileUtil.copyFileToTarget(addExpList.get(i), GlobalConfig.appDirPath + dirName + "/" + fileName);//移动文件
+                            //保存之前先查看数据库中是否已经有了
+                            Expression expression = new Expression(1, fileName, GlobalConfig.appDirPath + dirName + "/" + fileName, dirName);
+                            MyDataBase.addExpressionRecord(expression);
+                        }
+                        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                        initData();
                     }
-                    EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-                    initData();
+
                 }
             }).start();
         }

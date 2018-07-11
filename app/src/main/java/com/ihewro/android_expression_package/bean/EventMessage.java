@@ -13,9 +13,11 @@ public class EventMessage {
 
     public static final String DATABASE = "database";
     public static final String DESCRIPTION_SAVE = "descriptionSave";
+    public static final String LOCAL_DESCRIPTION_SAVE = "localDescriptionSave";
     private String type;
     private String message;
     private String message2;
+    private String message3;
 
 
     public EventMessage(String type) {
@@ -27,10 +29,19 @@ public class EventMessage {
         this.message = message;
     }
 
+
     public EventMessage(String type, String message, String message2) {
         this.type = type;
         this.message = message;
         this.message2 = message2;
+    }
+
+
+    public EventMessage(String type, String message, String message2,String message3) {
+        this.type = type;
+        this.message = message;
+        this.message2 = message2;
+        this.message3 = message3;
     }
 
     public String getType() {
@@ -55,6 +66,14 @@ public class EventMessage {
 
     public void setMessage2(String message2) {
         this.message2 = message2;
+    }
+
+    public String getMessage3() {
+        return message3;
+    }
+
+    public void setMessage3(String message3) {
+        this.message3 = message3;
     }
 
     @Override

@@ -171,10 +171,11 @@ public class ExpressionContentFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refreshUI(EventMessage eventBusMessage) {
-        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.LOCAL_DESCRIPTION_SAVE)) {
             ALog.d("怎么回事？");
             if (Objects.equals(eventBusMessage.getMessage2(), tabName)){
                 ALog.d("更新首页布局");
+                currentPosition= Integer.parseInt(eventBusMessage.getMessage3());
                 expressionList.get(currentPosition).setDesStatus(1);
                 expressionList.get(currentPosition).setDescription(eventBusMessage.getMessage());
             }
