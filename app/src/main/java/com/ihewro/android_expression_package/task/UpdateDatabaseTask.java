@@ -73,7 +73,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                 if (files.length > 0){//排除空文件夹
                     int currentFolderCount = 0;
                     Boolean isExistFolder = false;
-                    List<ExpressionFolder> tempExpressionFolderList = LitePal.where("name = ?",dir[i].getName()).find(ExpressionFolder.class,true);
+                    List<ExpressionFolder> tempExpressionFolderList = LitePal.where("name = ? and exist = ?",dir[i].getName(), String.valueOf(1)).find(ExpressionFolder.class,true);
                     if (tempExpressionFolderList.size() > 0){//首先查询数据库中有没有这个目录
                         ALog.d("当前目录存在");
                         expressionFolder = tempExpressionFolderList.get(0);

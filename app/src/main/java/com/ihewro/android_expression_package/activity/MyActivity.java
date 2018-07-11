@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.animation.BaseAnimation;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
@@ -27,6 +29,8 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
+import com.ihewro.android_expression_package.util.DataUtil;
+import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
@@ -35,7 +39,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -165,6 +171,27 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
         }else if (item.getItemId() == android.R.id.home) {
             finish();
+        }else if (item.getItemId() == R.id.re_add){
+            //新建表情文件夹
+            new MaterialDialog.Builder(this)
+                    .title("输入表情包名称")
+                    .content("同样会使用该名称新建一个文件夹")
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input("任意文字", "", new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence input) {
+                            // Do something
+                            File dirFile = new File(GlobalConfig.appDirPath + dialog.getInputEditText().getText().toString());
+                            if (dirFile.exists() && dirFile.isDirectory()){
+                                Toasty.error(MyActivity.this,"目录名称已存在，请更换").show();
+                            }else {
+                                dirFile.mkdir();
+                                ExpressionFolder expressionFolder = new ExpressionFolder(1,0,dialog.getInputEditText().getText().toString(),null,null, DateUtil.getNowDateStr(),null,null,-1);
+                                expressionFolder.save();
+                                initData();
+                            }
+                        }
+                    }).show();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -128,7 +128,7 @@
         android:paddingStart="15dp"
         android:layout_marginEnd="90dp"
         android:visibility="gone"
-        android:tooltipText="输入关键字搜索，按返回键关闭搜索"
+        android:hint="输入关键字搜索，按返回键关闭搜索"
         android:layout_gravity="end|bottom"
         tools:targetApi="o" />
 

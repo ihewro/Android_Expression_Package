@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/re_add"
-        android:title="新建表情包"
+        android:title="添加表情"
         app:showAsAction="collapseActionView" />
 </menu>

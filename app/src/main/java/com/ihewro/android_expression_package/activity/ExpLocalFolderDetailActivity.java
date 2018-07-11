@@ -2,10 +2,14 @@ package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
@@ -14,20 +18,30 @@ import android.widget.Toast;
 
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
+import com.ihewro.android_expression_package.view.MyGlideEngine;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.zhihu.matisse.filter.Filter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -148,6 +162,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     @Override
                     public void run() {
                         adapter.setNewData(expressionList);
+                        adapter.notifyDataSetChanged();
                     }
                 });
             }
@@ -326,4 +341,49 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_local_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.re_add){
+            //
+            Matisse.from(ExpLocalFolderDetailActivity.this)
+                    .choose(MimeType.ofAll(),false)
+                    .countable(true)
+                    .maxSelectable(9)
+                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                    .thumbnailScale(0.85f)
+                    .theme(R.style.Matisse_Dracula)
+                    .imageEngine(new MyGlideEngine())
+                    .forResult(1998);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1998){
+            //把图片加入到图库中
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<String> addExpList = Matisse.obtainPathResult(data);
+                    for (int i = 0;i<addExpList.size();i++){
+                        String fileName = new File(addExpList.get(i)).getName();
+                        FileUtil.copyFileToTarget(addExpList.get(i), GlobalConfig.appDirPath + dirName + "/" + fileName);//移动文件
+                        //保存之前先查看数据库中是否已经有了
+                        Expression expression = new Expression(1,fileName,GlobalConfig.appDirPath + dirName + "/" + fileName,dirName);
+                        MyDataBase.addExpressionRecord(expression);
+                    }
+                    EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                    initData();
+                }
+            }).start();
+        }
+    }
 }

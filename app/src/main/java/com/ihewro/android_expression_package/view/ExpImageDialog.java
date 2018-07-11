@@ -314,7 +314,7 @@ public class ExpImageDialog extends MaterialDialog{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        List<Expression> expressionList = LitePal.where("name = ?",expression.getName()).find(Expression.class,true);
+                        List<Expression> expressionList = LitePal.where("name = ? and foldername = ?",expression.getName(),expression.getFolderName()).find(Expression.class,true);
                         expressionList.get(0).setDesStatus(1);
                         expressionList.get(0).setDescription(inputText.getText().toString());
                         expressionList.get(0).save();

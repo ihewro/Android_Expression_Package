@@ -74,7 +74,9 @@ public class ExpressionContentFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
 
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
 
 
         //初始化弹出层相关信息

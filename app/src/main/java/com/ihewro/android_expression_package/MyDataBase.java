@@ -42,8 +42,9 @@ public class MyDataBase {
         //2. 检查该目录中有没有该表情名称
         if (expressionFolderList.size () == 1){
             expressionFolder = expressionFolderList.get(0);
-            List<Expression> expressionList = LitePal.where("name = ?",expression.getName()).find(Expression.class);
+            List<Expression> expressionList = LitePal.where("name = ? and foldername = ?",expression.getName(),expression.getFolderName()).find(Expression.class);
             if (expressionList.size() >0){//有该表情的信息就不用管了
+                expressionList.get(0).setExpressionFolder(expressionFolder);
                 return true;
             }
             ALog.d("目录存在，但是表情不存在");
