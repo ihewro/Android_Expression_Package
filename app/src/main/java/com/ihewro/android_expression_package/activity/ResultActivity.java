@@ -118,6 +118,11 @@ public class ResultActivity extends BaseActivity {
                         Toasty.success(ResultActivity.this,"搜索到" + searchExpressionList.size() + "个结果").show();
                         expressionList = searchExpressionList;
                         adapter.setNewData(searchExpressionList);
+
+                        if (searchExpressionList.size() == 0){
+                            adapter.setNewData(null);
+                            adapter.setEmptyView(notDataView);
+                        }
                     }
                 });
             }

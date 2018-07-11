@@ -64,6 +64,8 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     TextView selectAddButton;
     @BindView(R.id.owner_avatar)
     AvatarImageView ownerAvatar;
+    @BindView(R.id.exit_select)
+    TextView exitSelect;
     private ExpImageDialog expressionDialog;
     View notDataView;
 
@@ -140,7 +142,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter( expressionList,false);
+        adapter = new ExpressionListAdapter(expressionList, false);
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
@@ -148,7 +150,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
                 .build();
 
         ownerName.setText(ownerNameString);
-        UIUtil.setImageToImageView(2,ownerAvatarString,ownerAvatar);
+        UIUtil.setImageToImageView(2, ownerAvatarString, ownerAvatar);
     }
 
 
@@ -218,6 +220,13 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     }
 
     private void initListener() {
+
+        exitSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContraryCheck();
+            }
+        });
 
         downloadAll.setOnClickListener(new View.OnClickListener() {
             @Override

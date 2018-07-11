@@ -71,7 +71,7 @@ public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder,
         helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExpLocalFolderDetailActivity.actionStart(activity,item.getId(),item.getName());
+                ExpLocalFolderDetailActivity.actionStart(activity,item.getId(),item.getName(),item.getCreateTime());
             }
         });
 

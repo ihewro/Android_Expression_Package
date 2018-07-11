@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +23,6 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.util.FileUtil;
@@ -33,8 +31,6 @@ import com.ihewro.android_expression_package.view.MyGlideEngine;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
-import com.zhihu.matisse.filter.Filter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -76,6 +72,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     RelativeLayout selectDelete;
     @BindView(R.id.to_select)
     TextView toSelect;
+    @BindView(R.id.exit_select)
+    TextView exitSelect;
 
 
     private ExpImageDialog expressionDialog;
@@ -95,6 +93,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
      */
     private List<String> checkList = new ArrayList<>();
     List<Expression> deleteExpList = new ArrayList<>();
+    private String createTime;
     GridLayoutManager gridLayoutManager;
 
     Comparator<Integer> cmp = new Comparator<Integer>() {
@@ -103,10 +102,11 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         }
     };
 
-    public static void actionStart(Activity activity, int dirId, String dirName) {
+    public static void actionStart(Activity activity, int dirId, String dirName, String createTime) {
         Intent intent = new Intent(activity, ExpLocalFolderDetailActivity.class);
         intent.putExtra("id", dirId);
         intent.putExtra("folderName", dirName);
+        intent.putExtra("time", createTime);
         activity.startActivityForResult(intent, 1);
     }
 
@@ -136,12 +136,13 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         refreshLayout.setEnableLoadMore(false);
         gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(expressionList,true);
+        adapter = new ExpressionListAdapter(expressionList, true);
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
                 .setContext(this, null)
                 .build();
+        downloadTime.setText(createTime);
 
     }
 
@@ -151,6 +152,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         if (getIntent() != null) {
             dirId = getIntent().getIntExtra("id", 1);
             dirName = getIntent().getStringExtra("folderName");
+            createTime = getIntent().getStringExtra("time");
         }
 
         new Thread(new Runnable() {
@@ -173,6 +175,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     private void initListener() {
 
+        exitSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContraryCheck();
+            }
+        });
         toSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -324,8 +332,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void refreshUI(final EventMessage eventBusMessage){
-        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)){
+    public void refreshUI(final EventMessage eventBusMessage) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -349,10 +357,10 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.re_add){
+        if (item.getItemId() == R.id.re_add) {
             //
             Matisse.from(ExpLocalFolderDetailActivity.this)
-                    .choose(MimeType.ofAll(),false)
+                    .choose(MimeType.ofAll(), false)
                     .countable(true)
                     .maxSelectable(9)
                     .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
@@ -367,17 +375,17 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1998){
+        if (requestCode == 1998) {
             //把图片加入到图库中
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     List<String> addExpList = Matisse.obtainPathResult(data);
-                    for (int i = 0;i<addExpList.size();i++){
+                    for (int i = 0; i < addExpList.size(); i++) {
                         String fileName = new File(addExpList.get(i)).getName();
                         FileUtil.copyFileToTarget(addExpList.get(i), GlobalConfig.appDirPath + dirName + "/" + fileName);//移动文件
                         //保存之前先查看数据库中是否已经有了
-                        Expression expression = new Expression(1,fileName,GlobalConfig.appDirPath + dirName + "/" + fileName,dirName);
+                        Expression expression = new Expression(1, fileName, GlobalConfig.appDirPath + dirName + "/" + fileName, dirName);
                         MyDataBase.addExpressionRecord(expression);
                     }
                     EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
