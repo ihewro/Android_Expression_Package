@@ -20,6 +20,7 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <pre>
@@ -68,7 +69,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
         //LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
         //LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
         for (int i = 0;i < dir.length;i++){//app目录下面的每个目录分别进行扫描
-            if (dir[i].isDirectory()){//表情包目录
+            if (dir[i].isDirectory() && !Objects.equals(dir[i].getName(), "database")){//表情包目录//排除掉存放数据库备份的目录
                 File[] files = dir[i].listFiles();//目录下的所有文件
                 if (files.length > 0){//排除空文件夹
                     int currentFolderCount = 0;

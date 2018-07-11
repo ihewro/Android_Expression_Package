@@ -51,6 +51,7 @@ import com.canking.minipay.MiniPayUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.MySharePreference;
 import com.ihewro.android_expression_package.R;
@@ -64,10 +65,13 @@ import com.ihewro.android_expression_package.callback.RemoveCacheListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
+import com.ihewro.android_expression_package.task.RecoverDataTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
+import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CustomImageView;
@@ -482,12 +486,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         new SecondaryDrawerItem().withName("表情商店").withIcon(GoogleMaterial.Icon.gmd_add_shopping_cart).withSelectable(false),//2
                         new SecondaryDrawerItem().withName("我的表情").withIcon(GoogleMaterial.Icon.gmd_photo_library).withSelectable(false),//3
                         removeCache,//4
-                        new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app).withSelectable(false),//5
-                        new DividerDrawerItem(),//6
-                        new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo).withSelectable(false),//7
-                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withSelectable(false),//8
-                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment).withSelectable(false),//9
-                        new SecondaryDrawerItem().withName("检查更新").withIcon(GoogleMaterial.Icon.gmd_system_update_alt).withSelectable(false).withDescription("v" + APKVersionCodeUtils.getVerName(MainActivity.this) + "(" + APKVersionCodeUtils.getVersionCode(MainActivity.this) + ")")//10
+                        new SecondaryDrawerItem().withName("备份数据").withIcon(GoogleMaterial.Icon.gmd_file_download).withSelectable(false),//5
+                        new SecondaryDrawerItem().withName("恢复数据").withIcon(GoogleMaterial.Icon.gmd_backup).withSelectable(false),//6
+                        new DividerDrawerItem(),//7
+                        new SecondaryDrawerItem().withName("关于应用").withIcon(R.drawable.logo).withSelectable(false),//8
+                        new SecondaryDrawerItem().withName("五星好评").withIcon(GoogleMaterial.Icon.gmd_favorite).withSelectable(false),//9
+                        new SecondaryDrawerItem().withName("捐赠我们").withIcon(GoogleMaterial.Icon.gmd_payment).withSelectable(false),//10
+                        new SecondaryDrawerItem().withName("检查更新").withIcon(GoogleMaterial.Icon.gmd_system_update_alt).withSelectable(false).withDescription("v" + APKVersionCodeUtils.getVerName(MainActivity.this) + "(" + APKVersionCodeUtils.getVersionCode(MainActivity.this) + ")"),//11
+                        new SecondaryDrawerItem().withName("退出应用").withIcon(GoogleMaterial.Icon.gmd_exit_to_app).withSelectable(false)//12
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -522,13 +528,33 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                         })
                                         .show();
                                 break;
-                            case 5://退出应用
-                                finish();
+
+                            case 5://备份数据
+                                new MaterialDialog.Builder(MainActivity.this)
+                                        .title("为什么需要备份？")
+                                        .content("本应用没有云端同步功能，一旦卸载或者清空应用数据将导致[表情的描述信息]丢失（不会丢失表情）\n\n" +
+                                                "这将无法使用搜索功能。\n" +
+                                                "备份数据后，即使重新安装后，你可以先[恢复数据]，再重新[同步表情]，这样你的表情描述仍然不会消失")
+                                        .positiveText("开始备份")
+                                        .negativeText("取消")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                FileUtil.copyFileToTarget(MainActivity.this.getDatabasePath("expBaby.db").getAbsolutePath(), GlobalConfig.appDirPath + "database/" + DateUtil.getNowDateStr() + ".db");
+                                                Toasty.info(MainActivity.this,"备份数据成功",Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .show();
                                 break;
-                            case 7://关于我们
+                            case 6://恢复数据
+                                //扫描database备份目录下面的文件
+                                new RecoverDataTask(MainActivity.this).execute();
+                                break;
+
+                            case 8://关于我们
                                 AboutActivity.actionStart(MainActivity.this);
                                 break;
-                            case 8://五星好评
+                            case 9://五星好评
                                 Uri uri = Uri.parse("market://details?id=" + UIUtil.getContext().getPackageName());
                                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
                                 try {
@@ -537,13 +563,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                     Toasty.error(MainActivity.this, "无法启动应用市场，请重试", Toast.LENGTH_SHORT).show();
                                 }
                                 break;
-                            case 9://捐赠
+                            case 10://捐赠
                                 MiniPayUtils.setupPay(MainActivity.this, new Config.Builder("FKX07840DBMQMUHP92W1DD", R.drawable.alipay, R.drawable.wechatpay).build());
                                 break;
 
-                            case 10://检查更新
+                            case 11://检查更新
                                 checkUpdateTask = new CheckUpdateTask(MainActivity.this, getPackageManager());
                                 checkUpdateTask.execute();
+                                break;
+                            case 12://退出应用
+                                finish();
                                 break;
                         }
 
