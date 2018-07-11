@@ -1,0 +1,79 @@
+package com.ihewro.android_expression_package.task;
+
+import android.app.Activity;
+import android.os.AsyncTask;
+
+import com.baidu.ocr.sdk.OCR;
+import com.baidu.ocr.sdk.OnResultListener;
+import com.baidu.ocr.sdk.exception.OCRError;
+import com.baidu.ocr.sdk.model.GeneralBasicParams;
+import com.baidu.ocr.sdk.model.GeneralResult;
+import com.baidu.ocr.sdk.model.WordSimple;
+import com.blankj.ALog;
+import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.util.UIUtil;
+
+import java.io.File;
+
+import es.dmoral.toasty.Toasty;
+
+/**
+ * <pre>
+ *     author : hewro
+ *     e-mail : ihewro@163.com
+ *     time   : 2018/07/11
+ *     desc   :
+ *     version: 1.0
+ * </pre>
+ */
+public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
+
+    private Activity activity;
+    private int count = 0;
+
+    GetExpDesTask(Activity activity) {
+        this.activity = activity;
+    }
+
+    @Override
+    protected Void doInBackground(Expression... expressions) {
+
+        final Expression expression = expressions[0];
+
+        GeneralBasicParams param = new GeneralBasicParams();
+        param.setDetectDirection(true);
+        param.setImageFile(new File(expression.getUrl()));
+        OCR.getInstance(UIUtil.getContext()).recognizeGeneralBasic(param, new OnResultListener<GeneralResult>() {
+            @Override
+            public void onResult(GeneralResult result) {
+                StringBuilder sb = new StringBuilder();
+                for (WordSimple wordSimple : result.getWordList()) {
+                    WordSimple word = wordSimple;
+                    sb.append(word.getWords());
+                    sb.append("\n");
+                }
+                if (sb.length()>1){
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                expression.setDesStatus(1);
+                expression.setDescription(sb.toString());
+                expression.save();
+                ALog.d(sb);
+                count ++;
+                ALog.d("获取文字" + count + "次");
+            }
+
+            @Override
+            public void onError(OCRError error) {
+                ALog.d(error.getMessage());
+                Toasty.error(activity,expression.getName()+"表情的描述自动获取失败，你可以稍后手动识别描述").show();
+                count ++;
+                ALog.d("获取文字" + count + "次");
+            }
+        });
+
+
+        return null;
+    }
+
+}

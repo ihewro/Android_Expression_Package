@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.task;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 
 import com.blankj.ALog;
@@ -12,6 +13,7 @@ import com.ihewro.android_expression_package.util.DateUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -31,12 +33,14 @@ import java.util.List;
 public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
 
     private UpdateDatabaseListener listener;
+    private Activity activity;
     private int lastProgress;//上一个任务执行进度
     private int count  = 0;//需要扫描的总文件数目
     private int alCount = 0;//已经扫描的文件数目
     ExpressionFolder expressionFolder;
-    public UpdateDatabaseTask(UpdateDatabaseListener listener) {
+    public UpdateDatabaseTask(Activity activity, UpdateDatabaseListener listener) {
         this.listener = listener;
+        this.activity = activity;
     }
 
     /**
@@ -60,35 +64,105 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
         }
 
         publishProgress(0);
-        LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
-        LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
+        List<String> existFolderIdList = new ArrayList<>();
+        //LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
+        //LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
         for (int i = 0;i < dir.length;i++){//app目录下面的每个目录分别进行扫描
             if (dir[i].isDirectory()){//表情包目录
-                File[] files = dir[i].listFiles();//所有文件
+                File[] files = dir[i].listFiles();//目录下的所有文件
                 if (files.length > 0){//排除空文件夹
                     int currentFolderCount = 0;
-                    expressionFolder = new ExpressionFolder(1,0,dir[i].getName(),null,null, DateUtil.getTimeStringByInt(dir[i].lastModified()),DateUtil.getTimeStringByInt(dir[i].lastModified()),new ArrayList<Expression>(),-1);
-                    expressionFolder.save();
+                    Boolean isExistFolder = false;
+                    List<ExpressionFolder> tempExpressionFolderList = LitePal.where("name = ?",dir[i].getName()).find(ExpressionFolder.class,true);
+                    if (tempExpressionFolderList.size() > 0){//首先查询数据库中有没有这个目录
+                        ALog.d("当前目录存在");
+                        expressionFolder = tempExpressionFolderList.get(0);
+                        existFolderIdList.add(String.valueOf(expressionFolder.getId()));//把数据库中真实存在的目录id存进去
+                        isExistFolder = true;
+                    }else {
+                        ALog.d("当前目录不存在");
+                        expressionFolder = new ExpressionFolder(1,0,dir[i].getName(),null,null, DateUtil.getTimeStringByInt(dir[i].lastModified()),DateUtil.getTimeStringByInt(dir[i].lastModified()),new ArrayList<Expression>(),-1);
+                        expressionFolder.save();
+                        existFolderIdList.add(String.valueOf(expressionFolder.getId()));//把数据库中真实存在的目录id存进去
+                    }
 
+
+                    if (expressionFolder.isSaved()){
+                        ALog.d("该对象已经是持续化了");
+                    }else {
+                        ALog.d("出了点问题");
+                    }
+
+                    List<String> existExpIdList = new ArrayList<>();
                     for (int j = 0; j<files.length;j++){
                         if (files[j].isFile() && files[j].getTotalSpace() > 0){//排除0B大小的文件
                             ALog.d("保存表情");
-                            Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder);
-                            expression.save();
-                            currentFolderCount++;
+                            //目录在数据库中存在的前提下检查图片描述是否存在，不存在的话才调用接口
+                            boolean isExistExp = false;
+                            if (isExistFolder){
+                                List<Expression> tempExpList = LitePal.where("name = ? and foldername = ?",files[j].getName(),dir[i].getName()).find(Expression.class,true);
+                                if (tempExpList.size() > 0){//表情库里有这个表情信息
+                                    Expression expression = tempExpList.get(0);
+                                    isExistExp = true;
+                                    expression.setExpressionFolder(expressionFolder);
+                                    existExpIdList.add(String.valueOf(expression.getId()));
+                                    //判断是否有描述，没有的话需要获取描述
+                                    if (expression.getDesStatus() == 0){
+                                        new GetExpDesTask(activity).execute(expression);
+                                    }
+
+                                }
+                            }
+                            if (!isExistExp){//表情中中没这个表情信息
+                                ALog.d("表情库中没这个表情信息" + files[j].getName());
+                                Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder);
+                                expression.save();
+                                existExpIdList.add(String.valueOf(expression.getId()));
+
+                                new GetExpDesTask(activity).execute(expression);
+                                currentFolderCount++;
+                                expressionFolder.setCount(currentFolderCount);
+                                expressionFolder.getExpressionList().add(expression);
+                                expressionFolder.save();
+                            }
                             alCount++;
                             publishProgress(alCount);//更新进度
-                            expressionFolder.setCount(currentFolderCount);
-                            expressionFolder.getExpressionList().add(expression);
-                            expressionFolder.save();
                         }
+                    }
+                    //在表情的表中删除目录中不存在的图片信息
+                    if (isExistFolder){
+                        String condition = "";
+                        for (int k = 0;k<existExpIdList.size();k++){
+                            if (k != existExpIdList.size()-1){
+                                condition += "?,";
+                            }else {
+                                condition += "?";
+                            }
+                        }
+                        existExpIdList.add(0,"foldername = ? and id not IN (" + condition + ")");
+                        existExpIdList.add(1,dir[i].getName());
+                        LitePal.deleteAll(Expression.class,existExpIdList.toArray(new String[existExpIdList.size()]));
                     }
                 }
             }
         }
+
+
+        //在表情包的表中把实际不存在的目录从表中删除
+        String condition = "";
+        for (int k = 0;k<existFolderIdList.size();k++){
+            if (k != existFolderIdList.size()-1){
+                condition += "?,";
+            }else {
+                condition += "?";
+            }
+        }
+        existFolderIdList.add(0,"id not IN ("+condition+")");
+        LitePal.deleteAll(ExpressionFolder.class,existFolderIdList.toArray(new String[existFolderIdList.size()]));
         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         return true;
     }
+
 
     /**
      * 更新进度条 | 主线程，doInBackground()中通过调用publishProgress，来切换到主线程执行这个函数，更新UI界面

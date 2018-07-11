@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
 
-public class ResultActivity extends AppCompatActivity {
+public class ResultActivity extends BaseActivity {
 
 
     @BindView(R.id.toolbar)
@@ -114,6 +114,7 @@ public class ResultActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toasty.success(ResultActivity.this,"搜索到" + searchExpressionList.size() + "个结果").show();
+                        expressionList = searchExpressionList;
                         adapter.setNewData(searchExpressionList);
                     }
                 });

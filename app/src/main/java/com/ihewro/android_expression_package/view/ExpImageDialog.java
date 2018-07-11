@@ -290,7 +290,9 @@ public class ExpImageDialog extends MaterialDialog{
                             sb.append(word.getWords());
                             sb.append("\n");
                         }
-                        sb.deleteCharAt(sb.length() - 1);
+                        if (sb.length()>1){
+                            sb.deleteCharAt(sb.length() - 1);
+                        }
                         inputText.setText(sb);
                         dialog.dismiss();
                     }
@@ -313,8 +315,8 @@ public class ExpImageDialog extends MaterialDialog{
                     @Override
                     public void run() {
                         List<Expression> expressionList = LitePal.where("name = ?",expression.getName()).find(Expression.class,true);
-                        expressionList.get(0).setDescription(inputText.getText().toString());
                         expressionList.get(0).setDesStatus(1);
+                        expressionList.get(0).setDescription(inputText.getText().toString());
                         expressionList.get(0).save();
                         //发个消息让首页更新数据
 //                        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));

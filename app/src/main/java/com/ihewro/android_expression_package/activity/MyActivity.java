@@ -188,7 +188,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
+                        UpdateDatabaseTask task = new UpdateDatabaseTask(MyActivity.this,new UpdateDatabaseListener() {
 
                             private MaterialDialog updateLoadingDialog;
 

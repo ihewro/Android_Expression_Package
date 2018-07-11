@@ -36,7 +36,7 @@ public class ErrorActivity extends AppCompatActivity {
 
 
     private void updateDatabase() {
-        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
+        UpdateDatabaseTask task = new UpdateDatabaseTask(this,new UpdateDatabaseListener() {
 
             private MaterialDialog updateLoadingDialog;
 

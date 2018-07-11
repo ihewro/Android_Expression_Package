@@ -48,6 +48,15 @@ public class Expression extends LitePalSupport{
     }
 
 
+    public Expression(int status, String name, String folderName, ExpressionFolder expressionFolder, String description, int desStatus) {
+        this.status = status;
+        this.name = name;
+        this.folderName = folderName;
+        this.expressionFolder = expressionFolder;
+        this.description = description;
+        this.desStatus = desStatus;
+    }
+
     public int getId() {
         return id;
     }
