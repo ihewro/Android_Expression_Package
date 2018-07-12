@@ -44,7 +44,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         if (expression.getStatus() == 1){//sd卡图片
             result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
-            //MyDataBase.addExpressionRecord(expression,expression.getImage());这里肯定是在数据库里面的
             return result;
         }else if (expression.getStatus() == 2){//网络来源的图片
             try {
@@ -55,9 +54,9 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                 if(imageFile != null && imageFile.exists()){
                     MyDataBase.addExpressionRecord(expression,imageFile);
                     EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-
-                   /* File targetFile = new File(targetPath);
-                    result = FileUtil.copyFileToTarget(imageFile,targetFile);*/
+                    //保存单张图片的时候不仅保存到数据库里也保存到本地文件夹
+                    File targetFile = new File(targetPath);
+                    result = FileUtil.copyFileToTarget(imageFile,targetFile);
                 }else {
                     result = false;
                 }

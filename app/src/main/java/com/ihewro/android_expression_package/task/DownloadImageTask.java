@@ -148,27 +148,20 @@ public class DownloadImageTask  {
                         public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
 
                             try {
-
-                                File file = new File( dirFile.getAbsoluteFile()  + "/" + expFolderAllExpList.get(finalI).getName());
                                 //写入文件
                                 assert response.body() != null;
-                                InputStream is = response.body().byteStream();
-                                FileOutputStream fos = new FileOutputStream(file);
-                                byte[] bytes = UIUtil.InputStreamTOByte(is);
-
-
-                                ALog.d(file.getAbsolutePath());
+                                byte[] bytes = response.body().bytes();
                                 downloadCount++;
 
                                 //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
                                 isExistInFolder = false;
-                                List<Expression> temp = LitePal.where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
+                                List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
                                 if (temp.size()>0){//找到记录了
                                     isExistInFolder = true;
                                 }
 
                                 if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),file.getAbsolutePath(),folderName,expressionFolder,bytes);
+                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getUrl(),folderName,expressionFolder,bytes);
                                     new GetExpDesTask(activity,false).execute(expression);
                                     expression.save();
                                     //更新数据中该目录的关联数据
@@ -177,10 +170,6 @@ public class DownloadImageTask  {
                                     expressionFolder.getExpressionList().add(expression);
                                     expressionFolder.save();
                                 }
-
-
-                                //更新图片库
-                                //FileUtil.updateMediaStore(activity,file.getAbsolutePath());
 
                                 //如果全部下载完成，进度条框提示下载完成。
                                 if (downloadCount >= downloadAllCount){
