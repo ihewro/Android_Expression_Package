@@ -12,6 +12,7 @@ import com.baidu.ocr.sdk.model.WordSimple;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import java.io.File;
@@ -40,12 +41,14 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
 
     @Override
     protected Void doInBackground(Expression... expressions) {
-
         final Expression expression = expressions[0];
+        final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
+        FileUtil.bytesSavedToFile(expression.getImage(),tempFile);
+
         if (expression.getDesStatus() == 0){
             GeneralBasicParams param = new GeneralBasicParams();
             param.setDetectDirection(true);
-            param.setImageFile(new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()));
+            param.setImageFile(tempFile);
             OCR.getInstance(UIUtil.getContext()).recognizeGeneralBasic(param, new OnResultListener<GeneralResult>() {
                 @Override
                 public void onResult(GeneralResult result) {
@@ -64,6 +67,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
                     ALog.d(sb);
                     count ++;
                     ALog.d("获取文字" + count + "次");
+                    tempFile.delete();
                 }
 
                 @Override
@@ -75,6 +79,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
                     }
                     count ++;
                     ALog.d("获取文字" + count + "次");
+                    tempFile.delete();
                 }
             });
         }

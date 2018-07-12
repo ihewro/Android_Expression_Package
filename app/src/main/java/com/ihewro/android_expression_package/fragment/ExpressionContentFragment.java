@@ -12,22 +12,18 @@ import android.view.ViewGroup;
 
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.callback.ShowExpListListener;
-import com.ihewro.android_expression_package.task.ShowExpListTask;
+import com.ihewro.android_expression_package.callback.GetExpListListener;
+import com.ihewro.android_expression_package.task.GetExpListTask;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.litepal.LitePal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +49,7 @@ public class ExpressionContentFragment extends Fragment {
     private View notDataView;
     private String tabName;
     private boolean isNotShow;
-
+    private GridLayoutManager gridLayoutManager;
 
     public static Fragment fragmentInstant(String name,boolean isNotShow){
         ExpressionContentFragment fragment = new ExpressionContentFragment();
@@ -125,9 +121,9 @@ public class ExpressionContentFragment extends Fragment {
         tabName = bundle.getString("name");
         isNotShow = bundle.getBoolean("isNotShow");
 
-        if (!isNotShow || expressionList.size()>0){
+        if (!isNotShow){
 
-            new ShowExpListTask(new ShowExpListListener() {
+            new GetExpListTask(new GetExpListListener() {
                 @Override
                 public void onFinish(List<Expression> expressions) {
                     expressionList = expressions;
@@ -136,8 +132,6 @@ public class ExpressionContentFragment extends Fragment {
                 }
             }).execute(tabName);
         }
-
-
     }
 
     private void initView(){
@@ -146,9 +140,9 @@ public class ExpressionContentFragment extends Fragment {
                 .build();
 
 
-        GridLayoutManager gridLayoutManager =  new GridLayoutManager(getActivity(),4);
+        gridLayoutManager =  new GridLayoutManager(getActivity(),4);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(expressionList,false);
+        adapter = new ExpressionListAdapter(expressionList,true);
         recyclerView.setAdapter(adapter);
 
         if (expressionList.size() == 0){
@@ -168,7 +162,11 @@ public class ExpressionContentFragment extends Fragment {
     public void refreshUI(EventMessage eventBusMessage) {
         if (Objects.equals(eventBusMessage.getType(), EventMessage.LOCAL_DESCRIPTION_SAVE)) {
             if (Objects.equals(eventBusMessage.getMessage2(), tabName)){
+
                 currentPosition= Integer.parseInt(eventBusMessage.getMessage3());
+                View view = gridLayoutManager.findViewByPosition(currentPosition).findViewById(R.id.notice);
+                view.setVisibility(View.GONE);
+
                 expressionList.get(currentPosition).setDesStatus(1);
                 expressionList.get(currentPosition).setDescription(eventBusMessage.getMessage());
             }

@@ -23,8 +23,10 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.GetExpListListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
+import com.ihewro.android_expression_package.task.GetExpListTask;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.ihewro.android_expression_package.view.MyGlideEngine;
@@ -122,6 +124,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
         initView();
 
+        setAdapter();
+
         initListener();
     }
 
@@ -154,24 +158,20 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             dirName = getIntent().getStringExtra("folderName");
             createTime = getIntent().getStringExtra("time");
         }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                expressionList = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("expressionfolder_id = ?", String.valueOf(dirId)).find(Expression.class);
-                ALog.d("输出大小" + expressionList.size());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.setNewData(expressionList);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
-
     }
 
+
+    private void setAdapter(){
+
+        new GetExpListTask(new GetExpListListener() {
+            @Override
+            public void onFinish(List<Expression> expressions) {
+                expressionList = expressions;
+                adapter.setNewData(expressions);
+                adapter.notifyDataSetChanged();
+            }
+        }).execute(dirName);
+    }
 
     private void initListener() {
 
@@ -392,7 +392,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                             MyDataBase.addExpressionRecord(expression,tempFile);
                         }
                         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-                        initData();
+                        setAdapter();
                     }
 
                 }

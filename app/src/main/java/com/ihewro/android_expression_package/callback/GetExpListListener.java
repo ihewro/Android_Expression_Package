@@ -13,6 +13,6 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public interface ShowExpListListener {
+public interface GetExpListListener {
     public void onFinish(List<Expression> expressions);
 }

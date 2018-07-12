@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.baidu.ocr.sdk.OCR;
 import com.baidu.ocr.sdk.OnResultListener;
 import com.baidu.ocr.sdk.exception.OCRError;
@@ -57,14 +59,14 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
-import com.ihewro.android_expression_package.callback.ShowMainExpListener;
+import com.ihewro.android_expression_package.callback.GetMainExpListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
 import com.ihewro.android_expression_package.task.RecoverDataTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
-import com.ihewro.android_expression_package.task.ShowMainExpFolderTask;
+import com.ihewro.android_expression_package.task.GetExpFolderTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
@@ -105,7 +107,7 @@ import retrofit2.Response;
 
 import static java.lang.Thread.sleep;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, FileChooserDialog.FileCallback {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -317,9 +319,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             case 5://备份数据
                                 new MaterialDialog.Builder(MainActivity.this)
                                         .title("为什么需要备份？")
-                                        .content("本应用没有云端同步功能，一旦卸载或者清空应用数据将导致[表情的描述信息]丢失（不会丢失表情）\n\n" +
-                                                "这将无法使用搜索功能。\n" +
-                                                "备份数据后，即使重新安装后，你可以先[恢复数据]，再重新[同步表情]，这样你的表情描述仍然不会消失")
+                                        .content("本应用没有云端同步功能，所有表情文件信息存储在应用内容，一旦卸载将会丢失所有信息\n\n" +
+                                                "备份数据后，点击[恢复数据]即可恢复所有表情文件（包含描述文字）\n\n" +
+                                                "你也可以导出备份文件，将文件分享给别人，别人恢复你的备份也可以轻松获取你的表情包")
                                         .positiveText("开始备份")
                                         .negativeText("取消")
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -431,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
         ALog.d("表情包的数目" + expressionFolderList.size());
 
-        new ShowMainExpFolderTask(new ShowMainExpListener() {
+        new GetExpFolderTask(new GetMainExpListener() {
             @Override
             public void onFinish(List<Fragment> fragmentList, List<String> pageTitleList) {
                 //新建适配器
@@ -853,5 +855,31 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (requestCode == 125) {
             checkUpdateTask.installApk();
         }
+    }
+
+    @Override
+    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+        ALog.d("什么情况？" + file.getAbsolutePath());
+        ALog.d(file.getParentFile().getAbsolutePath() + "|" + GlobalConfig.appDirPath + "database");
+        boolean isExist = false;//备份文件是否已经存在在备份列表了
+        if (Objects.equals(file.getParentFile().getAbsolutePath(), GlobalConfig.appDirPath + "database")){
+            if (file.exists()){
+                isExist = true;
+                ALog.d("已经存在的文件了");
+            }
+        }
+        if (!isExist){
+            FileUtil.copyFileToTarget(file.getAbsolutePath(),GlobalConfig.appDirPath+"database" + "/" + file.getName());
+        }
+
+        ALog.d("AAA" + GlobalConfig.appDirPath+"database" + "/" + file.getName());
+        FileUtil.copyFileToTarget(GlobalConfig.appDirPath+"database" + "/" + file.getName(),this.getDatabasePath("expBaby.db").getAbsolutePath());
+        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+        Toasty.success(this,"导入备份成功").show();
+    }
+
+    @Override
+    public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+
     }
 }

@@ -13,6 +13,6 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public interface ShowMainExpListener {
+public interface GetMainExpListener {
     public void onFinish(List<Fragment> fragmentList,List<String> pageTitleList);
 }

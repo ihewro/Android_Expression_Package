@@ -87,6 +87,8 @@ dependencies {
 
     //dialog
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+
 
     //图片加载框架
     implementation 'com.github.bumptech.glide:glide:4.6.1'

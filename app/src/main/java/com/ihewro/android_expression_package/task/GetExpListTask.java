@@ -3,10 +3,11 @@ package com.ihewro.android_expression_package.task;
 import android.os.AsyncTask;
 
 import com.ihewro.android_expression_package.bean.Expression;
-import com.ihewro.android_expression_package.callback.ShowExpListListener;
+import com.ihewro.android_expression_package.callback.GetExpListListener;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,18 +19,22 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public class ShowExpListTask extends AsyncTask<String,Void,List<Expression>>{
+public class GetExpListTask extends AsyncTask<String,Void,List<Expression>>{
 
-    ShowExpListListener listener;
+    GetExpListListener listener;
 
-    public ShowExpListTask(ShowExpListListener listener) {
+    public GetExpListTask(GetExpListListener listener) {
         this.listener = listener;
     }
 
     @Override
     protected List<Expression> doInBackground(String... strings) {
         String name = strings[0];
-        return  LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+        try {
+            return  LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+        }catch (Exception e){
+            return new ArrayList<>();
+        }
     }
 
     @Override

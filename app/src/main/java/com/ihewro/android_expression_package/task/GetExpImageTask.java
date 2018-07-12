@@ -18,15 +18,25 @@ import org.litepal.LitePal;
  */
 public class GetExpImageTask extends AsyncTask<Integer,Void,Expression> {
 
-    GetExpImageListener listener;
+    private GetExpImageListener listener;
+    private boolean isQueryFolder;
 
     public GetExpImageTask(GetExpImageListener listener) {
         this.listener = listener;
     }
 
+    public GetExpImageTask(GetExpImageListener listener, boolean isQueryFolder) {
+        this.listener = listener;
+        this.isQueryFolder = isQueryFolder;
+    }
+
     @Override
     protected Expression doInBackground(Integer... integers) {
-        return LitePal.find(Expression.class,integers[0]);
+        if (isQueryFolder){
+            return LitePal.find(Expression.class,integers[0],true);
+        }else {
+            return LitePal.find(Expression.class,integers[0],false);
+        }
     }
 
     @Override

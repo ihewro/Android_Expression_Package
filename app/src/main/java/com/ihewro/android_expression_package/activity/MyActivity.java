@@ -207,7 +207,9 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     private void updateDatabase(){
         new MaterialDialog.Builder(this)
                 .title("操作通知")
-                .content("同步数据的过程会扫描你的sd卡中的表情包目录\n\n在这个过程中会自动的为您图片文字识别，添加表情描述（如果添加失败，可以稍后手动添加）")
+                .content("同步数据可以解决两个问题:\n\n" +
+                        "1. 表情显示的数目不正确\n" +
+                        "2. 同步过程中自动为您识别表情文字，作为表情描述方便搜索")
                 .positiveText("朕确定")
                 .negativeText("我只是点着玩的，快关掉快关掉！")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {

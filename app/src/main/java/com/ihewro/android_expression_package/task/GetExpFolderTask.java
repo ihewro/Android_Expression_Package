@@ -3,11 +3,8 @@ package com.ihewro.android_expression_package.task;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 
-import com.blankj.ALog;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
-import com.ihewro.android_expression_package.callback.ShowMainExpListener;
+import com.ihewro.android_expression_package.callback.GetMainExpListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 
 import org.litepal.LitePal;
@@ -24,15 +21,15 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public class ShowMainExpFolderTask extends AsyncTask<Void,Void,Void> {
+public class GetExpFolderTask extends AsyncTask<Void,Void,Void> {
 
-    private ShowMainExpListener listener;
+    private GetMainExpListener listener;
 
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
     private List<String> pageTitleList = new ArrayList<>();
     private List<Fragment> fragmentList = new ArrayList<>();
 
-    public ShowMainExpFolderTask(ShowMainExpListener listener) {
+    public GetExpFolderTask(GetMainExpListener listener) {
         this.listener = listener;
     }
 

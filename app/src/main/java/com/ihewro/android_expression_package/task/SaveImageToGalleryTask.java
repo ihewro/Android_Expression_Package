@@ -40,10 +40,10 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     @Override
     protected Boolean doInBackground(Expression... expressions) {
         Expression expression = expressions[0];
-        expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         boolean result;
         if (expression.getStatus() == 1){//sd卡图片
+            expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
             result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
             return result;
         }else if (expression.getStatus() == 2){//网络来源的图片

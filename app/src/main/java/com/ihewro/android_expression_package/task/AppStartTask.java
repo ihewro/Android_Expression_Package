@@ -37,14 +37,14 @@ import static java.lang.Thread.sleep;
  *     version: 1.0
  * </pre>
  */
-public class GetExpFolderDataTask extends AsyncTask<Void,Integer,String> {
+public class AppStartTask extends AsyncTask<Void,Integer,String> {
 
     GetExpFolderDataListener listener;
     private boolean getOnes = false;
     long beginTime;
     long endTime;
 
-    public GetExpFolderDataTask(GetExpFolderDataListener listener) {
+    public AppStartTask(GetExpFolderDataListener listener) {
         this.listener = listener;
     }
 

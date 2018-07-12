@@ -326,24 +326,18 @@ public class ExpImageDialog extends MaterialDialog{
         saveToDatabase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //保存表情描述到数据库中
-                new Thread(new Runnable() {
+                new GetExpImageTask(new GetExpImageListener() {
                     @Override
-                    public void run() {
-                        List<Expression> expressionList = MyDataBase.queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
-                        expressionList.get(0).setDesStatus(1);
-                        expressionList.get(0).setDescription(inputText.getText().toString());
-                        expressionList.get(0).save();
+                    public void onFinish(Expression expression) {
+                        expression.setDesStatus(1);
+                        expression.setDescription(inputText.getText().toString());
+                        expression.save();
                         //发个消息让首页更新数据
                         EventBus.getDefault().post(new EventMessage(EventMessage.DESCRIPTION_SAVE,inputText.getText().toString(),expression.getFolderName()));
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toasty.success(activity,"保存表情描述成功",Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        Toasty.success(activity,"保存表情描述成功",Toast.LENGTH_SHORT).show();
                     }
-                }).start();
+                },true).execute(expression.getId());
+
             }
         });
 
