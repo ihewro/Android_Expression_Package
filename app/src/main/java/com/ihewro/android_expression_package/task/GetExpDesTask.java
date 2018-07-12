@@ -15,6 +15,8 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
+import org.litepal.LitePal;
+
 import java.io.File;
 
 import es.dmoral.toasty.Toasty;
@@ -43,8 +45,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
     protected Void doInBackground(Expression... expressions) {
         final Expression expression = expressions[0];
         final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
-        //
-        FileUtil.bytesSavedToFile(expression.getImage(),tempFile);
+        FileUtil.bytesSavedToFile(expression,tempFile);
 
         if (expression.getDesStatus() == 0){
             GeneralBasicParams param = new GeneralBasicParams();

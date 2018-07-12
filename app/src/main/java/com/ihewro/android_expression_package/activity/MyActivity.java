@@ -33,6 +33,8 @@ import com.ihewro.android_expression_package.util.DataUtil;
 import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -79,11 +81,11 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
         EventBus.getDefault().register(this);
 
-        initData();
-
         initView();
 
         initListener();
+
+        refreshLayout.autoRefresh();
     }
 
 
@@ -95,7 +97,6 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         }
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
         refreshLayout.setEnableLoadMore(false);
-        refreshLayout.setEnableRefresh(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
         adapter.openLoadAnimation(new BaseAnimation() {
@@ -129,6 +130,8 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                         }else {
                             adapter.setNewData(expressionFolderList);
                         }
+                        refreshLayout.finishRefresh();
+                        refreshLayout.setEnableRefresh(false);
                     }
                 });
             }
@@ -141,6 +144,12 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
      * 监听事件
      */
     private void initListener() {
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                initData();
+            }
+        });
     }
 
 
@@ -189,6 +198,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                                 expressionFolder.save();
                                 initData();
                             }
+                            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         }
                     }).show();
         }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
@@ -45,17 +46,14 @@ public class MyDataBase {
     public static boolean addExpressionRecord(Expression expression,File source){
         //先进行图片压缩，避免数据太大，导致读取问题
         File compressToFile = null;
-        try {
-            compressToFile = new Compressor(UIUtil.getContext())
-                    .setMaxWidth(400)
-                    .setMaxHeight(400)
-                    .setQuality(75)
-                    .compressToFile(source);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        compressToFile = FileUtil.returnCompressExp(source);
         ALog.d("压缩后的路径" + compressToFile.getAbsolutePath() + "大小" + compressToFile.length());
         byte[] bytes = FileUtil.fileToBytes(compressToFile);
+
+        //因为compressToFile 和 source是同一个文件，所以先判断下，再决定是否删除
+        if (compressToFile.exists() && !Objects.equals(compressToFile.getAbsolutePath(), source.getAbsolutePath())){
+            compressToFile.delete();
+        }
         return addExpressionRecord(expression,bytes);
     }
 

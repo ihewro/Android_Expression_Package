@@ -15,6 +15,9 @@ import com.blankj.ALog;
 import com.canking.minipay.MiniPayUtils;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.bean.Expression;
+
+import org.litepal.LitePal;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+
+import id.zelory.compressor.Compressor;
 
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
@@ -115,6 +120,15 @@ public class FileUtil {
     }
 
 
+    public static boolean bytesSavedToFile(Expression expression,File target){
+        if (expression.getImage() == null || expression.getImage().length == 0){
+            expression = LitePal.find(Expression.class,expression.getId());
+        }
+
+        return FileUtil.bytesSavedToFile(expression.getImage(),target);
+
+    }
+
     public static boolean bytesSavedToFile(byte[] bytes,String target){
         return bytesSavedToFile(bytes,new File(target));
     }
@@ -123,7 +137,6 @@ public class FileUtil {
         if (!targetFile.getParentFile().exists()){
             targetFile.getParentFile().mkdir();
         }
-        ALog.d("图片大小" + bytes.length);
         OutputStream output = null;
 
         try {
@@ -212,6 +225,29 @@ public class FileUtil {
         }
 
         return bytes;
+    }
+
+    public static File returnCompressExp(File file){
+        String fileName = file.getName();
+        String back = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
+        ALog.d("文件后缀" + back);
+        if (Objects.equals(back, "gif") || Objects.equals(back, "GIF")){
+            return file;
+        }else {
+            try {
+                File compressTempFile = new Compressor(UIUtil.getContext())
+                        .setMaxWidth(400)
+                        .setMaxHeight(400)
+                        .setQuality(75)
+                        .compressToFile(file);
+                return compressTempFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return null;
     }
 
 }

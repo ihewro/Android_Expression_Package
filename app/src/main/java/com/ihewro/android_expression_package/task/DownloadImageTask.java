@@ -156,15 +156,15 @@ public class DownloadImageTask  {
                                 byte[] bytes = response.body().bytes();
                                 File temFile = new File(GlobalConfig.appDirPath + expFolderAllExpList.get(finalI).getName());
                                 FileUtil.bytesSavedToFile(bytes,temFile);
-                                File compressTempFile = new Compressor(UIUtil.getContext())
-                                        .setMaxWidth(400)
-                                        .setMaxHeight(400)
-                                        .setQuality(75)
-                                        .compressToFile(temFile);
 
+                                File compressTempFile = FileUtil.returnCompressExp(temFile);
                                 bytes = FileUtil.fileToBytes(compressTempFile);
-                                temFile.delete();
-                                compressTempFile.delete();
+                                if (temFile.exists()){
+                                    temFile.delete();
+                                }
+                                if (compressTempFile.exists()){
+                                    compressTempFile.delete();
+                                }
 
                                 //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
                                 isExistInFolder = false;

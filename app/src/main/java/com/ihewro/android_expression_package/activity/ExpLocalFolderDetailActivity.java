@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +33,8 @@ import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.ihewro.android_expression_package.view.MyGlideEngine;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
@@ -127,9 +130,9 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
         initView();
 
-        setAdapter();
-
         initListener();
+
+        refreshLayout.autoRefresh();
     }
 
     private void initView() {
@@ -137,10 +140,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        toolbar.setTitle(dirName);
-        refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadMore(false);
+        toolbar.setTitle(dirName);
         gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(expressionList, true);
@@ -155,7 +156,6 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
 
     private void initData() {
-
         if (getIntent() != null) {
             dirId = getIntent().getIntExtra("id", 1);
             dirName = getIntent().getStringExtra("folderName");
@@ -172,11 +172,21 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                 expressionList = expressions;
                 adapter.setNewData(expressions);
                 adapter.notifyDataSetChanged();
+                refreshLayout.finishRefresh(true);
+                refreshLayout.setEnableRefresh(false);
             }
         },true).execute(dirName);
     }
 
     private void initListener() {
+
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                ALog.d("怎么回事");
+                setAdapter();
+            }
+        });
 
         exitSelect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -398,7 +408,13 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                             MyDataBase.addExpressionRecord(expression,tempFile);
                         }
                         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-                        setAdapter();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshLayout.setEnableRefresh(true);
+                                refreshLayout.autoRefresh();
+                            }
+                        });
                     }
 
                 }
