@@ -50,6 +50,7 @@ public class ExpressionContentFragment extends Fragment {
     private String tabName;
     private boolean isNotShow;
     private GridLayoutManager gridLayoutManager;
+    private GetExpListTask task;
 
     public static Fragment fragmentInstant(String name,boolean isNotShow){
         ExpressionContentFragment fragment = new ExpressionContentFragment();
@@ -62,6 +63,7 @@ public class ExpressionContentFragment extends Fragment {
     }
 
 
+
     public ExpressionContentFragment() {
     }
 
@@ -72,13 +74,9 @@ public class ExpressionContentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_expression_content, container, false);
         unbinder = ButterKnife.bind(this, view);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
-        if (!EventBus.getDefault().isRegistered(this)){
+        /*if (!EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().register(this);
-        }
-
-        //初始化界面空布局
-        initView();
-
+        }*/
 
         return view;
     }
@@ -88,10 +86,12 @@ public class ExpressionContentFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         ALog.d("重新创建了该fragment");
 
-
-        setExpressionData();
+        //初始化界面空布局
+        initView();
 
         initListener();
+
+        setExpressionData();
 
     }
 
@@ -100,7 +100,6 @@ public class ExpressionContentFragment extends Fragment {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-
                 currentPosition = position;
                 Expression expression = expressionList.get(position);
                 expressionDialog.setImageData(expression);
@@ -123,14 +122,15 @@ public class ExpressionContentFragment extends Fragment {
 
         if (!isNotShow){
 
-            new GetExpListTask(new GetExpListListener() {
+            task = new GetExpListTask(new GetExpListListener() {
                 @Override
                 public void onFinish(List<Expression> expressions) {
                     expressionList = expressions;
                     adapter.setNewData(expressions);
 
                 }
-            }).execute(tabName);
+            });
+            task.execute(tabName);
         }
     }
 
@@ -154,6 +154,9 @@ public class ExpressionContentFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().unregister(this);
+        }
         unbinder.unbind();
     }
 
@@ -173,4 +176,12 @@ public class ExpressionContentFragment extends Fragment {
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (task!=null){
+            task.cancel(true);
+        }
+    }
 }
