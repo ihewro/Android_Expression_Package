@@ -24,7 +24,7 @@ import java.util.List;
  *     version: 1.0
  * </pre>
  */
-public class ShowMainExpTask extends AsyncTask<Void,Void,Void> {
+public class ShowMainExpFolderTask extends AsyncTask<Void,Void,Void> {
 
     private ShowMainExpListener listener;
 
@@ -32,7 +32,7 @@ public class ShowMainExpTask extends AsyncTask<Void,Void,Void> {
     private List<String> pageTitleList = new ArrayList<>();
     private List<Fragment> fragmentList = new ArrayList<>();
 
-    public ShowMainExpTask(ShowMainExpListener listener) {
+    public ShowMainExpFolderTask(ShowMainExpListener listener) {
         this.listener = listener;
     }
 

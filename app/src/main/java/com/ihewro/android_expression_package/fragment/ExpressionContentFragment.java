@@ -18,6 +18,8 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.ShowExpListListener;
+import com.ihewro.android_expression_package.task.ShowExpListTask;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -123,28 +125,20 @@ public class ExpressionContentFragment extends Fragment {
         tabName = bundle.getString("name");
         isNotShow = bundle.getBoolean("isNotShow");
 
-        if (!isNotShow){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    expressionList = LitePal.where("foldername = ?",tabName).find(Expression.class,false);
-                    if (getActivity()!=null){
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.setNewData(expressionList);
-                            }
-                        });
-                    }
-                }
-            }).start();
+        if (!isNotShow || expressionList.size()>0){
 
+            new ShowExpListTask(new ShowExpListListener() {
+                @Override
+                public void onFinish(List<Expression> expressions) {
+                    expressionList = expressions;
+                    adapter.setNewData(expressions);
+
+                }
+            }).execute(tabName);
         }
 
 
     }
-
-
 
     private void initView(){
         expressionDialog  = new ExpImageDialog.Builder(Objects.requireNonNull(getActivity()))

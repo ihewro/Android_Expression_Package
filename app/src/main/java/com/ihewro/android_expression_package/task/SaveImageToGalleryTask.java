@@ -14,6 +14,7 @@ import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener
 import com.ihewro.android_expression_package.util.FileUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.litepal.LitePal;
 
 import java.io.File;
 
@@ -39,6 +40,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     @Override
     protected Boolean doInBackground(Expression... expressions) {
         Expression expression = expressions[0];
+        expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         boolean result;
         if (expression.getStatus() == 1){//sd卡图片

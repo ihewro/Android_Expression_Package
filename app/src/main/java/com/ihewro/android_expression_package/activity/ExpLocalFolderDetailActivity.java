@@ -158,7 +158,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                expressionList = LitePal.where("expressionfolder_id = ?", String.valueOf(dirId)).find(Expression.class);
+                expressionList = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("expressionfolder_id = ?", String.valueOf(dirId)).find(Expression.class);
                 ALog.d("输出大小" + expressionList.size());
                 runOnUiThread(new Runnable() {
                     @Override

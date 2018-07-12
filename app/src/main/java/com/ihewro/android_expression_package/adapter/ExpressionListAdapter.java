@@ -61,7 +61,6 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
         }else {
             helper.getView(R.id.notice).setVisibility(View.GONE);
         }
-        item = LitePal.find(Expression.class,item.getId());
         UIUtil.setImageToImageView(item, (ImageView) helper.getView(R.id.iv_expression));
 
         final CheckBox checkBox = helper.getView(R.id.cb_item);

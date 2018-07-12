@@ -46,15 +46,15 @@ public class MyDataBase {
 
     public static boolean addExpressionRecord(Expression expression,byte[] source) {
         //1. 检查有没有表情对应的目录
-        List<ExpressionFolder> expressionFolderList = LitePal.where("name = ? and exist = ?",expression.getFolderName(), String.valueOf(1)).find(ExpressionFolder.class,true);
-        ExpressionFolder expressionFolder = null;//当前表情的目录的持久化对象
+        List<ExpressionFolder> expressionFolderList = LitePal.where("name = ? and exist = ?",expression.getFolderName(), String.valueOf(1)).find(ExpressionFolder.class);
+        ExpressionFolder expressionFolder;//当前表情的目录的持久化对象
 
         Expression currentExpression;//当前表情的持久化对象
 
         //2. 检查该目录中有没有该表情名称
         if (expressionFolderList.size () == 1){
             expressionFolder = expressionFolderList.get(0);
-            List<Expression> expressionList = LitePal.where("name = ? and foldername = ?",expression.getName(),expression.getFolderName()).find(Expression.class);
+            List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
             if (expressionList.size() >0){//有该表情的信息就不用管了
                 currentExpression = expressionList.get(0);
                 currentExpression.setExpressionFolder(expressionFolder);
@@ -136,4 +136,13 @@ public class MyDataBase {
             ALog.d("expression 不是持久化对象");
         }
     }
+
+    public static List<Expression> queryExpListByNameAndFolderName(boolean isImage,String name,String folderName){
+        if (isImage){
+            return LitePal.where("name = ? and foldername = ?",name,folderName).find(Expression.class);
+        }else {
+            return LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",name,folderName).find(Expression.class);
+        }
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.ihewro.android_expression_package.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -32,7 +31,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,9 +46,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.MySharePreference;
@@ -69,7 +64,7 @@ import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
 import com.ihewro.android_expression_package.task.RecoverDataTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
-import com.ihewro.android_expression_package.task.ShowMainExpTask;
+import com.ihewro.android_expression_package.task.ShowMainExpFolderTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
 import com.ihewro.android_expression_package.util.DataCleanManager;
@@ -96,7 +91,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -104,9 +98,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
-import me.jessyan.progressmanager.ProgressListener;
-import me.jessyan.progressmanager.ProgressManager;
-import me.jessyan.progressmanager.body.ProgressInfo;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -440,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
         ALog.d("表情包的数目" + expressionFolderList.size());
 
-        new ShowMainExpTask(new ShowMainExpListener() {
+        new ShowMainExpFolderTask(new ShowMainExpListener() {
             @Override
             public void onFinish(List<Fragment> fragmentList, List<String> pageTitleList) {
                 //新建适配器

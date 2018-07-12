@@ -130,7 +130,6 @@ public class FileUtil {
             BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
             bufferedOutput.write(bytes);
             output.close();
-            bufferedOutput.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

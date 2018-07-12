@@ -24,10 +24,13 @@ import com.baidu.ocr.sdk.model.GeneralResult;
 import com.baidu.ocr.sdk.model.WordSimple;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.GetExpImageListener;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
+import com.ihewro.android_expression_package.task.GetExpImageTask;
 import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.ShareUtil;
@@ -274,40 +277,49 @@ public class ExpImageDialog extends MaterialDialog{
         getAuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
-                GeneralBasicParams param = new GeneralBasicParams();
-                param.setDetectDirection(true);
-                FileUtil.bytesSavedToFile(expression.getImage(),tempFile);
-                param.setImageFile(tempFile);
-                final MaterialDialog dialog = new MaterialDialog.Builder(activity)
-                        .progress(true, 0)
-                        .progressIndeterminateStyle(true)
-                        .show();
-                OCR.getInstance(activity).recognizeGeneralBasic(param, new OnResultListener<GeneralResult>() {
-                    @Override
-                    public void onResult(GeneralResult result) {
-                        StringBuilder sb = new StringBuilder();
-                        for (WordSimple wordSimple : result.getWordList()) {
-                            WordSimple word = wordSimple;
-                            sb.append(word.getWords());
-                            sb.append("\n");
-                        }
-                        if (sb.length()>1){
-                            sb.deleteCharAt(sb.length() - 1);
-                        }
-                        inputText.setText(sb);
-                        dialog.dismiss();
-                        tempFile.delete();
-                    }
 
+                new GetExpImageTask(new GetExpImageListener() {
                     @Override
-                    public void onError(OCRError error) {
-                        Toasty.error(activity,error.getMessage()).show();
-                        dialog.dismiss();
-                        ALog.d(error.getMessage());
-                        tempFile.delete();
+                    public void onFinish(Expression expression) {
+                        final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
+                        FileUtil.bytesSavedToFile(expression.getImage(),tempFile);
+
+                        GeneralBasicParams param = new GeneralBasicParams();
+                        param.setDetectDirection(true);
+                        param.setImageFile(tempFile);
+                        final MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                                .progress(true, 0)
+                                .progressIndeterminateStyle(true)
+                                .show();
+                        OCR.getInstance(activity).recognizeGeneralBasic(param, new OnResultListener<GeneralResult>() {
+                            @Override
+                            public void onResult(GeneralResult result) {
+                                StringBuilder sb = new StringBuilder();
+                                for (WordSimple wordSimple : result.getWordList()) {
+                                    WordSimple word = wordSimple;
+                                    sb.append(word.getWords());
+                                    sb.append("\n");
+                                }
+                                if (sb.length()>1){
+                                    sb.deleteCharAt(sb.length() - 1);
+                                }
+                                inputText.setText(sb);
+                                dialog.dismiss();
+                                tempFile.delete();
+                            }
+
+                            @Override
+                            public void onError(OCRError error) {
+                                Toasty.error(activity,error.getMessage()).show();
+                                dialog.dismiss();
+                                ALog.d(error.getMessage());
+                                tempFile.delete();
+                            }
+                        });
                     }
-                });
+                }).execute(expression.getId());
+
+
             }
         });
 
@@ -318,7 +330,7 @@ public class ExpImageDialog extends MaterialDialog{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        List<Expression> expressionList = LitePal.where("name = ? and foldername = ?",expression.getName(),expression.getFolderName()).find(Expression.class,true);
+                        List<Expression> expressionList = MyDataBase.queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
                         expressionList.get(0).setDesStatus(1);
                         expressionList.get(0).setDescription(inputText.getText().toString());
                         expressionList.get(0).save();

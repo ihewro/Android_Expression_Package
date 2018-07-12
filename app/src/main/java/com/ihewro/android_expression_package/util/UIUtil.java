@@ -14,6 +14,8 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -23,7 +25,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.GetExpImageListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.GetExpImageTask;
 
 import org.litepal.LitePal;
 
@@ -110,16 +114,19 @@ public class UIUtil {
         return context.getResources().getDimensionPixelSize(resourceId);
     }
 
-    public static void setImageToImageView(Expression expression,ImageView imageView){
+    public static void setImageToImageView(Expression expression, final ImageView imageView){
 
-        RequestOptions options = new RequestOptions()
+        final RequestOptions options = new RequestOptions()
                 .placeholder(R.drawable.loading)
                 .error(R.drawable.fail);
-
         switch (expression.getStatus()){
             case 1:
-                List<Expression>tempExpList = LitePal.where("name =? and foldername =?",expression.getName(),expression.getFolderName()).find(Expression.class);
-                Glide.with(UIUtil.getContext()).load(tempExpList.get(0).getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                new GetExpImageTask(new GetExpImageListener() {
+                    @Override
+                    public void onFinish(Expression expression) {
+                        Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                    }
+                }).execute(expression.getId());
                 break;
             case 2:
                 Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
