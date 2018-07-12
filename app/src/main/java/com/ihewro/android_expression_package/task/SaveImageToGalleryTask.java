@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package.task;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
@@ -43,7 +44,10 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
         boolean result;
         if (expression.getStatus() == 1){//sd卡图片
-            expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
+            if (expression.getImage() == null || expression.getImage().length == 0){
+                expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
+            }
+            ALog.d("id = " + expression.getId() + "大小" + expression.getImage().length);
             result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
             return result;
         }else if (expression.getStatus() == 2){//网络来源的图片

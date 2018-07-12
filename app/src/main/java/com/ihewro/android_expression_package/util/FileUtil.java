@@ -123,12 +123,21 @@ public class FileUtil {
         if (!targetFile.getParentFile().exists()){
             targetFile.getParentFile().mkdir();
         }
-
+        ALog.d("图片大小" + bytes.length);
         OutputStream output = null;
+
         try {
+            // 如果文件存在则删除
+            if (targetFile.exists()) {
+                targetFile.delete();
+            }
+            // 在文件系统中根据路径创建一个新的空文件
+            targetFile.createNewFile();
             output = new FileOutputStream(targetFile);
             BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
             bufferedOutput.write(bytes);
+            // 刷出缓冲输出流，该步很关键，要是不执行flush()方法，那么文件的内容是空的。
+            bufferedOutput.flush();
             output.close();
         } catch (IOException e) {
             e.printStackTrace();

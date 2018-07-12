@@ -4,5 +4,5 @@
     <item
         android:id="@+id/re_add"
         android:title="添加表情"
-        app:showAsAction="collapseActionView" />
+        app:showAsAction="always" />
 </menu>

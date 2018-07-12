@@ -22,14 +22,12 @@
         android:id="@+id/expression_image"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
+        android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="200dp"
         android:layout_gravity="center_horizontal"
-        android:scaleType="centerInside"
+        android:scaleType="fitCenter"
         android:src="@drawable/header"/>
 
     <!--图片的工具菜单栏-->
@@ -131,6 +129,8 @@
             android:layout_marginTop="4dp"
             android:inputType="textMultiLine"
             android:layout_marginRight="120dp"
+            android:hint="输入图片描述，用于搜索"
+            android:textSize="14sp"
             android:textColor="#000000"/>
 
         <LinearLayout

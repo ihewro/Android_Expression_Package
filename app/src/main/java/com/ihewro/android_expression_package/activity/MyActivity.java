@@ -175,7 +175,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
             //新建表情文件夹
             new MaterialDialog.Builder(this)
                     .title("输入表情包名称")
-                    .content("同样会使用该名称新建一个文件夹")
+                    .content("具有一点分类意义的名字哦，方便查找")
                     .inputType(InputType.TYPE_CLASS_TEXT)
                     .input("任意文字", "", new MaterialDialog.InputCallback() {
                         @Override
