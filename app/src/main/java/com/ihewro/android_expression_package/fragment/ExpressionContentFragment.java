@@ -9,6 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -18,6 +21,7 @@ import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.GetExpListListener;
 import com.ihewro.android_expression_package.task.GetExpListTask;
+import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,17 +51,23 @@ public class ExpressionContentFragment extends Fragment {
     private ExpImageDialog expressionDialog;
     private int currentPosition = -1;
     private View notDataView;
+    private View loadingView;
     private String tabName;
     private boolean isNotShow;
     private GridLayoutManager gridLayoutManager;
     private GetExpListTask task;
+    private boolean isLoadData;//是否加载数据了
 
-    public static Fragment fragmentInstant(String name,boolean isNotShow){
+    int currentTabPos;
+    int tabPos;
+
+    public static Fragment fragmentInstant(String name,boolean isNotShow,int tabPos){
         ExpressionContentFragment fragment = new ExpressionContentFragment();
         Bundle bundle = new Bundle();
 //        bundle.putSerializable("data", data);//json字符串
         bundle.putString("name",name);
         bundle.putBoolean("isNotShow",isNotShow);
+        bundle.putInt("tabpos",tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -74,9 +84,21 @@ public class ExpressionContentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_expression_content, container, false);
         unbinder = ButterKnife.bind(this, view);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
+        loadingView = getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) recyclerView.getParent(), false);
+
         if (!EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().register(this);
         }
+
+        initData();
+
+        //初始化界面空布局
+        initView();
+
+        initListener();
+
+        setExpressionData();
+
 
         return view;
     }
@@ -86,12 +108,6 @@ public class ExpressionContentFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         ALog.d("重新创建了该fragment");
 
-        //初始化界面空布局
-        initView();
-
-        initListener();
-
-        setExpressionData();
 
     }
 
@@ -111,15 +127,18 @@ public class ExpressionContentFragment extends Fragment {
 
 
 
-    /**
-     * 初始化表情包数据
-     */
-    private void setExpressionData(){
+    private void initData(){
         Bundle bundle = getArguments();
         assert bundle != null;
         tabName = bundle.getString("name");
         isNotShow = bundle.getBoolean("isNotShow");
+        tabPos = bundle.getInt("tabpos",0);
+    }
 
+    /**
+     * 初始化表情包数据
+     */
+    private void setExpressionData(){
         if (!isNotShow){
 
             task = new GetExpListTask(new GetExpListListener() {
@@ -127,7 +146,11 @@ public class ExpressionContentFragment extends Fragment {
                 public void onFinish(List<Expression> expressions) {
                     expressionList = expressions;
                     adapter.setNewData(expressions);
-
+                    if (expressions.size() == 0){
+                        adapter.setNewData(null);
+                        adapter.setEmptyView(notDataView);
+                    }
+                    isLoadData = true;
                 }
             },true);
             task.execute(tabName);
@@ -144,11 +167,13 @@ public class ExpressionContentFragment extends Fragment {
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(expressionList,true);
         recyclerView.setAdapter(adapter);
+        adapter.setNewData(null);
+        ImageView imageView = loadingView.findViewById(R.id.imageView5);
+        Animation rotateAnimation = AnimationUtils.loadAnimation(UIUtil.getContext(), R.anim.rotate);
+        imageView.setAnimation(rotateAnimation);
+        imageView.startAnimation(rotateAnimation);
+        adapter.setEmptyView(loadingView);
 
-        if (expressionList.size() == 0){
-            adapter.setNewData(null);
-            adapter.setEmptyView(notDataView);
-        }
     }
 
     @Override
@@ -161,12 +186,12 @@ public class ExpressionContentFragment extends Fragment {
     }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void refreshUI(EventMessage eventBusMessage) {
         if (Objects.equals(eventBusMessage.getType(), EventMessage.LOCAL_DESCRIPTION_SAVE)) {
-            if (Objects.equals(eventBusMessage.getMessage2(), tabName)){
+            if (Objects.equals(eventBusMessage.getMessage2(), tabName)) {
 
-                currentPosition= Integer.parseInt(eventBusMessage.getMessage3());
+                currentPosition = Integer.parseInt(eventBusMessage.getMessage3());
                 View view = gridLayoutManager.findViewByPosition(currentPosition).findViewById(R.id.notice);
                 view.setVisibility(View.GONE);
 
@@ -176,12 +201,9 @@ public class ExpressionContentFragment extends Fragment {
         }
     }
 
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-
-        /*if (task!=null){
-            task.cancel(true);
-        }*/
     }
 }

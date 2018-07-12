@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.ihewro.android_expression_package.GlobalConfig;
@@ -211,6 +212,10 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 //Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+                                final MaterialDialog dialog = new MaterialDialog.Builder(ExpLocalFolderDetailActivity.this)
+                                        .progress(true, 0)
+                                        .progressIndeterminateStyle(true)
+                                        .show();
                                 new DeleteImageTask(false, deleteExpList, dirName, new TaskListener() {
                                     @Override
                                     public void onFinish(Boolean result) {
@@ -218,7 +223,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                                         for (int i = 0; i < checkList.size(); i++) {
                                             adapter.remove(Integer.parseInt(checkList.get(i)));
                                         }
-                                        adapter.notifyDataSetChanged();
+                                        dialog.dismiss();
                                         setContraryCheck();
                                     }
                                 }).execute();

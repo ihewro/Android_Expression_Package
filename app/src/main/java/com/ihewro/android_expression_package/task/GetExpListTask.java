@@ -10,6 +10,8 @@ import org.litepal.LitePal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 /**
  * <pre>
  *     author : hewro
@@ -35,12 +37,16 @@ public class GetExpListTask extends AsyncTask<String,Void,List<Expression>>{
     @Override
     protected List<Expression> doInBackground(String... strings) {
         String name = strings[0];
+        List<Expression> expressionList;
         try {
             if (isImage){
-                return  LitePal.where("foldername = ?",name).find(Expression.class);
+                expressionList = LitePal.where("foldername = ?",name).find(Expression.class);
             }else {
-                return  LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+                expressionList = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
             }
+
+            sleep(700);
+            return expressionList;
         }catch (Exception e){
             return new ArrayList<>();
         }

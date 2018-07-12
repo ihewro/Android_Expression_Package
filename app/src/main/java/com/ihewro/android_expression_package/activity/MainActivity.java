@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -398,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      */
     private void initTabLayout() {
         List<Fragment>fragments = new ArrayList<>();
-        fragments.add(ExpressionContentFragment.fragmentInstant("默认",true));
+        fragments.add(ExpressionContentFragment.fragmentInstant("默认",true,0));
         List<String> pageTitleList = new ArrayList<>();
         pageTitleList.add("默认");
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragments, pageTitleList);
@@ -410,9 +411,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void setTabLayout(boolean isUpdate) {
         //设置viewPager
         setViewPager(viewPager, isUpdate);
-
         bindTabWithViewPager();
-
     }
 
     private void bindTabWithViewPager(){

@@ -39,11 +39,11 @@ public class GetExpFolderTask extends AsyncTask<Void,Void,Void> {
         expressionFolderList = LitePal.findAll(ExpressionFolder.class);
 
         if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
-            fragmentList.add(ExpressionContentFragment.fragmentInstant("默认",true));
+            fragmentList.add(ExpressionContentFragment.fragmentInstant("默认",true,0));
             pageTitleList.add("默认");
         } else {
             for (int i = 0; i < expressionFolderList.size(); i++) {
-                fragmentList.add(ExpressionContentFragment.fragmentInstant(expressionFolderList.get(i).getName(),false));
+                fragmentList.add(ExpressionContentFragment.fragmentInstant(expressionFolderList.get(i).getName(),false,i));
                 pageTitleList.add(expressionFolderList.get(i).getName());
             }
         }

@@ -14,6 +14,7 @@ public class EventMessage {
     public static final String DATABASE = "database";
     public static final String DESCRIPTION_SAVE = "descriptionSave";
     public static final String LOCAL_DESCRIPTION_SAVE = "localDescriptionSave";
+    public static final String VIEWPAGER = "VIEWPAGER";
     private String type;
     private String message;
     private String message2;

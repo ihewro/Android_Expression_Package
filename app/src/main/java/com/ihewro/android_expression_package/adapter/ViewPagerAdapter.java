@@ -54,5 +54,6 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         //super.destroyItem(container, position, object);
     }
+
 }
 

@@ -116,4 +116,8 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
     public void setAllCheckboxNotSelected(){
 
     }
+
+    public void RemoveDate(int position){
+        expressionList.remove(position);
+    }
 }
