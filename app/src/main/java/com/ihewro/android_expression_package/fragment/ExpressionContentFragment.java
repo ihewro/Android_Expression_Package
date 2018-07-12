@@ -128,12 +128,14 @@ public class ExpressionContentFragment extends Fragment {
                 @Override
                 public void run() {
                     expressionList = LitePal.where("foldername = ?",tabName).find(Expression.class,false);
-                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.setNewData(expressionList);
-                        }
-                    });
+                    if (getActivity()!=null){
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.setNewData(expressionList);
+                            }
+                        });
+                    }
                 }
             }).start();
 

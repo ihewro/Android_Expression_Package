@@ -31,8 +31,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     private SaveImageToGalleryListener listener;
     private Activity activity;
 
-    private boolean result = true;
-
     public SaveImageToGalleryTask(SaveImageToGalleryListener listener, Activity activity) {
         this.listener = listener;
         this.activity = activity;
@@ -42,6 +40,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     protected Boolean doInBackground(Expression... expressions) {
         Expression expression = expressions[0];
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
+        boolean result;
         if (expression.getStatus() == 1){//sd卡图片
             result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
             return result;

@@ -26,11 +26,11 @@ import java.util.List;
  */
 public class ShowMainExpTask extends AsyncTask<Void,Void,Void> {
 
-    ShowMainExpListener listener;
+    private ShowMainExpListener listener;
 
-    List<ExpressionFolder> expressionFolderList = new ArrayList<>();
-    List<String> pageTitleList = new ArrayList<>();
-    List<Fragment> fragmentList = new ArrayList<>();
+    private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
+    private List<String> pageTitleList = new ArrayList<>();
+    private List<Fragment> fragmentList = new ArrayList<>();
 
     public ShowMainExpTask(ShowMainExpListener listener) {
         this.listener = listener;
