@@ -15,7 +15,6 @@
         android:id="@+id/iv_expression"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:src="@drawable/loading"
         android:scaleType="fitCenter"/>
 
 

@@ -15,6 +15,7 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
+import id.zelory.compressor.Compressor;
 import me.jessyan.progressmanager.ProgressListener;
 import me.jessyan.progressmanager.ProgressManager;
 import me.jessyan.progressmanager.body.ProgressInfo;
@@ -146,12 +148,23 @@ public class DownloadImageTask  {
                     call2.enqueue(new Callback<ResponseBody>() {//执行下载
                         @Override
                         public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                            downloadCount++;
 
                             try {
-                                //写入文件
+                                //写入文件进行压缩，然后再写成bytes 存到数据库中
                                 assert response.body() != null;
                                 byte[] bytes = response.body().bytes();
-                                downloadCount++;
+                                File temFile = new File(GlobalConfig.appDirPath + expFolderAllExpList.get(finalI).getName());
+                                FileUtil.bytesSavedToFile(bytes,temFile);
+                                File compressTempFile = new Compressor(UIUtil.getContext())
+                                        .setMaxWidth(400)
+                                        .setMaxHeight(400)
+                                        .setQuality(75)
+                                        .compressToFile(temFile);
+
+                                bytes = FileUtil.fileToBytes(compressTempFile);
+                                temFile.delete();
+                                compressTempFile.delete();
 
                                 //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
                                 isExistInFolder = false;

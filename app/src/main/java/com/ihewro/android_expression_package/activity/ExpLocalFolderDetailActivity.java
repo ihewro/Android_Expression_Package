@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +50,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
+import id.zelory.compressor.Compressor;
 
 
 /**
@@ -170,7 +172,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                 adapter.setNewData(expressions);
                 adapter.notifyDataSetChanged();
             }
-        }).execute(dirName);
+        },true).execute(dirName);
     }
 
     private void initListener() {
@@ -387,7 +389,6 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                         for (int i = 0; i < addExpList.size(); i++) {
                             File tempFile = new File(addExpList.get(i));
                             String fileName = tempFile.getName();
-                            //保存之前先查看数据库中是否已经有了
                             Expression expression = new Expression(1, fileName, "", dirName);
                             MyDataBase.addExpressionRecord(expression,tempFile);
                         }

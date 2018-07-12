@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.task;
 
 import android.os.AsyncTask;
 
+import com.blankj.ALog;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.GetExpImageListener;
 
@@ -35,6 +36,7 @@ public class GetExpImageTask extends AsyncTask<Integer,Void,Expression> {
         if (isQueryFolder){
             return LitePal.find(Expression.class,integers[0],true);
         }else {
+            ALog.d("id = " + integers[0]);
             return LitePal.find(Expression.class,integers[0],false);
         }
     }

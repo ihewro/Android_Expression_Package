@@ -22,16 +22,25 @@ import java.util.List;
 public class GetExpListTask extends AsyncTask<String,Void,List<Expression>>{
 
     GetExpListListener listener;
-
+    private boolean isImage;
     public GetExpListTask(GetExpListListener listener) {
         this.listener = listener;
+    }
+
+    public GetExpListTask(GetExpListListener listener, boolean isImage) {
+        this.listener = listener;
+        this.isImage = isImage;
     }
 
     @Override
     protected List<Expression> doInBackground(String... strings) {
         String name = strings[0];
         try {
-            return  LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+            if (isImage){
+                return  LitePal.where("foldername = ?",name).find(Expression.class);
+            }else {
+                return  LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+            }
         }catch (Exception e){
             return new ArrayList<>();
         }

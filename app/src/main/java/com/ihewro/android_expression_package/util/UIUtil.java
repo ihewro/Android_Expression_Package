@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.widget.ImageView;
 
+import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
@@ -121,12 +122,19 @@ public class UIUtil {
                 .error(R.drawable.fail);
         switch (expression.getStatus()){
             case 1:
-                new GetExpImageTask(new GetExpImageListener() {
-                    @Override
-                    public void onFinish(Expression expression) {
-                        Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
-                    }
-                }).execute(expression.getId());
+                if (expression.getImage() ==null ||expression.getImage().length == 0){
+                    new GetExpImageTask(new GetExpImageListener() {
+                        @Override
+                        public void onFinish(Expression expression) {
+                            Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                        }
+                    }).execute(expression.getId());
+                }else {
+                    ALog.d("有图片数据");
+                    Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+
+                }
+
                 break;
             case 2:
                 Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);

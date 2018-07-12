@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package;
 import android.widget.Toast;
 
 import com.blankj.ALog;
+import com.ihewro.android_expression_package.activity.ExpLocalFolderDetailActivity;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetailList;
@@ -15,11 +16,13 @@ import org.litepal.LitePal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
+import id.zelory.compressor.Compressor;
 
 /**
  * <pre>
@@ -40,7 +43,19 @@ public class MyDataBase {
      * @return
      */
     public static boolean addExpressionRecord(Expression expression,File source){
-        byte[] bytes = FileUtil.fileToBytes(source);
+        //先进行图片压缩，避免数据太大，导致读取问题
+        File compressToFile = null;
+        try {
+            compressToFile = new Compressor(UIUtil.getContext())
+                    .setMaxWidth(400)
+                    .setMaxHeight(400)
+                    .setQuality(75)
+                    .compressToFile(source);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ALog.d("压缩后的路径" + compressToFile.getAbsolutePath() + "大小" + compressToFile.length());
+        byte[] bytes = FileUtil.fileToBytes(compressToFile);
         return addExpressionRecord(expression,bytes);
     }
 

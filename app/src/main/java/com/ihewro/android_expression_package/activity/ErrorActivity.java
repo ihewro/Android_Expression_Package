@@ -8,6 +8,7 @@ import android.widget.Button;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
+import com.ihewro.android_expression_package.task.RecoverDataTask;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 
 import butterknife.BindView;
@@ -78,7 +79,8 @@ public class ErrorActivity extends AppCompatActivity {
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateDatabase();
+                //updateDatabase();
+                new RecoverDataTask(ErrorActivity.this).execute();
             }
         });
         restart.setOnClickListener(new View.OnClickListener() {

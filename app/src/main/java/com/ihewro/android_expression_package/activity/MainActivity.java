@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //tabLayout绑定
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-        viewPager.setOffscreenPageLimit(2);//参数为预加载数量，系统最小值为1。慎用！预加载数量过多低端机子受不了
+        viewPager.setOffscreenPageLimit(1);//参数为预加载数量，系统最小值为1。慎用！预加载数量过多低端机子受不了
     }
 
 

@@ -133,6 +133,8 @@ dependencies {
     //图片选择器
     compile 'com.zhihu.android:matisse:0.5.1'
 
+    //图片压缩
+    compile 'id.zelory:compressor:2.1.0'
 
 
 }

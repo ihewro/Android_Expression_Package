@@ -74,9 +74,9 @@ public class ExpressionContentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_expression_content, container, false);
         unbinder = ButterKnife.bind(this, view);
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
-        /*if (!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().register(this);
-        }*/
+        }
 
         return view;
     }
@@ -129,7 +129,7 @@ public class ExpressionContentFragment extends Fragment {
                     adapter.setNewData(expressions);
 
                 }
-            });
+            },true);
             task.execute(tabName);
         }
     }
@@ -180,8 +180,8 @@ public class ExpressionContentFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (task!=null){
+        /*if (task!=null){
             task.cancel(true);
-        }
+        }*/
     }
 }
