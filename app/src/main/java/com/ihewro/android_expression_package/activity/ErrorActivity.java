@@ -23,6 +23,8 @@ public class ErrorActivity extends AppCompatActivity {
     Button restart;
     @BindView(R.id.button6)
     Button update;
+    @BindView(R.id.button)
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,7 @@ public class ErrorActivity extends AppCompatActivity {
 
 
     private void updateDatabase() {
-        UpdateDatabaseTask task = new UpdateDatabaseTask(this,new UpdateDatabaseListener() {
+        UpdateDatabaseTask task = new UpdateDatabaseTask(this, new UpdateDatabaseListener() {
 
             private MaterialDialog updateLoadingDialog;
 
@@ -76,11 +78,17 @@ public class ErrorActivity extends AppCompatActivity {
     }
 
     private void initListener() {
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RecoverDataTask(ErrorActivity.this).execute();
+            }
+        });
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //updateDatabase();
-                new RecoverDataTask(ErrorActivity.this).execute();
+                updateDatabase();
             }
         });
         restart.setOnClickListener(new View.OnClickListener() {

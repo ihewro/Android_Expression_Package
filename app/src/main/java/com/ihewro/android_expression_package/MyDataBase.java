@@ -49,12 +49,17 @@ public class MyDataBase {
         compressToFile = FileUtil.returnCompressExp(source);
         ALog.d("压缩后的路径" + compressToFile.getAbsolutePath() + "大小" + compressToFile.length());
         byte[] bytes = FileUtil.fileToBytes(compressToFile);
-
-        //因为compressToFile 和 source是同一个文件，所以先判断下，再决定是否删除
-        if (compressToFile.exists() && !Objects.equals(compressToFile.getAbsolutePath(), source.getAbsolutePath())){
-            compressToFile.delete();
+        ALog.d("文件大小为" + bytes.length);
+        if (bytes.length>2060826){
+            return false;
+        }else {
+            //因为compressToFile 和 source是同一个文件，所以先判断下，再决定是否删除
+            if (compressToFile.exists() && !Objects.equals(compressToFile.getAbsolutePath(), source.getAbsolutePath())){
+                compressToFile.delete();
+            }
+            return addExpressionRecord(expression,bytes);
         }
-        return addExpressionRecord(expression,bytes);
+
     }
 
     public static boolean addExpressionRecord(Expression expression,byte[] source) {

@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.litepal.LitePal;
 import org.litepal.crud.LitePalSupport;
 
 /**
@@ -123,6 +124,11 @@ public class Expression extends LitePalSupport{
     }
 
     public byte[] getImage() {
+        return image;
+    }
+
+    public byte[] getImage(boolean is) {
+        LitePal.find(Expression.class,this.id).getImage();
         return image;
     }
 

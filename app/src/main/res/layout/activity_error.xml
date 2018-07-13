@@ -60,12 +60,20 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar2">
 
         <Button
-            android:id="@+id/button6"
+            android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginRight="40dp"
-            android:text="恢复同步" />
+            android:text="恢复备份" />
+
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="40dp"
+            android:layout_weight="1"
+            android:text="重新同步" />
 
         <Button
             android:id="@+id/button7"

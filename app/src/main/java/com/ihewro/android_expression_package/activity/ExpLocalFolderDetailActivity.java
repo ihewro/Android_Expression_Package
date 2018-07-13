@@ -30,6 +30,7 @@ import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.task.GetExpListTask;
 import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.ihewro.android_expression_package.view.MyGlideEngine;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -380,7 +381,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             Matisse.from(ExpLocalFolderDetailActivity.this)
                     .choose(MimeType.ofAll(), false)
                     .countable(true)
-                    .maxSelectable(9)
+                    .maxSelectable(90)
                     .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                     .thumbnailScale(0.85f)
                     .theme(R.style.Matisse_Dracula)
@@ -403,8 +404,15 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                         for (int i = 0; i < addExpList.size(); i++) {
                             File tempFile = new File(addExpList.get(i));
                             String fileName = tempFile.getName();
-                            Expression expression = new Expression(1, fileName, "", dirName);
-                            MyDataBase.addExpressionRecord(expression,tempFile);
+                            final Expression expression = new Expression(1, fileName, "", dirName);
+                            if(!MyDataBase.addExpressionRecord(expression,tempFile)){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toasty.info(UIUtil.getContext(),expression.getName() + "文件大小太大，将不会存储").show();
+                                    }
+                                });
+                            }
                         }
                         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         runOnUiThread(new Runnable() {

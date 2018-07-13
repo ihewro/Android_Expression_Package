@@ -63,6 +63,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
         List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class);
         for (ExpressionFolder expressionFolder:
              expressionFolderList) {
+            int num = 0;
             List<Expression> expressions = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",expressionFolder.getName()).find(Expression.class);
             for (Expression expression:
                  expressions) {
@@ -83,12 +84,17 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                     expression.setUrl(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
                 }
                 expression.save();
+                //4. 如果二进制文件太大，选择删除该标签
+                /*if (LitePal.find(Expression.class,expression.getId()).getImage().length > 2060826){
+                    expression.delete();
+                    num ++;
+                }*/
                 alCount++;
                 publishProgress(alCount);
             }
 
             //4.修正表情包的数目
-            expressionFolder.setCount(expressions.size());
+            expressionFolder.setCount(expressions.size() - num);
             expressionFolder.save();
         }
         return true;

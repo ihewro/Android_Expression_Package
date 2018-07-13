@@ -166,23 +166,28 @@ public class DownloadImageTask  {
                                     compressTempFile.delete();
                                 }
 
-                                //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
-                                isExistInFolder = false;
-                                List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
-                                if (temp.size()>0){//找到记录了
-                                    isExistInFolder = true;
+                                if (bytes.length > 2060826){
+                                    Toasty.info(activity,expFolderAllExpList.get(finalI).getName() +"大小太大，将不会存储").show();
+                                }else {
+//检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
+                                    isExistInFolder = false;
+                                    List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
+                                    if (temp.size()>0){//找到记录了
+                                        isExistInFolder = true;
+                                    }
+
+                                    if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
+                                        Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getUrl(),folderName,expressionFolder,bytes);
+                                        new GetExpDesTask(activity,false).execute(expression);
+                                        expression.save();
+                                        //更新数据中该目录的关联数据
+                                        ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
+                                        expressionFolder.setCount(expressionFolder.getCount() + 1);
+                                        expressionFolder.getExpressionList().add(expression);
+                                        expressionFolder.save();
+                                    }
                                 }
 
-                                if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                    Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getUrl(),folderName,expressionFolder,bytes);
-                                    new GetExpDesTask(activity,false).execute(expression);
-                                    expression.save();
-                                    //更新数据中该目录的关联数据
-                                    ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
-                                    expressionFolder.setCount(expressionFolder.getCount() + 1);
-                                    expressionFolder.getExpressionList().add(expression);
-                                    expressionFolder.save();
-                                }
 
                                 //如果全部下载完成，进度条框提示下载完成。
                                 if (downloadCount >= downloadAllCount){
