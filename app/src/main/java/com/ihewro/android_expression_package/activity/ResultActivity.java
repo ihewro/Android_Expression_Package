@@ -96,7 +96,7 @@ public class ResultActivity extends BaseActivity {
 
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this, null)
+                .setContext(this, null,4)
                 .build();
     }
 

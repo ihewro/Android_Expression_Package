@@ -130,7 +130,7 @@ public class UIUtil {
                         }
                     }).execute(expression.getId());
                 }else {
-                    ALog.d("有图片数据");
+                    //ALog.d("有图片数据");
                     Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
 
                 }

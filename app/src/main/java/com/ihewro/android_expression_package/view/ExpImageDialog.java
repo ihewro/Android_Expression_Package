@@ -76,6 +76,7 @@ public class ExpImageDialog extends MaterialDialog{
     private final Builder builder;
     private Activity activity;//显示该对话框的活动
     private Fragment fragment;//显示该对话框的碎片
+    private int position;
 
     private Expression expression;
 
@@ -103,6 +104,7 @@ public class ExpImageDialog extends MaterialDialog{
     private void initData(){
         this.activity = this.builder.activity;
         this.fragment = this.builder.fragment;
+        this.position = this.builder.position;
     }
 
 
@@ -332,8 +334,8 @@ public class ExpImageDialog extends MaterialDialog{
                         expression.setDesStatus(1);
                         expression.setDescription(inputText.getText().toString());
                         expression.save();
-                        //发个消息让首页更新数据
-                        EventBus.getDefault().post(new EventMessage(EventMessage.DESCRIPTION_SAVE,inputText.getText().toString(),expression.getFolderName()));
+                        //发个消息让首页更新数据，第一个数据是内容，第二个是表情包名称，第三个是当前弹框的位置，1表示在localdetail,2表示在首页
+                        EventBus.getDefault().post(new EventMessage(EventMessage.DESCRIPTION_SAVE,inputText.getText().toString(),expression.getFolderName(),String.valueOf(position)));
                         Toasty.success(activity,"保存表情描述成功",Toast.LENGTH_SHORT).show();
                     }
                 },true).execute(expression.getId());
@@ -347,14 +349,16 @@ public class ExpImageDialog extends MaterialDialog{
 
         private Activity activity;//显示该对话框的活动
         private Fragment fragment;//显示该对话框的碎片
+        private int position;//1表示在webdetail,2表示在localdetail,3表示在首页
 
         public Builder(@NonNull Context context) {
             super(context);
         }
 
-        public Builder setContext(Activity activity,Fragment fragment){
+        public Builder setContext(Activity activity,Fragment fragment,int position){
             this.activity = activity;
             this.fragment = fragment;
+            this.position = position;
             return this;
         }
 

@@ -81,9 +81,8 @@ public class EventMessage {
     public String toString() {
         return "type" + type + "\n" +
                 "message" + message + "\n" +
-                "message2" + message2;
-
-
+                "message2" + message2 + "\n" +
+                "message3" + message3;
 
     }
 }

@@ -146,7 +146,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this, null)
+                .setContext(this, null,1)
                 .build();
 
         ownerName.setText(ownerNameString);

@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                 Expression expression = new Expression(2, oneDetailLists.getDate().substring(0, 10) + (currentItem) + ".jpg", oneDetailList.get(currentItem).getImgUrl(), "头图");
                 ExpImageDialog expImageDialog = new ExpImageDialog.Builder(MainActivity.this)
-                        .setContext(MainActivity.this, null)
+                        .setContext(MainActivity.this, null,3)
                         .build();
                 expImageDialog.setImageData(expression);
                 expImageDialog.show();

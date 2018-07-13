@@ -91,7 +91,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     private ExpressionListAdapter adapter;
     private int dirId;
     private String dirName;
-    private int clickPosition;
+    private int clickPosition = -1;
     /**
      * 是否显示checkbox
      */
@@ -148,7 +148,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this, null)
+                .setContext(this, null,2)
                 .build();
         downloadTime.setText(createTime);
 
@@ -350,14 +350,13 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refreshUI(final EventMessage eventBusMessage) {
-        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE) && clickPosition != -1) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ALog.d("更新布局" + clickPosition);
                     ALog.d(eventBusMessage.toString());
                     View view = gridLayoutManager.findViewByPosition(clickPosition).findViewById(R.id.notice);
-                    ALog.d(view);
                     view.setVisibility(View.GONE);
                     expressionList.get(clickPosition).setDesStatus(1);
                     expressionList.get(clickPosition).setDescription(eventBusMessage.getMessage());

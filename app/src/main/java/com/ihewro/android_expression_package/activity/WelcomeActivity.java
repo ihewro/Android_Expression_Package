@@ -34,7 +34,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 MainActivity.actionStart(WelcomeActivity.this);
             }
         }).execute();
-
     }
 
 }

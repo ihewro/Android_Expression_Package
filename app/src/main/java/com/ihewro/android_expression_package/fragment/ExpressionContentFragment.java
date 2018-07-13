@@ -64,7 +64,6 @@ public class ExpressionContentFragment extends Fragment {
     public static Fragment fragmentInstant(String name,boolean isNotShow,int tabPos){
         ExpressionContentFragment fragment = new ExpressionContentFragment();
         Bundle bundle = new Bundle();
-//        bundle.putSerializable("data", data);//json字符串
         bundle.putString("name",name);
         bundle.putBoolean("isNotShow",isNotShow);
         bundle.putInt("tabpos",tabPos);
@@ -139,27 +138,25 @@ public class ExpressionContentFragment extends Fragment {
      * 初始化表情包数据
      */
     private void setExpressionData(){
-        if (!isNotShow){
 
-            task = new GetExpListTask(new GetExpListListener() {
-                @Override
-                public void onFinish(List<Expression> expressions) {
-                    expressionList = expressions;
-                    adapter.setNewData(expressions);
-                    if (expressions.size() == 0){
-                        adapter.setNewData(null);
-                        adapter.setEmptyView(notDataView);
-                    }
-                    isLoadData = true;
+        task = new GetExpListTask(new GetExpListListener() {
+            @Override
+            public void onFinish(List<Expression> expressions) {
+                expressionList = expressions;
+                adapter.setNewData(expressions);
+                if (expressions.size() == 0){
+                    adapter.setNewData(null);
+                    adapter.setEmptyView(notDataView);
                 }
-            },true);
-            task.execute(tabName);
-        }
+                isLoadData = true;
+            }
+        },true);
+        task.execute(tabName);
     }
 
     private void initView(){
         expressionDialog  = new ExpImageDialog.Builder(Objects.requireNonNull(getActivity()))
-                .setContext(getActivity(),this)
+                .setContext(getActivity(),this,3)
                 .build();
 
 
@@ -186,15 +183,27 @@ public class ExpressionContentFragment extends Fragment {
     }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void refreshUI(EventMessage eventBusMessage) {
+        ALog.d(eventBusMessage);
         if (Objects.equals(eventBusMessage.getType(), EventMessage.LOCAL_DESCRIPTION_SAVE)) {
             if (Objects.equals(eventBusMessage.getMessage2(), tabName)) {
-
-                currentPosition = Integer.parseInt(eventBusMessage.getMessage3());
+                ALog.d("当前位置" + currentPosition);
+                if(eventBusMessage.getMessage3()!=null || eventBusMessage.getMessage3()!=""){
+                    currentPosition = Integer.parseInt(eventBusMessage.getMessage3());
+                }
                 View view = gridLayoutManager.findViewByPosition(currentPosition).findViewById(R.id.notice);
                 view.setVisibility(View.GONE);
 
+                expressionList.get(currentPosition).setDesStatus(1);
+                expressionList.get(currentPosition).setDescription(eventBusMessage.getMessage());
+            }
+        }else if (Objects.equals(eventBusMessage.getType(), EventMessage.DESCRIPTION_SAVE)){
+            if (Integer.parseInt(eventBusMessage.getMessage3()) == 3 && currentPosition != -1){
+                ALog.d("当前位置" + currentPosition);
+
+                View view = gridLayoutManager.findViewByPosition(currentPosition).findViewById(R.id.notice);
+                view.setVisibility(View.GONE);
                 expressionList.get(currentPosition).setDesStatus(1);
                 expressionList.get(currentPosition).setDescription(eventBusMessage.getMessage());
             }
