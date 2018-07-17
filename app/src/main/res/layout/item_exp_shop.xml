@@ -129,14 +129,15 @@
                 android:clickable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:orientation="horizontal">
-                <ImageView
+                <TextView
                     android:background="@drawable/bg_download"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="下载全套"
                     android:src="@drawable/ic_file_download_black_24dp"/>
             </LinearLayout>
         </RelativeLayout>

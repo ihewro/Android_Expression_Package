@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
@@ -13,20 +14,30 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.widget.ImageView;
 
+import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestOptions;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.callback.GetExpImageListener;
+import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.GetExpImageTask;
+
+import org.litepal.LitePal;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
@@ -104,6 +115,33 @@ public class UIUtil {
         return context.getResources().getDimensionPixelSize(resourceId);
     }
 
+    public static void setImageToImageView(Expression expression, final ImageView imageView){
+
+        final RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.fail);
+        switch (expression.getStatus()){
+            case 1:
+                if (expression.getImage() ==null ||expression.getImage().length == 0){
+                    new GetExpImageTask(new GetExpImageListener() {
+                        @Override
+                        public void onFinish(Expression expression) {
+                            Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                        }
+                    }).execute(expression.getId());
+                }else {
+                    //ALog.d("有图片数据");
+                    Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+
+                }
+
+                break;
+            case 2:
+                Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
+                break;
+        }
+
+    }
 
     public static void setImageToImageView(int status, String url, ImageView imageView){
         RequestOptions options = new RequestOptions()
@@ -185,6 +223,68 @@ public class UIUtil {
             return var1;
         }else {
             return var2;
+        }
+    }
+
+    public static void goodEgg(int times, TaskListener listener){
+        switch (times) {
+            case 3:
+                ToastUtil.showMessageShort("还戳！！！");
+                break;
+
+            case 10:
+                ToastUtil.showMessageShort("好玩吗");
+                break;
+
+            case 20:
+                ToastUtil.showMessageShort("很无聊？");
+                break;
+
+            case 40:
+                ToastUtil.showMessageShort("。。。");
+                break;
+
+            case 50:
+                ToastUtil.showMessageShort("其实我是一个炸弹💣");
+                break;
+
+            case 60:
+                ToastUtil.showMessageShort("是不是吓坏了哈哈，骗你的");
+                break;
+
+            case 70:
+                ToastUtil.showMessageShort("看你还能坚持多久");
+                break;
+
+            case 90:
+                ToastUtil.showMessageShort("哇！！！就问你手指痛吗");
+                break;
+
+            case 110:
+                ToastUtil.showMessageShort("其实，生活还有很多有意义的事情做，比如。。。。");
+                break;
+
+            case 120:
+                ToastUtil.showMessageShort("比如找我聊天啊，别戳了喂");
+                break;
+
+            case 130:
+                ToastUtil.showMessageShort("去找我聊天吧，用我的表情包，哈哈哈哈哈");
+                break;
+
+            case 140:
+                ToastUtil.showMessageShort("我走了，祝你玩得开心");
+                break;
+
+            case 150:
+                ToastUtil.showMessageShort("哈哈哈，其实我没走哦，看你这么努力，告诉你一个秘密");
+                break;
+
+            case 160:
+                ToastUtil.showMessageShort("我喜欢你( *︾▽︾)，这次真的要再见了哦👋，再见");
+                listener.onFinish(true);
+                break;
+
         }
     }
 

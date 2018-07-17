@@ -1,23 +1,31 @@
 package com.ihewro.android_expression_package.task;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <pre>
@@ -31,12 +39,13 @@ import java.util.List;
 public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
 
     private UpdateDatabaseListener listener;
+    private Activity activity;
     private int lastProgress;//上一个任务执行进度
     private int count  = 0;//需要扫描的总文件数目
     private int alCount = 0;//已经扫描的文件数目
-    ExpressionFolder expressionFolder;
-    public UpdateDatabaseTask(UpdateDatabaseListener listener) {
+    public UpdateDatabaseTask(Activity activity, UpdateDatabaseListener listener) {
         this.listener = listener;
+        this.activity = activity;
     }
 
     /**
@@ -46,49 +55,51 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
      */
     @Override
     protected Boolean doInBackground(Void... voids) {//子线程
-        //扫描文件夹
-        File appDir = new File(GlobalConfig.appDirPath);
+        //扫描数据库
+        count = LitePal.count(Expression.class);//计算总的数目
+        alCount = 0;
+        publishProgress(alCount);
 
-        //首先获取该文件下的所有文件夹的所有文件数目，然后对每个文件夹和数据库的信息进行匹配处理
-        // TODO:这个地方计算文件的数目大小好像有点问题啊
-        final File dir[] = appDir.listFiles();
-        for (int i = 0; i < dir.length; i++){
-            if (dir[i].isDirectory()){
-                ALog.d("count" + dir[i].list().length);
-                count = count + dir[i].list().length;
-            }
-        }
+        List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class);
+        for (ExpressionFolder expressionFolder:
+             expressionFolderList) {
+            int num = 0;
+            List<Expression> expressions = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",expressionFolder.getName()).find(Expression.class);
+            for (Expression expression:
+                 expressions) {
+                //1. 重新外键关联
+                expression.setExpressionFolder(expressionFolder);
+                expression.save();
 
-        publishProgress(0);
-        LitePal.deleteAll(ExpressionFolder.class);//删除表中所有的数据
-        LitePal.deleteAll(Expression.class);//表情表有的外键丢失，上面那行代码是删除不掉的
-        for (int i = 0;i < dir.length;i++){//app目录下面的每个目录分别进行扫描
-            if (dir[i].isDirectory()){//表情包目录
-                File[] files = dir[i].listFiles();//所有文件
-                if (files.length > 0){//排除空文件夹
-                    int currentFolderCount = 0;
-                    expressionFolder = new ExpressionFolder(1,0,dir[i].getName(),null,null, DateUtil.getTimeStringByInt(dir[i].lastModified()),DateUtil.getTimeStringByInt(dir[i].lastModified()),new ArrayList<Expression>(),-1);
-                    expressionFolder.save();
-
-                    for (int j = 0; j<files.length;j++){
-                        if (files[j].isFile() && files[j].getTotalSpace() > 0){//排除0B大小的文件
-                            ALog.d("保存表情");
-                            Expression expression = new Expression(1,files[j].getName() ,files[j].getAbsolutePath(),dir[i].getName(),expressionFolder);
-                            expression.save();
-                            currentFolderCount++;
-                            alCount++;
-                            publishProgress(alCount);//更新进度
-                            expressionFolder.setCount(currentFolderCount);
-                            expressionFolder.getExpressionList().add(expression);
-                            expressionFolder.save();
-                        }
-                    }
+                //2. 没有表情描述，自动识别文字
+                if (expression.getDesStatus() == 0){
+                    new GetExpDesTask(activity,true).execute(expression);
                 }
+
+                //3. 地址修正，如果本地文件不存在，则url置为空，否则才置为本地路径
+                File local = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                if (!local.exists()){
+                    expression.setUrl("");
+                }else {
+                    expression.setUrl(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                }
+                expression.save();
+                //4. 如果二进制文件太大，选择删除该标签
+                /*if (LitePal.find(Expression.class,expression.getId()).getImage().length > 2060826){
+                    expression.delete();
+                    num ++;
+                }*/
+                alCount++;
+                publishProgress(alCount);
             }
+
+            //4.修正表情包的数目
+            expressionFolder.setCount(expressions.size() - num);
+            expressionFolder.save();
         }
-        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         return true;
     }
+
 
     /**
      * 更新进度条 | 主线程，doInBackground()中通过调用publishProgress，来切换到主线程执行这个函数，更新UI界面

@@ -24,3 +24,5 @@
 -keep class **.R$* {
     <fields>;
 }
+
+-dontwarn com.squareup.picasso.**

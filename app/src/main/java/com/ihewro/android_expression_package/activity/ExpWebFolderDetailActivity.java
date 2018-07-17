@@ -64,6 +64,8 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     TextView selectAddButton;
     @BindView(R.id.owner_avatar)
     AvatarImageView ownerAvatar;
+    @BindView(R.id.exit_select)
+    TextView exitSelect;
     private ExpImageDialog expressionDialog;
     View notDataView;
 
@@ -140,26 +142,26 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
-        adapter = new ExpressionListAdapter(R.layout.item_expression, expressionList);
+        adapter = new ExpressionListAdapter(expressionList, false);
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this, null)
+                .setContext(this, null,1)
                 .build();
 
         ownerName.setText(ownerNameString);
-        UIUtil.setImageToImageView(2,ownerAvatarString,ownerAvatar);
+        UIUtil.setImageToImageView(2, ownerAvatarString, ownerAvatar);
     }
 
 
     private void requestData(final int page) {
         currentPage = page;
-        if (page > 1 && (page - 1) * 50 > totalCount) {
+        if (page > 1 && (page - 1) * 30 > totalCount) {
             refreshLayout.finishLoadMoreWithNoMoreData();//没有更多数据了,显示不能加载更多提示
             ALog.d("当前页数page", currentPage);
             ALog.d("pageSize", expressionList.size());
         } else {
-            call = HttpUtil.getExpressionList(dirId, page, 50, dirName, new Callback<List<Expression>>() {
+            call = HttpUtil.getExpressionList(dirId, page, 30, dirName, new Callback<List<Expression>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Expression>> call, @NonNull final Response<List<Expression>> response) {
                     if (response.isSuccessful()) {
@@ -218,6 +220,13 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
     }
 
     private void initListener() {
+
+        exitSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContraryCheck();
+            }
+        });
 
         downloadAll.setOnClickListener(new View.OnClickListener() {
             @Override

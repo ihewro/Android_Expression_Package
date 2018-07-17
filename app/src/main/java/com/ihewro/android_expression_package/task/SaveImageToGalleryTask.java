@@ -3,6 +3,7 @@ package com.ihewro.android_expression_package.task;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
@@ -14,6 +15,7 @@ import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener
 import com.ihewro.android_expression_package.util.FileUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.litepal.LitePal;
 
 import java.io.File;
 
@@ -31,8 +33,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     private SaveImageToGalleryListener listener;
     private Activity activity;
 
-    private boolean result = true;
-
     public SaveImageToGalleryTask(SaveImageToGalleryListener listener, Activity activity) {
         this.listener = listener;
         this.activity = activity;
@@ -42,9 +42,13 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
     protected Boolean doInBackground(Expression... expressions) {
         Expression expression = expressions[0];
         final String targetPath = GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName();
+        boolean result;
         if (expression.getStatus() == 1){//sd卡图片
-            result =  FileUtil.copyFileToTarget(expression.getUrl(),targetPath);
-            MyDataBase.addExpressionRecord(expression);
+            if (expression.getImage() == null || expression.getImage().length == 0){
+                expression = LitePal.find(Expression.class,expression.getId());//查询出二进制图片
+            }
+            ALog.d("id = " + expression.getId() + "大小" + expression.getImage().length);
+            result =  FileUtil.bytesSavedToFile(expression.getImage(),targetPath);
             return result;
         }else if (expression.getStatus() == 2){//网络来源的图片
             try {
@@ -53,6 +57,9 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                         .load(expression.getUrl())
                         .submit().get();
                 if(imageFile != null && imageFile.exists()){
+                    MyDataBase.addExpressionRecord(expression,imageFile);
+                    EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                    //保存单张图片的时候不仅保存到数据库里也保存到本地文件夹
                     File targetFile = new File(targetPath);
                     result = FileUtil.copyFileToTarget(imageFile,targetFile);
                 }else {
@@ -62,9 +69,6 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                 result = false;
                 e.printStackTrace();
             }
-            MyDataBase.addExpressionRecord(expression);
-            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-
 
             return result;
         }else {//未知来源图片

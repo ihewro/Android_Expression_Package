@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.callback.GetExpFolderDataListener;
-import com.ihewro.android_expression_package.task.GetExpFolderDataTask;
+import com.ihewro.android_expression_package.task.AppStartTask;
 import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 
 import butterknife.BindView;
@@ -27,14 +27,13 @@ public class WelcomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         versionName.setText("v" + APKVersionCodeUtils.getVerName(this));
 
-        new GetExpFolderDataTask(new GetExpFolderDataListener() {
+        new AppStartTask(new GetExpFolderDataListener() {
             @Override
             public void onFinish(String jsonString) {
                 finish();
-                MainActivity.actionStart(WelcomeActivity.this, jsonString);
+                MainActivity.actionStart(WelcomeActivity.this);
             }
         }).execute();
-
     }
 
 }

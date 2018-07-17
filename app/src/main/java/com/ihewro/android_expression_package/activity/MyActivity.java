@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.animation.BaseAnimation;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
@@ -27,15 +29,21 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
+import com.ihewro.android_expression_package.util.DataUtil;
+import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +60,6 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
-
     View notDataView;
 
     //适配器
@@ -74,11 +81,11 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
         EventBus.getDefault().register(this);
 
-        initData();
-
         initView();
 
         initListener();
+
+        refreshLayout.autoRefresh();
     }
 
 
@@ -90,7 +97,6 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         }
         notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
         refreshLayout.setEnableLoadMore(false);
-        refreshLayout.setEnableRefresh(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
         adapter.openLoadAnimation(new BaseAnimation() {
@@ -113,7 +119,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class,true);
+                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -124,6 +130,8 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                         }else {
                             adapter.setNewData(expressionFolderList);
                         }
+                        refreshLayout.finishRefresh();
+                        refreshLayout.setEnableRefresh(false);
                     }
                 });
             }
@@ -136,6 +144,12 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
      * 监听事件
      */
     private void initListener() {
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                initData();
+            }
+        });
     }
 
 
@@ -166,6 +180,27 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
         }else if (item.getItemId() == android.R.id.home) {
             finish();
+        }else if (item.getItemId() == R.id.re_add){
+            //新建表情文件夹
+            new MaterialDialog.Builder(this)
+                    .title("输入表情包名称")
+                    .content("具有一点分类意义的名字哦，方便查找")
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input("任意文字", "", new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence input) {
+                            // Do something
+                            List<ExpressionFolder> temExpFolderList = LitePal.where("name = ?",dialog.getInputEditText().getText().toString()).find(ExpressionFolder.class);
+                            if (temExpFolderList.size()>0){
+                                Toasty.error(MyActivity.this,"目录名称已存在，请更换",Toast.LENGTH_SHORT).show();
+                            }else {
+                                ExpressionFolder expressionFolder = new ExpressionFolder(1,0,dialog.getInputEditText().getText().toString(),null,null, DateUtil.getNowDateStr(),null,null,-1);
+                                expressionFolder.save();
+                                initData();
+                            }
+                            EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
+                        }
+                    }).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -182,13 +217,15 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     private void updateDatabase(){
         new MaterialDialog.Builder(this)
                 .title("操作通知")
-                .content("您确定需要重新同步数据吗？一般本地表情包数据显示不正常才需要执行此操作。\n并且执行此操作会丢失表情包作者的头像和名称（不影响具体使用）。")
+                .content("同步数据可以解决两个问题:\n\n" +
+                        "1. 表情显示的数目不正确\n" +
+                        "2. 同步过程中自动为您识别表情文字，作为表情描述方便搜索")
                 .positiveText("朕确定")
                 .negativeText("我只是点着玩的，快关掉快关掉！")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        UpdateDatabaseTask task = new UpdateDatabaseTask(new UpdateDatabaseListener() {
+                        UpdateDatabaseTask task = new UpdateDatabaseTask(MyActivity.this,new UpdateDatabaseListener() {
 
                             private MaterialDialog updateLoadingDialog;
 

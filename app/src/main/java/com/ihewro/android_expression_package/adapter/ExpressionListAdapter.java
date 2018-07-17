@@ -13,6 +13,8 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.util.UIUtil;
 
+import org.litepal.LitePal;
+
 import java.util.List;
 
 
@@ -34,6 +36,8 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
      */
     private boolean showCheckBox = false;
 
+    private boolean showNotDes = false;
+
     /**
      * 防止Checkbox错乱 做setTag  getTag操作
      */
@@ -41,20 +45,26 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
 
     /**
      *
-     * @param layoutResId
      * @param data
      */
-    public ExpressionListAdapter(int layoutResId, @Nullable List<Expression> data) {
-        super(layoutResId, data);
+    public ExpressionListAdapter(@Nullable List<Expression> data,boolean showNotDes) {
+        super(R.layout.item_expression, data);
         expressionList = data;
+        this.showNotDes = showNotDes;
     }
 
     @Override
     protected void convert(final ExpressionListAdapter.IViewHolder helper, Expression item) {
 
+        if (showNotDes && item.getDesStatus() == 0){
+            helper.getView(R.id.notice).setVisibility(View.VISIBLE);
+        }else {
+            helper.getView(R.id.notice).setVisibility(View.GONE);
+        }
+        UIUtil.setImageToImageView(item, (ImageView) helper.getView(R.id.iv_expression));
+
         final CheckBox checkBox = helper.getView(R.id.cb_item);
         checkBox.setTag(helper.getAdapterPosition());
-        UIUtil.setImageToImageView(item.getStatus(),item.getUrl(), (ImageView) helper.getView(R.id.iv_expression));
         //判断当前checkbox的状态
         if (showCheckBox) {
             helper.getView(R.id.cb_item).setVisibility(View.VISIBLE);
@@ -97,11 +107,17 @@ public class ExpressionListAdapter extends BaseQuickAdapter<Expression, Expressi
     }
 
 
+
+
     public void setAllCheckboxSelected(){
 
     }
 
     public void setAllCheckboxNotSelected(){
 
+    }
+
+    public void RemoveDate(int position){
+        expressionList.remove(position);
     }
 }

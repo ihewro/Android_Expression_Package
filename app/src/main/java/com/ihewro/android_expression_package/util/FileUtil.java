@@ -13,15 +13,23 @@ import android.provider.MediaStore;
 
 import com.blankj.ALog;
 import com.canking.minipay.MiniPayUtils;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.bean.Expression;
 
+import org.litepal.LitePal;
+
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+
+import id.zelory.compressor.Compressor;
 
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
@@ -40,8 +48,11 @@ public class FileUtil {
      * 从图片库中删除图片
      */
     public static void deleteImageFromGallery(String file){
-        new File(file).delete();
-        updateMediaStore(UIUtil.getContext(),file);
+        File file1 = new File(file);
+        if (file1.exists() || file != ""){
+            new File(file).delete();
+            updateMediaStore(UIUtil.getContext(),file);
+        }
     }
 
     /**
@@ -109,6 +120,44 @@ public class FileUtil {
     }
 
 
+    public static boolean bytesSavedToFile(Expression expression,File target){
+        if (expression.getImage() == null || expression.getImage().length == 0){
+            expression = LitePal.find(Expression.class,expression.getId());
+        }
+
+        return FileUtil.bytesSavedToFile(expression.getImage(),target);
+
+    }
+
+    public static boolean bytesSavedToFile(byte[] bytes,String target){
+        return bytesSavedToFile(bytes,new File(target));
+    }
+
+    public static boolean bytesSavedToFile(byte[]bytes, File targetFile){
+        if (!targetFile.getParentFile().exists()){
+            targetFile.getParentFile().mkdir();
+        }
+        OutputStream output = null;
+
+        try {
+            // 如果文件存在则删除
+            if (targetFile.exists()) {
+                targetFile.delete();
+            }
+            // 在文件系统中根据路径创建一个新的空文件
+            targetFile.createNewFile();
+            output = new FileOutputStream(targetFile);
+            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
+            bufferedOutput.write(bytes);
+            // 刷出缓冲输出流，该步很关键，要是不执行flush()方法，那么文件的内容是空的。
+            bufferedOutput.flush();
+            output.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
 
 
     public static boolean copyFileToTarget(String origin,String target){
@@ -116,6 +165,7 @@ public class FileUtil {
             copyFileToTarget(origin,origin+"copy");
             deleteImageFromGallery(origin);
             copyFileToTarget(origin+"copy",target);
+            deleteImageFromGallery(origin+"copy");
             return true;
         }else {
             return copyFileToTarget(new File(origin),new File(target));
@@ -157,6 +207,46 @@ public class FileUtil {
             }
             return true;
         }
+    }
+
+    public static byte[] fileToBytes(String file) {
+
+        return fileToBytes(new File(file));
+    }
+        public static byte[] fileToBytes(File file){
+        InputStream is = null;
+        byte[] bytes = null;
+        try {
+            is = new FileInputStream(file);
+            bytes = UIUtil.InputStreamTOByte(is);
+            is.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
+    }
+
+    public static File returnCompressExp(File file){
+        String fileName = file.getName();
+        String back = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
+        ALog.d("文件后缀" + back);
+        if (Objects.equals(back, "gif") || Objects.equals(back, "GIF")){
+            return file;
+        }else {
+            try {
+                File compressTempFile = new Compressor(UIUtil.getContext())
+                        .setMaxWidth(400)
+                        .setMaxHeight(400)
+                        .setQuality(75)
+                        .compressToFile(file);
+                return compressTempFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
 }
