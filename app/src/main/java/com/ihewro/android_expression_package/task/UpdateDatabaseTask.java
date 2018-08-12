@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.task;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 
@@ -39,6 +40,7 @@ import java.util.Objects;
 public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
 
     private UpdateDatabaseListener listener;
+    @SuppressLint("StaticFieldLeak")
     private Activity activity;
     private int lastProgress;//上一个任务执行进度
     private int count  = 0;//需要扫描的总文件数目
@@ -67,6 +69,7 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
             List<Expression> expressions = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",expressionFolder.getName()).find(Expression.class);
             for (Expression expression:
                  expressions) {
+                ALog.d("对每个表情进行循环");
                 //1. 重新外键关联
                 expression.setExpressionFolder(expressionFolder);
                 expression.save();
@@ -93,6 +96,8 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                 publishProgress(alCount);
             }
 
+            //3.1 TODO：上述修复之后，仍然游离的表情（没有外键）进行删除
+
             //4.修正表情包的数目
             expressionFolder.setCount(expressions.size() - num);
             expressionFolder.save();
@@ -114,7 +119,8 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                 listener.onProgress(progress,count);
                 lastProgress = progress;
             }
-            listener.onProgress(lastProgress,count);
+            ALog.d("总数目" + count);
+            //listener.onProgress(lastProgress,count);
         }
     }
 

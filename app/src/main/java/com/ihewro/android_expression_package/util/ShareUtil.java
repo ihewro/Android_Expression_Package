@@ -60,6 +60,14 @@ public class ShareUtil {
                 msgText, type, uri);
     }
 
+    public static void shareTimFriend(String msgTitle, String msgText, int type,
+                                     Uri uri) {
+
+        shareMsg("com.tencent.tim",
+                "com.tencent.mobileqq.activity.JumpActivity", "Tim", msgTitle,
+                msgText, type, uri);
+    }
+
 
     /**
      * 分享到微信好友

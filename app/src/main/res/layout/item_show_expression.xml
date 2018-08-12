@@ -49,6 +49,17 @@
             app:iiv_color="@color/text_secondary_dark"
             android:layout_alignParentLeft="true" />
 
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/delete_image"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:padding="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            app:iiv_icon="gmd_delete"
+            app:iiv_color="@color/text_secondary_dark"
+            android:layout_toRightOf="@id/save_image" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="38dp"
@@ -65,16 +76,6 @@
                 app:iiv_color="@color/text_secondary_dark"
                 app:iiv_icon="gmd_share"/>
 
-            <com.mikepenz.iconics.view.IconicsImageView
-                android:id="@+id/tim_share"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:padding="10dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                app:iiv_color="@color/text_secondary_dark"
-                app:iiv_icon="faw_weixin"
-                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/weChat_share"
@@ -93,6 +94,16 @@
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/qq"
                 android:clickable="true"/>
+
+            <ImageView
+                android:id="@+id/tim_share"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="10dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/tim"
+                android:clickable="true"/>
+
 
             <com.mikepenz.iconics.view.IconicsImageView
                 android:id="@+id/love"
@@ -144,7 +155,8 @@
             <TextView
                 android:id="@+id/auto_get"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
                 android:textColor="@color/primaryColor"
                 android:textSize="15sp"
                 android:paddingRight="10dp"
@@ -155,7 +167,8 @@
             <TextView
                 android:id="@+id/save_to_database"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
                 android:textColor="@color/red"
                 android:textSize="15sp"
                 android:paddingRight="10dp"

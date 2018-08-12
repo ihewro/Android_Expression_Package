@@ -75,7 +75,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
                 @Override
                 public void onError(OCRError error) {
                     ALog.d(error.getMessage());
-                    Toasty.info(activity,expression.getName()+"表情的描述自动获取失败，你可以稍后手动识别描述").show();
+                    //Toasty.info(activity,expression.getName()+"表情的描述自动获取失败，你可以稍后手动识别描述").show();
                     if (isRepeat){
                         new GetExpDesTask(activity,isRepeat).execute(expression);
                     }

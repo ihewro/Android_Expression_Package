@@ -5,4 +5,18 @@
         android:id="@+id/re_add"
         android:title="添加表情"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/re_edit"
+        android:title="修改表情包名称"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/all_download"
+        android:title="下载到手机"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/all_delete"
+        android:title="删除本地该表情包文件"
+        app:showAsAction="never" />
 </menu>

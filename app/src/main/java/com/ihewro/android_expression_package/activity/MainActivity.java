@@ -59,6 +59,7 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
+import com.ihewro.android_expression_package.callback.GestureListener;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
 import com.ihewro.android_expression_package.callback.GetMainExpListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
@@ -528,6 +529,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void initListener() {
 
+        //监听图片的左右滑动
+        topImage.setLongClickable(true);
+        topImage.setOnTouchListener(new MyGestureListener(this));
+
         fabSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -881,4 +886,28 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
 
     }
+
+    /**
+     * 继承GestureListener，重写left和right方法
+     */
+    private class MyGestureListener extends GestureListener {
+        public MyGestureListener(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean left() {
+            Toasty.info(MainActivity.this,"点击顶部风车按钮切换图片文字哦").show();
+            return super.left();
+        }
+
+        @Override
+        public boolean right() {
+            Toasty.info(MainActivity.this,"点击顶部风车按钮切换图片文字哦").show();
+            return super.right();
+        }
+    }
+
 }
+
+
