@@ -36,31 +36,40 @@ import id.zelory.compressor.Compressor;
  */
 public class MyDataBase {
 
-
-
     /**
      * 把一个表情信息加入到数据库
      * @param expression
      * @return
      */
     public static boolean addExpressionRecord(Expression expression,File source){
+
+        byte[] bytes = fileToCompressedBytes(source);
+        if (bytes!=null){
+            return false;
+        }else {
+            return addExpressionRecord(expression,bytes);
+        }
+    }
+
+    private static byte[] fileToCompressedBytes(File source){
         //先进行图片压缩，避免数据太大，导致读取问题
-        File compressToFile = null;
+        File compressToFile;
         compressToFile = FileUtil.returnCompressExp(source);
         ALog.d("压缩后的路径" + compressToFile.getAbsolutePath() + "大小" + compressToFile.length());
         byte[] bytes = FileUtil.fileToBytes(compressToFile);
         ALog.d("文件大小为" + bytes.length);
         if (bytes.length>2060826){
-            return false;
+            return null;
         }else {
             //因为compressToFile 和 source是同一个文件，所以先判断下，再决定是否删除
             if (compressToFile.exists() && !Objects.equals(compressToFile.getAbsolutePath(), source.getAbsolutePath())){
                 compressToFile.delete();
             }
-            return addExpressionRecord(expression,bytes);
+            return bytes;
         }
-
     }
+
+
 
     public static boolean addExpressionRecord(Expression expression,byte[] source) {
         //1. 检查有没有表情对应的目录

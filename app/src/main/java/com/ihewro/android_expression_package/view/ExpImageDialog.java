@@ -135,7 +135,10 @@ public class ExpImageDialog extends MaterialDialog{
             }else {
                 inputText.setText("");
             }
-        }else {
+        } else if (expression.getStatus() == 3){
+            delete.setVisibility(View.VISIBLE);
+            save.setVisibility(View.GONE);
+        } else if (expression.getStatus() == 2){
             delete.setVisibility(View.GONE);
             inputView.setVisibility(View.GONE);
         }

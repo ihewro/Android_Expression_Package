@@ -19,7 +19,7 @@ import org.litepal.crud.LitePalSupport;
 public class Expression extends LitePalSupport{
 
     private int id;//主键
-    private int status;//标志位，图片来源：~~-1 apk内置图片~~ 1 sd卡图片 2 网络图片
+    private int status;//标志位，图片来源：~~-1 apk内置图片~~ 1 数据库图片 2 网络图片 3 本机图片（数据库中没有存，头图分享卡片就是这种类型）
     private String name;//图片名称
     private String url;//图片路径或者图片地址
     private String folderName;//目录的名称

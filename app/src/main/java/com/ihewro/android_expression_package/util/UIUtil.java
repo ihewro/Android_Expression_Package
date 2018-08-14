@@ -2,6 +2,7 @@ package com.ihewro.android_expression_package.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -14,15 +15,20 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.blankj.ALog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestOptions;
+import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyApplication;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.Expression;
@@ -35,10 +41,14 @@ import org.litepal.LitePal;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+
+import es.dmoral.toasty.Toasty;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -120,6 +130,10 @@ public class UIUtil {
         final RequestOptions options = new RequestOptions()
                 .placeholder(R.drawable.loading)
                 .error(R.drawable.fail);
+        final RequestOptions options2 = new RequestOptions()
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.fail)
+                .dontAnimate();
         switch (expression.getStatus()){
             case 1:
                 if (expression.getImage() ==null ||expression.getImage().length == 0){
@@ -132,12 +146,15 @@ public class UIUtil {
                 }else {
                     //ALog.d("有图片数据");
                     Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
-
                 }
-
                 break;
             case 2:
                 Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
+                break;
+
+            case 3:
+                Glide.with(UIUtil.getContext()).asBitmap().load(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()).apply(options2).into(imageView);
+
                 break;
         }
 
@@ -288,6 +305,95 @@ public class UIUtil {
         }
     }
 
+
+    /**
+     * 手动测量摆放View
+     * 对于手动 inflate 或者其他方式代码生成加载的View进行测量，避免该View无尺寸
+     * @param v
+     * @param width
+     * @param height
+     */
+    public static void layoutView(View v, int width, int height) {
+        // validate view.width and view.height
+        v.layout(0, 0, width, height);
+        int measuredWidth = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
+        int measuredHeight = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
+
+        // validate view.measurewidth and view.measureheight
+        v.measure(measuredWidth, measuredHeight);
+        v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+    }
+
+
+    public static int px2dip(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
+    /**
+     * 获取一个 View 的缓存视图
+     *  (前提是这个View已经渲染完成显示在页面上)
+     * @param view
+     * @return
+     */
+    public static Bitmap getCacheBitmapFromView(View view) {
+        final boolean drawingCacheEnabled = true;
+        view.setDrawingCacheEnabled(drawingCacheEnabled);
+        view.buildDrawingCache(drawingCacheEnabled);
+        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap bitmap;
+        if (drawingCache != null) {
+            bitmap = Bitmap.createBitmap(drawingCache);
+            view.setDrawingCacheEnabled(false);
+        } else {
+            bitmap = null;
+        }
+        return bitmap;
+    }
+    public static boolean saveBitmapToSdCard(Context context, Bitmap mybitmap, String name){
+        boolean result = false;
+        //创建位图保存目录
+        String path = GlobalConfig.appDirPath + name;
+        File sd = new File(path);
+        File fileParent = sd.getParentFile();//如果表情包目录都不存在，则需要先创建目录
+        if(!fileParent.exists()){
+            fileParent.mkdirs();
+        }
+
+        File file = new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        FileOutputStream fileOutputStream = null;
+        try {
+            // 判断SD卡是否存在，并且是否具有读写权限
+            if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                fileOutputStream = new FileOutputStream(file);
+                ALog.d(mybitmap);
+                mybitmap.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+                fileOutputStream.flush();
+                fileOutputStream.close();
+
+                //update gallery
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri uri = Uri.fromFile(file);
+                intent.setData(uri);
+                context.sendBroadcast(intent);
+                ALog.d("哈哈哈哈哈哈哈");
+                result = true;
+            }
+            else{
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
 }

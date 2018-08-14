@@ -213,7 +213,8 @@ public class FileUtil {
 
         return fileToBytes(new File(file));
     }
-        public static byte[] fileToBytes(File file){
+
+    public static byte[] fileToBytes(File file){
         InputStream is = null;
         byte[] bytes = null;
         try {
@@ -248,5 +249,7 @@ public class FileUtil {
 
         return null;
     }
+
+
 
 }
