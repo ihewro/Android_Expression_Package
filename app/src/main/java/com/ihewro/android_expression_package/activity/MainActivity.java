@@ -59,12 +59,14 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetail;
 import com.ihewro.android_expression_package.bean.OneDetailList;
+import com.ihewro.android_expression_package.callback.GestureListener;
 import com.ihewro.android_expression_package.callback.RemoveCacheListener;
 import com.ihewro.android_expression_package.callback.GetMainExpListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.fragment.ExpressionContentFragment;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.task.CheckUpdateTask;
+import com.ihewro.android_expression_package.task.GenerateScreenshotTask;
 import com.ihewro.android_expression_package.task.RecoverDataTask;
 import com.ihewro.android_expression_package.task.RemoveCacheTask;
 import com.ihewro.android_expression_package.task.GetExpFolderTask;
@@ -528,6 +530,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void initListener() {
 
+        //监听图片的左右滑动
+        topImage.setLongClickable(true);
+        topImage.setOnTouchListener(new MyGestureListener(this));
+
         fabSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -686,13 +692,26 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         topImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Expression expression = new Expression(2, oneDetailLists.getDate().substring(0, 10) + (currentItem) + ".jpg", oneDetailList.get(currentItem).getImgUrl(), "头图");
-                ExpImageDialog expImageDialog = new ExpImageDialog.Builder(MainActivity.this)
+                //生成截图
+                final Expression expression = new Expression(3, oneDetailLists.getDate().substring(0, 10) + (currentItem) + ".jpg", oneDetailList.get(currentItem).getImgUrl(), "头图");
+                final ExpImageDialog expImageDialog = new ExpImageDialog.Builder(MainActivity.this)
                         .setContext(MainActivity.this, null,3)
                         .build();
                 expImageDialog.setImageData(expression);
-                expImageDialog.show();
+
+                //判断是否已经生成过了
+                File file = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                if (file.exists()){
+                    expImageDialog.show();
+                }else {
+                    new GenerateScreenshotTask(MainActivity.this, oneText.getText().toString(), expression, new TaskListener() {
+                        @Override
+                        public void onFinish(Boolean result) {
+                            expImageDialog.show();
+                        }
+                    }).execute();
+                }
+
             }
         });
     }
@@ -881,4 +900,28 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
 
     }
+
+    /**
+     * 继承GestureListener，重写left和right方法
+     */
+    private class MyGestureListener extends GestureListener {
+        public MyGestureListener(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean left() {
+            Toasty.info(MainActivity.this,"点击顶部风车按钮切换图片文字哦").show();
+            return super.left();
+        }
+
+        @Override
+        public boolean right() {
+            Toasty.info(MainActivity.this,"点击顶部风车按钮切换图片文字哦").show();
+            return super.right();
+        }
+    }
+
 }
+
+

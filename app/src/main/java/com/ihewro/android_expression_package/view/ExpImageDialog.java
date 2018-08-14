@@ -64,7 +64,8 @@ public class ExpImageDialog extends MaterialDialog{
     private TextView tvExpression;
     private View save;
     private View share;
-    //View timShare;
+    private View delete;
+    View timShare;
     private View weChatShare;
     private View qqShare;//qq分享
     private View love;//输出一句撩人的话
@@ -120,14 +121,25 @@ public class ExpImageDialog extends MaterialDialog{
      * 更新对话框的界面数据
      */
     private void updateUI(){
-        if (expression.getStatus() == 1){//不是网络图片，将保存按钮取消掉
+        if (expression.getStatus() == 1){//本地图片，显示图片识别框
             inputView.setVisibility(View.VISIBLE);
+            if (new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()).exists()){
+                delete.setVisibility(View.VISIBLE);
+                save.setVisibility(View.GONE);
+            }else {
+                save.setVisibility(View.VISIBLE);
+                delete.setVisibility(View.GONE);
+            }
             if (expression.getDesStatus() == 1){
                 inputText.setText(expression.getDescription());
             }else {
                 inputText.setText("");
             }
-        }else {
+        } else if (expression.getStatus() == 3){
+            delete.setVisibility(View.VISIBLE);
+            save.setVisibility(View.GONE);
+        } else if (expression.getStatus() == 2){
+            delete.setVisibility(View.GONE);
             inputView.setVisibility(View.GONE);
         }
         UIUtil.setImageToImageView(expression,ivExpression);
@@ -148,8 +160,9 @@ public class ExpImageDialog extends MaterialDialog{
         ivExpression = view.findViewById(R.id.expression_image);
         tvExpression = view.findViewById(R.id.expression_name);
         save = view.findViewById(R.id.save_image);
+        delete = view.findViewById(R.id.delete_image);
         share = view.findViewById(R.id.share);
-        //timShare = view.findViewById(R.id.tim_share);
+        timShare = view.findViewById(R.id.tim_share);
         weChatShare = view.findViewById(R.id.weChat_share);
         qqShare = view.findViewById(R.id.qq_share);
         love = view.findViewById(R.id.love);
@@ -207,6 +220,31 @@ public class ExpImageDialog extends MaterialDialog{
                     }
                 },activity).execute(expression);
 
+            }
+        });
+
+        //调用tim分享
+        timShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SaveImageToGalleryTask(new SaveImageToGalleryListener() {
+                    @Override
+                    public void onFinish(Boolean result) {
+                        if (result){
+                            FileUtil.updateMediaStore(activity,GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                            File filePath = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                            Log.e("filepath", filePath.getAbsolutePath());
+                            Intent shareIntent = new Intent();
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            Uri imageUri = FileProvider.getUriForFile(
+                                    activity,
+                                    UIUtil.getContext().getPackageName() + ".fileprovider",
+                                    filePath);
+
+                            ShareUtil.shareTimFriend("title", "content", ShareUtil.DRAWABLE, imageUri);
+                        }
+                    }
+                },activity).execute(expression);
             }
         });
 
@@ -340,6 +378,19 @@ public class ExpImageDialog extends MaterialDialog{
                     }
                 },true).execute(expression.getId());
 
+            }
+        });
+
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File file = new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName());
+                if (file.exists()){
+                    //删除
+                    file.delete();
+                    Toasty.success(activity,"删除成功").show();
+                }
             }
         });
 

@@ -71,6 +71,8 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
             }
 
             return result;
+        }else if (expression.getStatus() == 3){//本机图片
+            return true;
         }else {//未知来源图片
             return false;
         }

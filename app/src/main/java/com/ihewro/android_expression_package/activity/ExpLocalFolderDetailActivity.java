@@ -1,6 +1,7 @@
 package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -25,10 +28,17 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpressionListAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
+import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.GetExpListListener;
+import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.DeleteExpFolderTask;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
+import com.ihewro.android_expression_package.task.EditExpFolderNameTask;
 import com.ihewro.android_expression_package.task.GetExpListTask;
+import com.ihewro.android_expression_package.task.SaveFolderToLocalTask;
+import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
+import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
@@ -43,6 +53,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -377,7 +388,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.re_add) {
-            //
+            //添加新的表情
             Matisse.from(ExpLocalFolderDetailActivity.this)
                     .choose(MimeType.ofAll(), false)
                     .countable(true)
@@ -387,6 +398,63 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     .theme(R.style.Matisse_Dracula)
                     .imageEngine(new MyGlideEngine())
                     .forResult(1998);
+        }else if (item.getItemId() == R.id.re_edit){
+            //修改表情包名称
+            new MaterialDialog.Builder(this)
+                    .title("输入修改后的表情包名称")
+                    .content("具有一点分类意义的名字哦，方便查找")
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input("任意文字", dirName, new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(final MaterialDialog dialog, CharSequence input) {
+                            List<ExpressionFolder> temExpFolderList = LitePal.where("name = ?",dialog.getInputEditText().getText().toString()).find(ExpressionFolder.class);
+                            if (temExpFolderList.size()>0){
+                                Toasty.error(ExpLocalFolderDetailActivity.this,"表情包名称已存在，请更换",Toast.LENGTH_SHORT).show();
+                            }else {
+                                //修改数据库的目录名称
+                                new EditExpFolderNameTask(ExpLocalFolderDetailActivity.this, expressionList.size(), dirName, dialog.getInputEditText().getText().toString(), new SaveImageToGalleryListener() {
+                                    @Override
+                                    public void onFinish(Boolean result) {
+                                        //修改本地表情包目录名称
+                                        File dir = new File(GlobalConfig.appDirPath + dirName);
+                                        if (dir.exists()){
+                                            dir.renameTo(new File(GlobalConfig.appDirPath + dialog.getInputEditText().getText().toString()));
+                                        }
+                                        toolbar.setTitle(dialog.getInputEditText().getText().toString());
+                                    }
+                                }).execute(expressionList);
+                            }
+                        }
+                    }).show();
+        }else if (item.getItemId() == R.id.all_download){
+            //下载到手机
+            new MaterialDialog.Builder(this)
+                    .title("下载提示")
+                    .content("从[表情商店]下载的图片以二进制存储在本地数据库中，不[下载到本地]仍然可以离线使用，无需流量。\n\n [下载到手机]表示将图片以文件形式存在在手机存储卡中")
+                    .negativeText("那就不下载了")
+                    .positiveText("给我下载")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            new SaveFolderToLocalTask(ExpLocalFolderDetailActivity.this,expressionList.size(),dirName).execute(expressionList);
+                        }
+                    })
+                    .show();
+
+        }else if (item.getItemId() == R.id.all_delete){
+            //删除本地文件
+            new MaterialDialog.Builder(this)
+                    .title("删除提示")
+                    .content("该操作会删除表情包在手机存储卡中的文件。\n\n删除后，表情仍然以二进制保留在数据库，可以离线使用。")
+                    .negativeText("取消")
+                    .positiveText("给我删除")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            new DeleteExpFolderTask(dirName,ExpLocalFolderDetailActivity.this).execute();
+                        }
+                    })
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }

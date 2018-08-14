@@ -69,9 +69,6 @@ public class AboutActivity extends AppCompatActivity {
 
         initListener();
 
-        Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        imageView.setAnimation(rotateAnimation);
-        imageView.startAnimation(rotateAnimation);
 
 
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +86,9 @@ public class AboutActivity extends AppCompatActivity {
                         if (clickTimes > 3 && !isPlayed){
                             isPlayed = true;
                             Toasty.info(AboutActivity.this,"准备为您播放彩蛋音乐", Toast.LENGTH_LONG).show();
+                            Animation rotateAnimation = AnimationUtils.loadAnimation(AboutActivity.this, R.anim.rotate);
+                            imageView.setAnimation(rotateAnimation);
+                            imageView.startAnimation(rotateAnimation);
                             String dataSource = "https://www.ihewro.com/little.mp3";
                             ALog.d("播放地址为" + dataSource);
 
@@ -102,7 +102,7 @@ public class AboutActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }else if (isPlayed){
-                            Toasty.info(AboutActivity.this,"已经为你播放过啦~",Toast.LENGTH_LONG).show();
+                            //Toasty.info(AboutActivity.this,"已经为你播放过啦~",Toast.LENGTH_LONG).show();
                         }
                     }else {
                         lastClickTime = -1;
