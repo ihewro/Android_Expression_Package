@@ -86,7 +86,7 @@ public class GenerateScreenshotTask extends AsyncTask<Void,Void,Boolean> {
         }
         date.setText(text);
         content.setText(this.content);
-        //生成截图 
+        //生成截图
         v.setDrawingCacheEnabled(true);
         //measure()实际测量 自己显示在屏幕上的宽高 2个参数，int widthMeasureSpec 和 int heightMeasureSpec表示具体的测量规则。
         v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),

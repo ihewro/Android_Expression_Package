@@ -44,7 +44,7 @@ public class MyDataBase {
     public static boolean addExpressionRecord(Expression expression,File source){
 
         byte[] bytes = fileToCompressedBytes(source);
-        if (bytes!=null){
+        if (bytes == null){
             return false;
         }else {
             return addExpressionRecord(expression,bytes);
