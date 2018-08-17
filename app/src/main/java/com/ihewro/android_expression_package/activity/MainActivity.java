@@ -859,7 +859,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void refreshUI(EventMessage eventBusMessage) {
-        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)) {
+        if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE) || Objects.equals(eventBusMessage.getType(), EventMessage.MAIN_DATABASE)) {
             updateData();
             setTabLayout(true);
         }

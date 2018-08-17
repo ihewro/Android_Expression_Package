@@ -71,15 +71,27 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
 
     OnItemDragListener onItemDragListener = new OnItemDragListener() {
+        int start = 0;
+        float end = 0;
         @Override
         public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos){
+            start = pos;
+            ALog.d("开始" + pos);
+        }
+        @Override
+        public void onItemDragMoving(RecyclerView.ViewHolder source, int from, RecyclerView.ViewHolder target, int to) {
+            ALog.d("开始" + from + " || 目标" + to);
 
         }
         @Override
-        public void onItemDragMoving(RecyclerView.ViewHolder source, int from, RecyclerView.ViewHolder target, int to) {}
-        @Override
         public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
-            //修改表情中表情包权值，移动的表情包权值 = 之前位置权值 + 1
+            //修改表情中表情包权值，移动的表情包权值 = 移动后的位置
+            ALog.d("结束" + pos);
+            end = pos;
+            expressionFolderList.get((int) end).setOrderValue(end + 1.5);
+            expressionFolderList.get((int) end).save();
+            EventBus.getDefault().post(new EventMessage(EventMessage.MAIN_DATABASE));
+
 
         }
     };
@@ -137,7 +149,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final List<ExpressionFolder> expressionFolderList = LitePal.findAll(ExpressionFolder.class);
+                expressionFolderList = LitePal.order("ordervalue").find(ExpressionFolder.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

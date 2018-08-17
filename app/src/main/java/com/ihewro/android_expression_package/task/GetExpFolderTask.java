@@ -36,7 +36,7 @@ public class GetExpFolderTask extends AsyncTask<Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         //从数据库中获取表情包信息
-        expressionFolderList = LitePal.findAll(ExpressionFolder.class);
+        expressionFolderList = LitePal.order("ordervalue").find(ExpressionFolder.class);
 
         if (expressionFolderList.size() == 0) {//如果没有表情包目录，则会显示为空
             fragmentList.add(ExpressionContentFragment.fragmentInstant("默认",true,0));

@@ -12,6 +12,7 @@ package com.ihewro.android_expression_package.bean;
 public class EventMessage {
 
     public static final String DATABASE = "database";
+    public static final String MAIN_DATABASE = "maindatabase";
     public static final String DESCRIPTION_SAVE = "descriptionSave";
     public static final String LOCAL_DESCRIPTION_SAVE = "localDescriptionSave";
     public static final String VIEWPAGER = "VIEWPAGER";

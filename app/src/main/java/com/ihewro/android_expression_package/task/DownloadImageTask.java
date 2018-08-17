@@ -132,7 +132,7 @@ public class DownloadImageTask  {
                 //第一行显示默认的表情包名称，下面显示数据库已经存在表情包名称
                 folderNameList.clear();
                 folderNameList.add(folderName + "(默认)");
-                expressionFolderList = LitePal.select("name").find(ExpressionFolder.class);
+                expressionFolderList = LitePal.select("name").order("ordervalue").find(ExpressionFolder.class);
                 for (ExpressionFolder expFolder:
                      expressionFolderList) {
                     folderNameList.add(expFolder.getName());
