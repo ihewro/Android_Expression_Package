@@ -47,14 +47,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <ImageView
-                android:id="@+id/image_1"
-                android:layout_weight="1"
-                android:layout_height="70dp"
-                android:src="@drawable/loading"
+
+
+
+            <FrameLayout
+                android:id="@+id/fl_image_1"
                 android:layout_marginRight="10dp"
-                android:scaleType="centerCrop"
-                android:layout_width="0dp" />
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+
+                <ImageView
+                    android:id="@+id/image_1"
+                    android:layout_height="70dp"
+                    android:src="@drawable/loading"
+                    android:scaleType="centerCrop"
+                    android:layout_width="match_parent" />
+                <View
+                    android:id="@+id/view_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#5c000000"
+                    android:visibility="gone"/>
+                <TextView
+                    android:id="@+id/exp_num_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25+"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
+            </FrameLayout>
+
 
             <ImageView
                 android:id="@+id/image_2"

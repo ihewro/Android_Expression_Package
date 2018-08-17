@@ -25,7 +25,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="25dp"
-        android:text="去表情商店下载一些表情包吧"
+        android:text="去下载或者添加一些表情包吧"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5" />

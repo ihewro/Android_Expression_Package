@@ -78,12 +78,27 @@ public class ExpMyRecyclerViewAdapter extends BaseItemDraggableAdapter<Expressio
             helper.getView(R.id.fl_image_5).setVisibility(View.INVISIBLE);
         }
 
+
+        if (item.getExpressionList(false).size() == 0){//如果是空表情，显示占位图片
+            ALog.d("名称" + item.getName() + helper.getAdapterPosition());
+            helper.getView(R.id.exp_num_1).setVisibility(View.VISIBLE);
+            helper.getView(R.id.view_1).setVisibility(View.VISIBLE);
+            helper.getView(imageViewArray[0]).setVisibility(View.VISIBLE);
+            UIUtil.setImageToImageView(null, (ImageView) helper.getView(imageViewArray[0]));
+            helper.setText(R.id.exp_num_1,"空");
+        }else {
+            helper.getView(R.id.exp_num_1).setVisibility(View.INVISIBLE);
+            helper.getView(R.id.view_1).setVisibility(View.INVISIBLE);
+        }
+
+
         helper.getView(R.id.item_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ExpLocalFolderDetailActivity.actionStart(activity,item.getId(),item.getName(),item.getCreateTime());
             }
         });
+
 
         //3. 点击事件
         //删除表情包

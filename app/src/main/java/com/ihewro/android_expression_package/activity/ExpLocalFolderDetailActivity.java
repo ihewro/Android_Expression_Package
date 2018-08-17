@@ -13,6 +13,7 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -116,11 +117,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     private String createTime;
     GridLayoutManager gridLayoutManager;
 
-    Comparator<Integer> cmp = new Comparator<Integer>() {
-        public int compare(Integer i1, Integer i2) {
-            return i2 - i1;
-        }
-    };
+    private View notDataView;
 
     public static void actionStart(Activity activity, int dirId, String dirName, String createTime) {
         Intent intent = new Intent(activity, ExpLocalFolderDetailActivity.class);
@@ -152,9 +149,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        notDataView = getLayoutInflater().inflate(R.layout.item_empty_view, (ViewGroup) recyclerView.getParent(), false);
+
         refreshLayout.setEnableLoadMore(false);
         toolbar.setTitle(dirName);
-        gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
         adapter = new ExpressionListAdapter(expressionList, true);
         recyclerView.setAdapter(adapter);
@@ -186,6 +186,11 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                 adapter.notifyDataSetChanged();
                 refreshLayout.finishRefresh(true);
                 refreshLayout.setEnableRefresh(false);
+
+                if (expressionList.size() == 0){
+                    adapter.setNewData(null);
+                    adapter.setEmptyView(notDataView);
+                }
             }
         },true).execute(dirName);
     }

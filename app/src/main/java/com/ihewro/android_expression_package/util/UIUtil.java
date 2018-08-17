@@ -49,6 +49,7 @@ import java.util.List;
 
 
 import es.dmoral.toasty.Toasty;
+import io.reactivex.annotations.Nullable;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -125,7 +126,7 @@ public class UIUtil {
         return context.getResources().getDimensionPixelSize(resourceId);
     }
 
-    public static void setImageToImageView(Expression expression, final ImageView imageView){
+    public static void setImageToImageView(@Nullable Expression expression, final ImageView imageView){
 
         final RequestOptions options = new RequestOptions()
                 .placeholder(R.drawable.loading)
@@ -134,29 +135,35 @@ public class UIUtil {
                 .placeholder(R.drawable.loading)
                 .error(R.drawable.fail)
                 .dontAnimate();
-        switch (expression.getStatus()){
-            case 1:
-                if (expression.getImage() ==null ||expression.getImage().length == 0){
-                    new GetExpImageTask(new GetExpImageListener() {
-                        @Override
-                        public void onFinish(Expression expression) {
-                            Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
-                        }
-                    }).execute(expression.getId());
-                }else {
-                    //ALog.d("有图片数据");
-                    Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
-                }
-                break;
-            case 2:
-                Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
-                break;
 
-            case 3:
-                Glide.with(UIUtil.getContext()).asBitmap().load(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()).apply(options2).into(imageView);
+        if (expression == null){
+            Glide.with(UIUtil.getContext()).load(R.drawable.empty2).apply(options).transition(withCrossFade()).into(imageView);
+        }else {
+            switch (expression.getStatus()){
+                case 1:
+                    if (expression.getImage() ==null ||expression.getImage().length == 0){
+                        new GetExpImageTask(new GetExpImageListener() {
+                            @Override
+                            public void onFinish(Expression expression) {
+                                Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                            }
+                        }).execute(expression.getId());
+                    }else {
+                        //ALog.d("有图片数据");
+                        Glide.with(UIUtil.getContext()).load(expression.getImage()).apply(options).transition(withCrossFade()).into(imageView);
+                    }
+                    break;
+                case 2:
+                    Glide.with(UIUtil.getContext()).load(expression.getUrl()).apply(options).transition(withCrossFade()).into(imageView);
+                    break;
 
-                break;
+                case 3:
+                    Glide.with(UIUtil.getContext()).asBitmap().load(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()).apply(options2).into(imageView);
+
+                    break;
+            }
         }
+
 
     }
 

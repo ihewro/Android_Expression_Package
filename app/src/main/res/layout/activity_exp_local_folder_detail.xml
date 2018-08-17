@@ -68,6 +68,22 @@
                     android:layout_toRightOf="@id/download_time_tip"/>
 
                 <TextView
+                    android:id="@+id/to_move"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/to_select"
+                    android:layout_marginRight="10dp"
+                    android:text="移动到"
+                    android:textColor="@color/primaryColor"
+                    android:visibility="gone"
+                    android:background="@drawable/bg_download"/>
+
+                <TextView
                     android:id="@+id/to_select"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

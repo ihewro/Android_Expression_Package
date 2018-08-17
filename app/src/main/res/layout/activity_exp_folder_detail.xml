@@ -79,6 +79,7 @@
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
                     android:text="批量添加"
+                    android:textColor="@color/primaryColor"
                     android:background="@drawable/bg_download"/>
             </RelativeLayout>
 
