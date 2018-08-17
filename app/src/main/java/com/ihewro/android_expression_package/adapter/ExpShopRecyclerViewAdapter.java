@@ -142,12 +142,17 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
                 3. 更新图库以便显示出下载的图片
                 */
 
-                Toasty.info(activity,"正在获取表情包数据",Toast.LENGTH_SHORT).show();
-
+                final MaterialDialog getInfoDialog  = new MaterialDialog.Builder(activity)
+                        .title("操作通知")
+                        .content("正在获取表情包数据……")
+                        .progress(true, 0)
+                        .progressIndeterminateStyle(true)
+                        .show();
                 HttpUtil.getExpressionList(item.getDir(), 1, 99999999,item.getName(), new Callback<List<Expression>>() {//获取该目录下的所有表情包，不分页
                     @Override
                     public void onResponse(Call<List<Expression>> call, Response<List<Expression>> response) {
                         if (response.isSuccessful()){
+                            getInfoDialog.dismiss();
                             Toasty.success(activity,"获取表情包数据成功",Toast.LENGTH_SHORT).show();
                             DownloadImageTask task = new DownloadImageTask(response.body(),item.getName(),item.getCount(),activity);
                             task.execute();

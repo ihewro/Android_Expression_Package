@@ -240,6 +240,7 @@ public class ExpWebFolderDetailActivity extends BaseActivity {
             public void onClick(View v) {
                 //执行下载操作
                 //Toast.makeText(ExpWebFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

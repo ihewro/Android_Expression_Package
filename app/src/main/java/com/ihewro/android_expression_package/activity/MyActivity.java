@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.chad.library.adapter.base.animation.BaseAnimation;
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
+import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
@@ -67,6 +70,19 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
     private List<ExpressionFolder> expressionFolderList = new ArrayList<>();
 
+    OnItemDragListener onItemDragListener = new OnItemDragListener() {
+        @Override
+        public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos){
+
+        }
+        @Override
+        public void onItemDragMoving(RecyclerView.ViewHolder source, int from, RecyclerView.ViewHolder target, int to) {}
+        @Override
+        public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
+            //修改表情中表情包权值，移动的表情包权值 = 之前位置权值 + 1
+
+        }
+    };
 
     public static void actionStart(Activity activity){
         Intent intent = new Intent(activity,MyActivity.class);
@@ -99,17 +115,19 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         refreshLayout.setEnableLoadMore(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(UIUtil.getContext()));
         adapter = new ExpMyRecyclerViewAdapter(expressionFolderList,this);
-        adapter.openLoadAnimation(new BaseAnimation() {
-            @Override
-            public Animator[] getAnimators(View view) {
-                return new Animator[]{
-                        ObjectAnimator.ofFloat(view, "scaleY", 1, 1.1f, 1),
-                        ObjectAnimator.ofFloat(view, "scaleX", 1, 1.1f, 1)
-                };
-            }
-        });
+        ItemDragAndSwipeCallback itemDragAndSwipeCallback = new ItemDragAndSwipeCallback(adapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemDragAndSwipeCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        // 开启拖拽
+        adapter.enableDragItem(itemTouchHelper, R.id.item_view, true);
+        adapter.setOnItemDragListener(onItemDragListener);
+
         recyclerView.setAdapter(adapter);
     }
+
+
+
 
     /**
      * 读取数据库的信息，获取本地的图片信息

@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
+import com.chad.library.adapter.base.BaseItemDraggableAdapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ihewro.android_expression_package.GlobalConfig;
@@ -39,7 +40,7 @@ import okhttp3.internal.Util;
  *     version: 1.0
  * </pre>
  */
-public class ExpMyRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolder, BaseViewHolder> {
+public class ExpMyRecyclerViewAdapter extends BaseItemDraggableAdapter<ExpressionFolder, BaseViewHolder> {
 
     private Activity activity;
     public ExpMyRecyclerViewAdapter(@Nullable List<ExpressionFolder> data, Activity activity) {

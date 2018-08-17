@@ -195,7 +195,6 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                ALog.d("怎么回事");
                 setAdapter();
             }
         });

@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
 import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
@@ -38,6 +40,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static java.lang.Thread.sleep;
+
 /**
  * <pre>
  *     author : hewro
@@ -65,6 +69,9 @@ public class DownloadImageTask  {
     private int count;
     private Activity activity;
 
+    private List<String> folderNameList = new ArrayList<>();
+
+    private Boolean isReady = false;//是否表情包目录已经加载完毕
     private boolean isExistInFolder = false;//需要下载的当前图片是否存在目录中
     private boolean isStopDown = false;//是否停止下载
     public DownloadImageTask() {
@@ -99,6 +106,55 @@ public class DownloadImageTask  {
             }
         });
 
+        //显示选择表情包列表的对话框
+        final MaterialDialog expFolderDialog = new MaterialDialog.Builder(activity)
+                .title("添加到表情包")
+                .content("加载表情目录中稍等")
+                .items()
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        if (isReady){
+                            if (which != 0){
+                                folderName = (String) dialog.getItems().get(which);
+                            }
+                            ALog.d(folderName);
+                            download();
+                        }
+
+                    }
+                })
+                .show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //获取表情包目录
+                //第一行显示默认的表情包名称，下面显示数据库已经存在表情包名称
+                folderNameList.clear();
+                folderNameList.add(folderName + "(默认)");
+                expressionFolderList = LitePal.select("name").find(ExpressionFolder.class);
+                for (ExpressionFolder expFolder:
+                     expressionFolderList) {
+                    folderNameList.add(expFolder.getName());
+                }
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ALog.d("主线程");
+                        int size = folderNameList.size();
+                        expFolderDialog.setContent("单击添加到指定的表情包下");
+                        expFolderDialog.setItems(folderNameList.toArray(new String[size]));
+                        expFolderDialog.notifyItemsChanged();
+                        isReady = true;
+                    }
+                });
+            }
+        }).start();
+    }
+
+
+
+    private void download(){
         downloadAllDialog.show();
 
         downloadAllCount = expFolderAllExpList.size();
@@ -171,7 +227,7 @@ public class DownloadImageTask  {
                                 }else {
 //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
                                     isExistInFolder = false;
-                                    List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getFolderName()).find(Expression.class);
+                                    List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),folderName).find(Expression.class);
                                     if (temp.size()>0){//找到记录了
                                         isExistInFolder = true;
                                     }
@@ -192,7 +248,9 @@ public class DownloadImageTask  {
                                 //如果全部下载完成，进度条框提示下载完成。
                                 if (downloadCount >= downloadAllCount){
                                     downloadAllDialog.setProgress(downloadAllCount);
-                                    downloadAllDialog.setContent("下载完成");
+//                                    downloadAllDialog.setContent("下载完成");
+                                    downloadAllDialog.dismiss();
+                                    Toasty.success(activity,"下载完成").show();
                                     EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                                 }
 
