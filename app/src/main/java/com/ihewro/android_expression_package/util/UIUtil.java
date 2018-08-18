@@ -126,15 +126,16 @@ public class UIUtil {
         return context.getResources().getDimensionPixelSize(resourceId);
     }
 
-    public static void setImageToImageView(@Nullable Expression expression, final ImageView imageView){
 
+    public static void setImageToImageView(@Nullable Expression expression, final ImageView imageView){
+//使用了placeholder()，则加载完成后图片的大小将被限制为加载过程中自定义图片的大小
         final RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.loading)
+                //.placeholder(R.drawable.loading)
                 .error(R.drawable.fail);
         final RequestOptions options2 = new RequestOptions()
-                .placeholder(R.drawable.loading)
-                .error(R.drawable.fail)
-                .dontAnimate();
+                //.placeholder(R.drawable.loading)
+                .error(R.drawable.fail);
+                //.dontAnimate();
 
         if (expression == null){
             Glide.with(UIUtil.getContext()).load(R.drawable.empty2).apply(options).transition(withCrossFade()).into(imageView);
@@ -163,6 +164,7 @@ public class UIUtil {
                     break;
             }
         }
+
 
 
     }

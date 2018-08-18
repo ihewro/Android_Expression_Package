@@ -88,7 +88,11 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
             //修改表情中表情包权值，移动的表情包权值 = 移动后的位置
             ALog.d("结束" + pos);
             end = pos;
-            expressionFolderList.get((int) end).setOrderValue(end + 1.5);
+            if (start > end){//向前移
+                expressionFolderList.get((int) end).setOrderValue(end + 0.5);
+            }else {//向后移
+                expressionFolderList.get((int) end).setOrderValue(end + 1.5);
+            }
             expressionFolderList.get((int) end).save();
             EventBus.getDefault().post(new EventMessage(EventMessage.MAIN_DATABASE));
 

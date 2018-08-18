@@ -7,7 +7,7 @@
     android:id="@+id/item_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="#ffffff">
+    android:background="#fefefe">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="350dp"
@@ -28,30 +28,31 @@
 
         <TextView
             android:id="@+id/dateText"
-            android:paddingTop="10dp"
-            android:paddingBottom="25dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:text="2018年8月1日"
+            android:textStyle="bold"
             android:textColor="#000000"
-            android:textSize="18sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/headerImage" />
 
 
         <TextView
             android:id="@+id/content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="无论年轻还是年长，在任何年龄段都有人对爱情有纯粹的向往和期待，不是所有人都在物化爱情。"
-            android:textColor="#494848"
             android:lineSpacingExtra="15dp"
             android:lineSpacingMultiplier="1"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_marginEnd="12dp"
+            android:text="文字内容"
+            android:textColor="#494848"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateText"
             tools:targetApi="lollipop" />
@@ -61,7 +62,7 @@
             android:id="@+id/footer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="12dp"
             android:layout_marginTop="48dp"
             android:paddingBottom="20dp"
             android:text="From 表情宝宝"
