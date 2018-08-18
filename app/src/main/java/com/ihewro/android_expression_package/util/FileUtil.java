@@ -179,6 +179,10 @@ public class FileUtil {
             File fileParent = target.getParentFile();//如果表情包目录都不存在，则需要先创建目录
             if(!fileParent.exists()){
                 fileParent.mkdirs();
+                File fileTwoParent = fileParent.getParentFile();
+                if (!fileTwoParent.exists()){
+                    fileTwoParent.mkdir();
+                }
             }
             FileInputStream fileInputStream = null;
             FileOutputStream fileOutputStream = null;

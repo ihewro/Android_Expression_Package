@@ -83,7 +83,7 @@ public class DeleteImageTask extends AsyncTask<Void,Void,Boolean>{
                 }
             }
         }
-
+        UIUtil.autoBackUpWhenItIsNecessary();
         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         return null;
     }

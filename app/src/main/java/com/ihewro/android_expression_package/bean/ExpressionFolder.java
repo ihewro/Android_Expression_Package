@@ -1,6 +1,11 @@
 package com.ihewro.android_expression_package.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ihewro.android_expression_package.GlobalConfig;
+import com.ihewro.android_expression_package.activity.MainActivity;
+import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.litepal.LitePal;
 import org.litepal.annotation.Column;
@@ -182,4 +187,5 @@ public class ExpressionFolder extends LitePalSupport {
                 +"count" + count + '\n'
                 + "name" + name;
     }
+    
 }

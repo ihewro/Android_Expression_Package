@@ -44,7 +44,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
     @Override
     protected Void doInBackground(Expression... expressions) {
         final Expression expression = expressions[0];
-        final File tempFile = new File(GlobalConfig.appDirPath + expression.getName());
+        final File tempFile = new File(GlobalConfig.appTempDirPath + expression.getName());
         FileUtil.bytesSavedToFile(expression,tempFile);
 
         if (expression.getDesStatus() == 0){

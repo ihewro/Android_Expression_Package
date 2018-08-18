@@ -404,5 +404,12 @@ public class UIUtil {
         return result;
     }
 
-
+    /**
+     * 自动数据库
+     */
+    public static void autoBackUpWhenItIsNecessary(){
+        //删除autobackup其他的所有文件
+        FileUtil.delFolder(GlobalConfig.appDirPath + "database/autobackup/");
+        FileUtil.copyFileToTarget(UIUtil.getContext().getDatabasePath("expBaby.db").getAbsolutePath(), GlobalConfig.appDirPath + "database/autobackup/" + "auto:" + DateUtil.getNowDateStr() + ".db");
+    }
 }

@@ -486,6 +486,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                                 });
                             }
                         }
+                        UIUtil.autoBackUpWhenItIsNecessary();
                         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         runOnUiThread(new Runnable() {
                             @Override

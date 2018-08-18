@@ -13,6 +13,7 @@ import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
@@ -58,6 +59,7 @@ public class SaveImageToGalleryTask extends AsyncTask<Expression, Integer, Boole
                         .submit().get();
                 if(imageFile != null && imageFile.exists()){
                     MyDataBase.addExpressionRecord(expression,imageFile);
+                    UIUtil.autoBackUpWhenItIsNecessary();
                     EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                     //保存单张图片的时候不仅保存到数据库里也保存到本地文件夹
                     File targetFile = new File(targetPath);

@@ -9,6 +9,7 @@ import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
@@ -83,6 +84,7 @@ public class EditExpFolderNameTask extends AsyncTask<List<Expression>, Integer, 
     protected void onPostExecute(Boolean aBoolean) {
         materialDialog.setTitle("修改名称成功");
         listener.onFinish(aBoolean);
+        UIUtil.autoBackUpWhenItIsNecessary();
         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
     }
 }

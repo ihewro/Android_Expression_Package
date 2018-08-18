@@ -232,6 +232,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                                 expressionFolder.save();
                                 initData();
                             }
+                            UIUtil.autoBackUpWhenItIsNecessary();
                             EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         }
                     }).show();

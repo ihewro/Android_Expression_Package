@@ -251,8 +251,12 @@ public class DownloadImageTask  {
 //                                    downloadAllDialog.setContent("下载完成");
                                     downloadAllDialog.dismiss();
                                     Toasty.success(activity,"下载完成").show();
+                                    UIUtil.autoBackUpWhenItIsNecessary();
                                     EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                                 }
+
+                                //删除temp文件夹，因为之前识别文字产生了图片
+                                FileUtil.delFolder(GlobalConfig.appTempDirPath);
 
                             } catch (java.io.IOException e) {
                                 e.printStackTrace();

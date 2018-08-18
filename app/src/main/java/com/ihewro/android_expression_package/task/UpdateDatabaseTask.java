@@ -12,6 +12,7 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
 import com.ihewro.android_expression_package.util.DateUtil;
+import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -101,6 +102,9 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
             //4.修正表情包的数目
             expressionFolder.setCount(expressions.size() - num);
             expressionFolder.save();
+
+            //5. 删除temp文件夹
+            FileUtil.delFolder(GlobalConfig.appTempDirPath);
         }
         return true;
     }

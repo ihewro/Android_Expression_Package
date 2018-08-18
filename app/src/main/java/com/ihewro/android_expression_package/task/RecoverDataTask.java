@@ -49,13 +49,29 @@ public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
     @Override
     protected Boolean doInBackground(Void... voids) {
         File dir = new File(GlobalConfig.appDirPath + "database");
+        File autoDir = new File(GlobalConfig.appDirPath + "database/autobackup");
+
         if (!dir.exists() || !dir.isDirectory()){
             dir.mkdir();
             return false;
         }else {
             backupFiles = dir.listFiles();
-            for (int i =0;i<backupFiles.length;i++){
-                backupFilesName.add(backupFiles[i].getName() +"("+ DataCleanManager.getFormatSize(backupFiles[i].length()) +")");
+            for (File backupFile : backupFiles) {
+                if (backupFile.isFile()){
+                    backupFilesName.add(backupFile.getName() + "(" + DataCleanManager.getFormatSize(backupFile.length()) + ")");
+                }
+            }
+
+            if (!autoDir.exists() || !autoDir.isDirectory()){
+                autoDir.mkdir();
+            }else {
+                backupFiles = autoDir.listFiles();
+                for (File autoBackupFile : backupFiles) {
+                    ALog.d(autoBackupFile.getName() + autoBackupFile.getAbsolutePath());
+                    if (autoBackupFile.isFile()){
+                        backupFilesName.add(autoBackupFile.getName() + "(" + DataCleanManager.getFormatSize(autoBackupFile.length()) + ")");
+                    }
+                }
             }
             return true;
         }
