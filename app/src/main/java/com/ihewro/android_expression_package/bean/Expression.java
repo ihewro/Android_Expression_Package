@@ -27,7 +27,6 @@ public class Expression extends LitePalSupport{
     private String name;//图片名称
     private String url;//图片路径或者图片地址
     private String folderName;//目录的名称
-    private ExpressionFolder expressionFolder;
     private String description;//图片描述
     private int desStatus;//是否有图片描述，1为有，0为无
     private byte[] image;//图片内容，二进制存储
@@ -36,6 +35,10 @@ public class Expression extends LitePalSupport{
     public Expression() {
     }
 
+
+
+
+    //构造方法里面增加了ExpressionFolder，避免某些情况，无法自动关联外键的情况，快被这个外键折腾疯了
     public Expression(int status, String name, String url, String folderName) {
         this.status = status;
         this.name = name;
@@ -43,22 +46,11 @@ public class Expression extends LitePalSupport{
         this.folderName = folderName;
     }
 
-
-    //构造方法里面增加了ExpressionFolder，避免某些情况，无法自动关联外键的情况，快被这个外键折腾疯了
-    public Expression(int status, String name, String url, String folderName,ExpressionFolder expressionFolder) {
+    public Expression(int status, String name, String url, String folderName,byte[] image) {
         this.status = status;
         this.name = name;
         this.url = url;
         this.folderName = folderName;
-        this.expressionFolder = expressionFolder;
-    }
-
-    public Expression(int status, String name, String url, String folderName,ExpressionFolder expressionFolder,byte[] image) {
-        this.status = status;
-        this.name = name;
-        this.url = url;
-        this.folderName = folderName;
-        this.expressionFolder = expressionFolder;
         this.image = image;
     }
 
@@ -95,13 +87,6 @@ public class Expression extends LitePalSupport{
         this.folderName = folderName;
     }
 
-    public ExpressionFolder getExpressionFolder() {
-        return expressionFolder;
-    }
-
-    public void setExpressionFolder(ExpressionFolder expressionFolder) {
-        this.expressionFolder = expressionFolder;
-    }
 
     public int getStatus() {
         return status;

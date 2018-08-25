@@ -29,6 +29,11 @@ public class GetExpListTask extends AsyncTask<String,Void,List<Expression>>{
         this.listener = listener;
     }
 
+    /**
+     *
+     * @param listener
+     * @param isImage 是否查询表情列表，将图片的数据也查询出来
+     */
     public GetExpListTask(GetExpListListener listener, boolean isImage) {
         this.listener = listener;
         this.isImage = isImage;
@@ -42,10 +47,10 @@ public class GetExpListTask extends AsyncTask<String,Void,List<Expression>>{
             if (isImage){
                 expressionList = LitePal.where("foldername = ?",name).find(Expression.class);
             }else {
-                expressionList = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",name).find(Expression.class);
+                expressionList = LitePal.select("id","name","foldername","status","url","desstatus","description").where("foldername = ?",name).find(Expression.class);
             }
 
-            sleep(700);
+            sleep(800);
             return expressionList;
         }catch (Exception e){
             return new ArrayList<>();

@@ -62,7 +62,6 @@ public class EditExpFolderNameTask extends AsyncTask<List<Expression>, Integer, 
         for (int i = 0; i < expressionList.size();i++){
             Expression expression = expressionList.get(i);
             expression.setFolderName(targetDirName);
-            expression.setExpressionFolder(expressionFolder);
             expression.save();
             publishProgress(i+1);
         }

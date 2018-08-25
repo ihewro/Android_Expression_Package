@@ -14,6 +14,7 @@ import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.http.HttpUtil;
 import com.ihewro.android_expression_package.http.WebImageInterface;
 import com.ihewro.android_expression_package.util.DateUtil;
@@ -94,9 +95,6 @@ public class DownloadImageTask  {
                 .content("陛下，耐心等下……")
                 .progress(false, count, true)
                 .build();
-    }
-
-    public void execute(){
 
         downloadAllDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -105,56 +103,21 @@ public class DownloadImageTask  {
                 isStopDown = true;
             }
         });
+    }
 
-        //显示选择表情包列表的对话框
-        final MaterialDialog expFolderDialog = new MaterialDialog.Builder(activity)
-                .title("添加到表情包")
-                .content("加载表情目录中稍等")
-                .items()
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        if (isReady){
-                            if (which != 0){
-                                folderName = (String) dialog.getItems().get(which);
-                            }
-                            ALog.d(folderName);
-                            download();
-                        }
-
-                    }
-                })
-                .show();
-        new Thread(new Runnable() {
+    public void execute(){
+        new ShowAllExpFolderTask(new TaskListener() {
             @Override
-            public void run() {
-                //获取表情包目录
-                //第一行显示默认的表情包名称，下面显示数据库已经存在表情包名称
-                folderNameList.clear();
-                folderNameList.add(folderName + "(默认)");
-                expressionFolderList = LitePal.select("name").order("ordervalue").find(ExpressionFolder.class);
-                for (ExpressionFolder expFolder:
-                     expressionFolderList) {
-                    folderNameList.add(expFolder.getName());
-                }
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ALog.d("主线程");
-                        int size = folderNameList.size();
-                        expFolderDialog.setContent("单击添加到指定的表情包下");
-                        expFolderDialog.setItems(folderNameList.toArray(new String[size]));
-                        expFolderDialog.notifyItemsChanged();
-                        isReady = true;
-                    }
-                });
+            public void onFinish(Object result) {
+                download((String) result);
             }
-        }).start();
+        },activity).execute();
     }
 
 
 
-    private void download(){
+    private void download(String result){
+        folderName = result;
         downloadAllDialog.show();
 
         downloadAllCount = expFolderAllExpList.size();
@@ -169,7 +132,7 @@ public class DownloadImageTask  {
             }
             //数据库中添加目录信息,添加之前需要查询数据库中是否已经存在该表情包，如果存在的话，需要更新
 
-            //当前目录的持久化对象，这里更新数据不能适用update,否则表情的表的外键无法更新的。url:https://github.com/LitePalFramework/LitePal/issues/282
+            //当前目录的持久化对象，这里更新数据不能使用update,否则表情的表的外键无法更新的。url:https://github.com/LitePalFramework/LitePal/issues/282
             expressionFolder = null;
 
             expressionFolderList.clear();;
@@ -227,19 +190,18 @@ public class DownloadImageTask  {
                                 }else {
 //检查数据库里面有没有这个表情的信息，如果有的话，就不用修改数据库信息了
                                     isExistInFolder = false;
-                                    List<Expression> temp = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),folderName).find(Expression.class);
+                                    List<Expression> temp = LitePal.select("id","name","foldername","status","url","desstatus","description").where("name = ? and foldername = ?",expFolderAllExpList.get(finalI).getName(),folderName).find(Expression.class);
                                     if (temp.size()>0){//找到记录了
                                         isExistInFolder = true;
                                     }
 
                                     if (!isExistInFolder){//目录表没有这个表情数据，则数目加1，下载成功的话，将下载的图片信息存到数据库中，并更新对应的目录表
-                                        Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getUrl(),folderName,expressionFolder,bytes);
+                                        Expression expression = new Expression(1,expFolderAllExpList.get(finalI).getName(),expFolderAllExpList.get(finalI).getUrl(),folderName,bytes);
                                         new GetExpDesTask(activity,false).execute(expression);
                                         expression.save();
                                         //更新数据中该目录的关联数据
                                         ALog.d("folder233", expressionFolder.isSaved() + "" + expressionFolder.getId());
                                         expressionFolder.setCount(expressionFolder.getCount() + 1);
-                                        expressionFolder.getExpressionList().add(expression);
                                         expressionFolder.save();
                                     }
                                 }

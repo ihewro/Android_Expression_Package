@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                 clickTimes++;
                                 UIUtil.goodEgg(clickTimes, new TaskListener() {
                                     @Override
-                                    public void onFinish(Boolean result2) {
+                                    public void onFinish(Object result2) {
                                         result.closeDrawer();//关闭侧边栏
                                     }
                                 });
@@ -706,7 +706,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }else {
                     new GenerateScreenshotTask(MainActivity.this, oneText.getText().toString(), expression, new TaskListener() {
                         @Override
-                        public void onFinish(Boolean result) {
+                        public void onFinish(Object result) {
                             expImageDialog.show();
                         }
                     }).execute();

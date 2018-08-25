@@ -67,13 +67,13 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
         for (ExpressionFolder expressionFolder:
              expressionFolderList) {
             int num = 0;
-            List<Expression> expressions = LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("foldername = ?",expressionFolder.getName()).find(Expression.class);
+            List<Expression> expressions = LitePal.select("id","name","foldername","status","url","desstatus","description").where("foldername = ?",expressionFolder.getName()).find(Expression.class,true);
+
+            ALog.d("数目" + expressions.size() + "名称" + expressionFolder.getName() + "id = " + expressionFolder.getId() + "isSave" + expressionFolder.isSaved());
             for (Expression expression:
                  expressions) {
                 ALog.d("对每个表情进行循环");
-                //1. 重新外键关联
-                expression.setExpressionFolder(expressionFolder);
-                expression.save();
+
 
                 //2. 没有表情描述，自动识别文字
                 if (expression.getDesStatus() == 0){
@@ -93,6 +93,8 @@ public class UpdateDatabaseTask  extends AsyncTask<Void, Integer, Boolean> {
                     expression.delete();
                     num ++;
                 }*/
+                //1. 重新外键关联 TODO:外键无法关联
+                expression.save();
                 alCount++;
                 publishProgress(alCount);
             }

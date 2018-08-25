@@ -10,5 +10,5 @@ package com.ihewro.android_expression_package.callback;
  * </pre>
  */
 public interface TaskListener {
-    public void onFinish(Boolean result);
+    public void onFinish(Object result);
 }

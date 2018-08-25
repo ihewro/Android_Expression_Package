@@ -84,7 +84,6 @@ public class MyDataBase {
             List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
             if (expressionList.size() >0){//有该表情的信息就不用管了
                 currentExpression = expressionList.get(0);
-                currentExpression.setExpressionFolder(expressionFolder);
                 saveExpImage(currentExpression,source,false);
                 return true;
             }
@@ -98,7 +97,7 @@ public class MyDataBase {
         }
 
         //3. 把表情的信息存储进去,执行这里的时候有两种情况，一种是目录和表情都没有的。一种目录存在，但是表情不存在。
-        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName(),expressionFolder);
+        currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName());
         currentExpression.save();
         saveExpImage(currentExpression,source,false);
 
@@ -106,15 +105,6 @@ public class MyDataBase {
 
         expressionFolder.setCount(expressionFolder.getCount() + 1);
 
-        if (expressionFolder.getExpressionList() == null || expressionFolder.getExpressionList().size() == 0){
-            List<Expression> tempExpressionList = new ArrayList<>();
-            expressionFolder.setExpressionList(tempExpressionList);
-            expressionFolder.getExpressionList().add(currentExpression);
-            ALog.d("表情数目为0");
-        }else {
-            ALog.d("表情数目不为0");
-            expressionFolder.getExpressionList().add(currentExpression);
-        }
         expressionFolder.save();
 
         return true;
@@ -168,7 +158,7 @@ public class MyDataBase {
         if (isImage){
             return LitePal.where("name = ? and foldername = ?",name,folderName).find(Expression.class);
         }else {
-            return LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").where("name = ? and foldername = ?",name,folderName).find(Expression.class);
+            return LitePal.select("id","name","foldername","status","url","desstatus","description").where("name = ? and foldername = ?",name,folderName).find(Expression.class);
         }
     }
 

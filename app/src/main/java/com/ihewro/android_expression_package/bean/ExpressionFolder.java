@@ -49,6 +49,7 @@ public class ExpressionFolder extends LitePalSupport {
     private int dir;//网络层的目录id，只在网络层中找到表情包目录对应的表情列表有用，存到本地数据库的时候可以随便存储一个值，这个不需要的
     @Column(defaultValue = "1.0")
     private double orderValue;//顺序权限
+    @Column(ignore = true)
     private List<Expression> expressionList;
 
     public ExpressionFolder() {
@@ -75,6 +76,11 @@ public class ExpressionFolder extends LitePalSupport {
         this.id = id;
     }
 
+
+    /**
+     * 获取表情包目录，网络层的表情列表
+     * @return
+     */
     public List<Expression> getExpressionList() {
         if (expressionList == null){
             return new ArrayList<Expression>();
@@ -84,9 +90,14 @@ public class ExpressionFolder extends LitePalSupport {
     }
 
 
+    /**
+     *
+     * @param data 是否查询图片
+     * @return
+     */
     public List<Expression> getExpressionList(boolean data) {
         if (!data){
-            return LitePal.select("id","name","foldername","status","url","expressionfolder_id","desstatus","description").limit(5).where("foldername = ?",name).find(Expression.class);
+            return LitePal.select("id","name","foldername","status","url","desstatus","description").limit(5).where("foldername = ?",name).find(Expression.class);
         }else {
             return LitePal.where("foldername =?",name).limit(5).find(Expression.class);//连图片数据也查询出来
         }

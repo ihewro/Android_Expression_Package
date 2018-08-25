@@ -96,7 +96,6 @@ public class ExpShopRecyclerViewAdapter extends BaseQuickAdapter<ExpressionFolde
             ((ImageView)helper.getView(imageViewArray[4])).setImageResource(R.drawable.loading);
 
         }else {//普通表情包
-            ALog.d(item.getExpressionList().size());
             int num = 0;
             if (item.getExpressionList().size()<5){
                 num = item.getExpressionList().size();

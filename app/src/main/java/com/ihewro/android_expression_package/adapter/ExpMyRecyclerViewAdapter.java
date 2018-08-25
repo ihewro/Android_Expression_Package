@@ -78,8 +78,7 @@ public class ExpMyRecyclerViewAdapter extends BaseItemDraggableAdapter<Expressio
             helper.getView(R.id.fl_image_5).setVisibility(View.INVISIBLE);
         }
 
-
-        if (item.getExpressionList(false).size() == 0){//如果是空表情，显示占位图片
+        if (expressionList.size() == 0){//如果是空表情，显示占位图片
             ALog.d("名称" + item.getName() + helper.getAdapterPosition());
             helper.getView(R.id.exp_num_1).setVisibility(View.VISIBLE);
             helper.getView(R.id.view_1).setVisibility(View.VISIBLE);
@@ -113,9 +112,9 @@ public class ExpMyRecyclerViewAdapter extends BaseItemDraggableAdapter<Expressio
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                new DeleteImageTask(true, item.getName(), new TaskListener() {
+                                new DeleteImageTask(true, item.getName(), activity, new TaskListener() {
                                     @Override
-                                    public void onFinish(Boolean result) {
+                                    public void onFinish(Object result) {
                                         Toasty.success(activity,"删除成功", Toast.LENGTH_SHORT).show();
                                         remove(helper.getAdapterPosition());
                                         notifyDataSetChanged();

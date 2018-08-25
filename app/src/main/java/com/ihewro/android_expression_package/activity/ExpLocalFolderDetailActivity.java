@@ -1,7 +1,6 @@
 package com.ihewro.android_expression_package.activity;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -37,10 +36,9 @@ import com.ihewro.android_expression_package.task.DeleteExpFolderTask;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.task.EditExpFolderNameTask;
 import com.ihewro.android_expression_package.task.GetExpListTask;
+import com.ihewro.android_expression_package.task.MoveExpTask;
 import com.ihewro.android_expression_package.task.SaveFolderToLocalTask;
-import com.ihewro.android_expression_package.task.SaveImageToGalleryTask;
-import com.ihewro.android_expression_package.util.DateUtil;
-import com.ihewro.android_expression_package.util.FileUtil;
+import com.ihewro.android_expression_package.task.ShowAllExpFolderTask;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
 import com.ihewro.android_expression_package.view.MyGlideEngine;
@@ -54,10 +52,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.LitePal;
-import org.litepal.crud.DataSupport;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,7 +63,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
-import id.zelory.compressor.Compressor;
 
 
 /**
@@ -95,6 +90,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     TextView toSelect;
     @BindView(R.id.exit_select)
     TextView exitSelect;
+    @BindView(R.id.to_move)
+    TextView toMove;
 
 
     private ExpImageDialog expressionDialog;
@@ -160,7 +157,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         expressionDialog = new ExpImageDialog.Builder(Objects.requireNonNull(this))
-                .setContext(this, null,2)
+                .setContext(this, null, 2)
                 .build();
         downloadTime.setText(createTime);
 
@@ -176,7 +173,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     }
 
 
-    private void setAdapter(){
+    private void setAdapter() {
 
         new GetExpListTask(new GetExpListListener() {
             @Override
@@ -187,12 +184,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                 refreshLayout.finishRefresh(true);
                 refreshLayout.setEnableRefresh(false);
 
-                if (expressionList.size() == 0){
+                if (expressionList.size() == 0) {
                     adapter.setNewData(null);
                     adapter.setEmptyView(notDataView);
                 }
             }
-        },true).execute(dirName);
+        }, true).execute(dirName);
     }
 
     private void initListener() {
@@ -217,47 +214,34 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             }
         });
 
+        toMove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //执行批量移动操作
+                new ShowAllExpFolderTask(new TaskListener() {
+                    @Override
+                    public void onFinish(Object result) {
+                        //执行添加的任务
+                        new MoveExpTask(expressionList,checkList, (String) result,ExpLocalFolderDetailActivity.this).execute();
+                    }
+                },ExpLocalFolderDetailActivity.this).execute();
+
+            }
+        });
         selectDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //执行删除操作
-                new Thread(new Runnable() {
+                new DeleteImageTask(false, expressionList,checkList, dirName, ExpLocalFolderDetailActivity.this,new TaskListener() {
                     @Override
-                    public void run() {
-                        deleteExpList.clear();
-                        Collections.sort(checkList, new Comparator<String>() {
-                            @Override
-                            public int compare(String o1, String o2) {
-                                return Integer.parseInt(o2) - Integer.parseInt(o1);
-                            }
-                        });
+                    public void onFinish(Object result) {
+                        Toasty.success(ExpLocalFolderDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < checkList.size(); i++) {
-                            deleteExpList.add(expressionList.get(Integer.parseInt(checkList.get(i))));
+                            adapter.remove(Integer.parseInt(checkList.get(i)));
                         }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //Toast.makeText(ExpLocalFolderDetailActivity.this, checkList.toString(), Toast.LENGTH_SHORT).show();
-                                final MaterialDialog dialog = new MaterialDialog.Builder(ExpLocalFolderDetailActivity.this)
-                                        .progress(true, 0)
-                                        .progressIndeterminateStyle(true)
-                                        .show();
-                                new DeleteImageTask(false, deleteExpList, dirName, new TaskListener() {
-                                    @Override
-                                    public void onFinish(Boolean result) {
-                                        Toasty.success(ExpLocalFolderDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
-                                        for (int i = 0; i < checkList.size(); i++) {
-                                            adapter.remove(Integer.parseInt(checkList.get(i)));
-                                        }
-                                        dialog.dismiss();
-                                        setContraryCheck();
-                                    }
-                                }).execute();
-
-                            }
-                        });
+                        setContraryCheck();
                     }
-                }).start();
+                }).execute();
             }
         });
 
@@ -376,7 +360,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     view.setVisibility(View.GONE);
                     expressionList.get(clickPosition).setDesStatus(1);
                     expressionList.get(clickPosition).setDescription(eventBusMessage.getMessage());
-                    EventBus.getDefault().post(new EventMessage(EventMessage.LOCAL_DESCRIPTION_SAVE,eventBusMessage.getMessage(),eventBusMessage.getMessage2(),String.valueOf(clickPosition)));
+                    EventBus.getDefault().post(new EventMessage(EventMessage.LOCAL_DESCRIPTION_SAVE, eventBusMessage.getMessage(), eventBusMessage.getMessage2(), String.valueOf(clickPosition)));
 
                 }
             });
@@ -402,7 +386,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     .theme(R.style.Matisse_Dracula)
                     .imageEngine(new MyGlideEngine())
                     .forResult(1998);
-        }else if (item.getItemId() == R.id.re_edit){
+        } else if (item.getItemId() == R.id.re_edit) {
             //修改表情包名称
             new MaterialDialog.Builder(this)
                     .title("输入修改后的表情包名称")
@@ -411,17 +395,17 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     .input("任意文字", dirName, new MaterialDialog.InputCallback() {
                         @Override
                         public void onInput(final MaterialDialog dialog, CharSequence input) {
-                            List<ExpressionFolder> temExpFolderList = LitePal.where("name = ?",dialog.getInputEditText().getText().toString()).find(ExpressionFolder.class);
-                            if (temExpFolderList.size()>0){
-                                Toasty.error(ExpLocalFolderDetailActivity.this,"表情包名称已存在，请更换",Toast.LENGTH_SHORT).show();
-                            }else {
+                            List<ExpressionFolder> temExpFolderList = LitePal.where("name = ?", dialog.getInputEditText().getText().toString()).find(ExpressionFolder.class);
+                            if (temExpFolderList.size() > 0) {
+                                Toasty.error(ExpLocalFolderDetailActivity.this, "表情包名称已存在，请更换", Toast.LENGTH_SHORT).show();
+                            } else {
                                 //修改数据库的目录名称
                                 new EditExpFolderNameTask(ExpLocalFolderDetailActivity.this, expressionList.size(), dirName, dialog.getInputEditText().getText().toString(), new SaveImageToGalleryListener() {
                                     @Override
                                     public void onFinish(Boolean result) {
                                         //修改本地表情包目录名称
                                         File dir = new File(GlobalConfig.appDirPath + dirName);
-                                        if (dir.exists()){
+                                        if (dir.exists()) {
                                             dir.renameTo(new File(GlobalConfig.appDirPath + dialog.getInputEditText().getText().toString()));
                                         }
                                         toolbar.setTitle(dialog.getInputEditText().getText().toString());
@@ -430,7 +414,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                             }
                         }
                     }).show();
-        }else if (item.getItemId() == R.id.all_download){
+        } else if (item.getItemId() == R.id.all_download) {
             //下载到手机
             new MaterialDialog.Builder(this)
                     .title("下载提示")
@@ -440,12 +424,12 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            new SaveFolderToLocalTask(ExpLocalFolderDetailActivity.this,expressionList.size(),dirName).execute(expressionList);
+                            new SaveFolderToLocalTask(ExpLocalFolderDetailActivity.this, expressionList.size(), dirName).execute(expressionList);
                         }
                     })
                     .show();
 
-        }else if (item.getItemId() == R.id.all_delete){
+        } else if (item.getItemId() == R.id.all_delete) {
             //删除本地文件
             new MaterialDialog.Builder(this)
                     .title("删除提示")
@@ -455,7 +439,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            new DeleteExpFolderTask(dirName,ExpLocalFolderDetailActivity.this).execute();
+                            new DeleteExpFolderTask(dirName, ExpLocalFolderDetailActivity.this).execute();
                         }
                     })
                     .show();
@@ -471,17 +455,17 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    if (data!=null){
+                    if (data != null) {
                         List<String> addExpList = Matisse.obtainPathResult(data);
                         for (int i = 0; i < addExpList.size(); i++) {
                             File tempFile = new File(addExpList.get(i));
                             String fileName = tempFile.getName();
                             final Expression expression = new Expression(1, fileName, "", dirName);
-                            if(!MyDataBase.addExpressionRecord(expression,tempFile)){
+                            if (!MyDataBase.addExpressionRecord(expression, tempFile)) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toasty.info(UIUtil.getContext(),expression.getName() + "文件大小太大，将不会存储").show();
+                                        Toasty.info(UIUtil.getContext(), expression.getName() + "文件大小太大，将不会存储").show();
                                     }
                                 });
                             }
