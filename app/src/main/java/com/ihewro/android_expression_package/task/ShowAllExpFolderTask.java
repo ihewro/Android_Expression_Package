@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.task;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.View;
@@ -26,17 +27,25 @@ import java.util.List;
 public class ShowAllExpFolderTask extends AsyncTask<Void, Integer, Boolean> {
 
     private TaskListener listener;
+    @SuppressLint("StaticFieldLeak")
     private Activity activity;
     private MaterialDialog dialog;
     private String folderName;
     private List<String> folderNameList = new ArrayList<>();//表情包名称列表
-    private List<ExpressionFolder> expressionFolderList = new ArrayList<>();//表情包目录列表
     private Boolean isReady = false;//是否表情包目录已经加载完毕
+    private Boolean isShowDefault = true;
 
 
     public ShowAllExpFolderTask(TaskListener listener,Activity activity) {
         this.listener = listener;
         this.activity = activity;
+    }
+
+    public ShowAllExpFolderTask(TaskListener listener, Activity activity, String folderName, Boolean isShowDefault) {
+        this.listener = listener;
+        this.activity = activity;
+        this.folderName = folderName;
+        this.isShowDefault = isShowDefault;
     }
 
     @Override
@@ -65,8 +74,10 @@ public class ShowAllExpFolderTask extends AsyncTask<Void, Integer, Boolean> {
     @Override
     protected Boolean doInBackground(Void... voids) {
         folderNameList.clear();
-        folderNameList.add(folderName + "(默认)");
-        expressionFolderList = LitePal.select("name").order("ordervalue").find(ExpressionFolder.class);
+        if (isShowDefault){
+            folderNameList.add(folderName + "(默认)");
+        }
+        List<ExpressionFolder> expressionFolderList = LitePal.select("name").order("ordervalue").find(ExpressionFolder.class);
         for (ExpressionFolder expFolder:
                 expressionFolderList) {
             folderNameList.add(expFolder.getName());

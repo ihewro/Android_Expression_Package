@@ -111,7 +111,7 @@ public class DownloadImageTask  {
             public void onFinish(Object result) {
                 download((String) result);
             }
-        },activity).execute();
+        },activity,folderName,true).execute();
     }
 
 

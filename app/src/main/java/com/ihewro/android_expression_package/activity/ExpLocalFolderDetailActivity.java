@@ -224,7 +224,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                         //执行添加的任务
                         new MoveExpTask(expressionList,checkList, (String) result,ExpLocalFolderDetailActivity.this).execute();
                     }
-                },ExpLocalFolderDetailActivity.this).execute();
+                },ExpLocalFolderDetailActivity.this,"",false).execute();
 
             }
         });
