@@ -1,5 +1,6 @@
 package com.ihewro.android_expression_package.task;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -38,9 +39,10 @@ import es.dmoral.toasty.Toasty;
  */
 public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
 
+    @SuppressLint("StaticFieldLeak")
     private Activity activity;
-    File[] backupFiles;
-    List<String> backupFilesName = new ArrayList<>();
+    private List<String> backupFilesPath = new ArrayList<>();
+    private List<String> backupFilesName = new ArrayList<>();
 
     public RecoverDataTask(Activity activity) {
         this.activity = activity;
@@ -55,9 +57,10 @@ public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
             dir.mkdir();
             return false;
         }else {
-            backupFiles = dir.listFiles();
+            File[] backupFiles = dir.listFiles();
             for (File backupFile : backupFiles) {
                 if (backupFile.isFile()){
+                    backupFilesPath.add(GlobalConfig.appDirPath + "database/" + backupFile.getName());
                     backupFilesName.add(backupFile.getName() + "(" + DataCleanManager.getFormatSize(backupFile.length()) + ")");
                 }
             }
@@ -69,6 +72,7 @@ public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
                 for (File autoBackupFile : backupFiles) {
                     ALog.d(autoBackupFile.getName() + autoBackupFile.getAbsolutePath());
                     if (autoBackupFile.isFile()){
+                        backupFilesPath.add(GlobalConfig.appDirPath + "database/autobackup/" + autoBackupFile.getName());
                         backupFilesName.add(autoBackupFile.getName() + "(" + DataCleanManager.getFormatSize(autoBackupFile.length()) + ")");
                     }
                 }
@@ -96,7 +100,7 @@ public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
                                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog2, @NonNull DialogAction which2) {
-                                            File file = new File(GlobalConfig.appDirPath + "database/" + backupFiles[position].getName());
+                                            File file = new File(backupFilesPath.get(position));
                                             if (file.exists()){
                                                 file.delete();
                                             }
@@ -120,7 +124,7 @@ public class RecoverDataTask extends AsyncTask<Void,Void,Boolean> {
                                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which2) {
-                                            FileUtil.copyFileToTarget(GlobalConfig.appDirPath + "database/" + backupFiles[which].getName(),activity.getDatabasePath("expBaby.db").getAbsolutePath());
+                                            FileUtil.copyFileToTarget(backupFilesPath.get(which),activity.getDatabasePath("expBaby.db").getAbsolutePath());
                                             Toasty.success(activity,"恢复数据成功", Toast.LENGTH_SHORT).show();
                                             EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                                         }
