@@ -12,6 +12,7 @@ import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.util.UIUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
@@ -91,6 +92,7 @@ public class MoveExpTask extends AsyncTask<Void, Integer, Boolean> {
             }
         }
         //发送数据库变化通知
+        UIUtil.autoBackUpWhenItIsNecessary();
         EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
         return true;
     }
@@ -103,6 +105,7 @@ public class MoveExpTask extends AsyncTask<Void, Integer, Boolean> {
         }else {
             Toasty.success(activity,"添加成功").show();
         }
+
 
         if (listener != null){
             listener.onFinish(aBoolean);

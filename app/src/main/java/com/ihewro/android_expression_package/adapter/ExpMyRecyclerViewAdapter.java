@@ -57,8 +57,8 @@ public class ExpMyRecyclerViewAdapter extends BaseItemDraggableAdapter<Expressio
         helper.setText(R.id.add_time,item.getCreateTime());
 
         //1.1 设置每个表情包的位置权值
-        item.setOrderValue(helper.getAdapterPosition() + 1.0);
-        item.save();
+       /* item.setOrderValue(helper.getAdapterPosition() + 1.0);
+        item.save();*/
 
         //2. 显示图片
         List<Expression> expressionList = item.getExpressionList(false);
