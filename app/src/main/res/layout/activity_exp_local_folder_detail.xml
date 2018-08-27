@@ -90,6 +90,7 @@
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
+                android:visibility="gone"
                 android:background="#fafafa">
 
 
@@ -114,7 +115,23 @@
                     android:paddingRight="10dp"
                     android:clickable="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:text="按返回键可以退出选择模式"/>
+                    android:text="退出多选"/>
+
+                <TextView
+                    android:id="@+id/to_copy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/to_move"
+                    android:layout_marginRight="10dp"
+                    android:text="加入到"
+                    android:textColor="@color/primaryColor"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    />
 
                 <TextView
                     android:id="@+id/to_move"
@@ -127,7 +144,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@id/select_delete_button"
                     android:layout_marginRight="10dp"
-                    android:text="加入到"
+                    android:text="移动到"
                     android:textColor="@color/primaryColor"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     />

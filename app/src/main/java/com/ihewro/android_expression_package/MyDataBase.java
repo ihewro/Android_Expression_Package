@@ -8,6 +8,7 @@ import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.bean.OneDetailList;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
+import com.ihewro.android_expression_package.task.GetExpDesTask;
 import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.FileUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
@@ -82,7 +83,7 @@ public class MyDataBase {
         if (expressionFolderList.size () == 1){
             expressionFolder = expressionFolderList.get(0);
             List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
-            if (expressionList.size() >0){//有该表情的信息就不用管了
+            if (expressionList.size() >0){//有该表情的信息，就修改一下表情的文件内容即可
                 currentExpression = expressionList.get(0);
                 saveExpImage(currentExpression,source,false);
                 return true;
@@ -95,19 +96,50 @@ public class MyDataBase {
         } else {
             return false;//这种错误几乎不会发生，除非数据库的错误严重错乱
         }
-
         //3. 把表情的信息存储进去,执行这里的时候有两种情况，一种是目录和表情都没有的。一种目录存在，但是表情不存在。
         currentExpression = new Expression(1,expression.getName(),GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName(),expression.getFolderName());
         currentExpression.save();
         saveExpImage(currentExpression,source,false);
 
-
-
         expressionFolder.setCount(expressionFolder.getCount() + 1);
 
         expressionFolder.save();
-
+        new GetExpDesTask(true).execute(currentExpression);
         return true;
+    }
+
+    /**
+     * 移动一个表情
+     * @param expression 移动的表情包
+     * @param originFolderName 原来的表情包名称
+     */
+    public static void moveExpressionRecord(Expression expression, String originFolderName, String targetFolderName) {
+        //1. 添加到现在的表情包目录
+        List<ExpressionFolder> nowExpressionFolderList = LitePal.where("name = ? and exist = ?",targetFolderName, String.valueOf(1)).find(ExpressionFolder.class);
+        ExpressionFolder nowExpFolder;
+        if (nowExpressionFolderList.size() <=0){
+            //目录不存在，不可能的
+            nowExpFolder = new ExpressionFolder(1,0,expression.getFolderName(),null,null, DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),-1);
+            nowExpFolder.save();
+            ALog.d("目录和表情都没有的");
+        }else {
+            nowExpFolder  = nowExpressionFolderList.get(0);
+        }
+        List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
+        if (expressionList.size() > 0){//已经存在了该名称，修改一下图片内容即可
+            expression.delete();//因为是移动，所有删除旧的表情包该表情
+            expressionList.get(0).setImage(expression.getImage());
+        }else {//添加表情
+            expression.setFolderName(targetFolderName);
+            expression.save();
+            nowExpFolder.setCount(nowExpFolder.getCount() + 1);
+            nowExpFolder.save();
+        }
+        //2. 以前的表情包数目-1
+        List<ExpressionFolder>  expressionFolderList = LitePal.where("name = ? and exist = ?",originFolderName,"1").find(ExpressionFolder.class,true);
+        ExpressionFolder expressionFolder = expressionFolderList.get(0);
+        expressionFolder.setCount(expressionFolder.getCount() - 1);
+        expressionFolder.save();
     }
 
 
@@ -140,11 +172,11 @@ public class MyDataBase {
      * 把图片存储到数据库的二进制中
      * @param expression
      * @param bytes
-     * @param isForce
+     * @param isForce 这个变量忘记干啥了，好像没用
      */
     public static void saveExpImage(Expression expression,byte[] bytes, boolean isForce){
         if (expression.isSaved()){
-            if (isForce || (expression.getImage() == null || expression.getImage().length == 0)){
+            if (isForce || (expression.getImage() == null || expression.getImage().length == 0)){//如果expression已经有文件信息，就不用存了
                 expression.setImage(bytes);
                 ALog.d(bytes);
                 expression.save();

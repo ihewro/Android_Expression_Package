@@ -537,10 +537,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         fabSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isSearching = true;
-                searchInput.setVisibility(View.VISIBLE);
-                if (!Objects.equals(searchInput.getText().toString(), "")) {
-                    ResultActivity.actionStart(MainActivity.this, searchInput.getText().toString());
+                if (isSearching){
+                    if (Objects.equals(searchInput.getText().toString(), "")){
+                        isSearching = false;
+                        searchInput.setVisibility(View.GONE);
+                    }else {
+                        ResultActivity.actionStart(MainActivity.this, searchInput.getText().toString());
+                    }
+
+                }else {
+                    searchInput.setVisibility(View.VISIBLE);
+                    isSearching = true;
                 }
 
             }

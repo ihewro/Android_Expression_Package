@@ -59,7 +59,7 @@ public class ShowAllExpFolderTask extends AsyncTask<Void, Integer, Boolean> {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         if (isReady){
-                            if (which != 0){
+                            if (which != 0 ||!isShowDefault){//如果显示默认名称的话，在第0项不需要赋值
                                 folderName = (String) dialog.getItems().get(which);
                             }
                             ALog.d(folderName);

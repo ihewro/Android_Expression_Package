@@ -267,8 +267,8 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                             @Override
                             public void onFinished() {
                                 updateLoadingDialog.setContent("终于同步完成");
-                                updateLoadingDialog.dismiss();
-                                Toasty.success(MyActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
+                                /*updateLoadingDialog.dismiss();
+                                Toasty.success(MyActivity.this,"同步完成", Toast.LENGTH_SHORT).show();*/
                                 //更新RecyclerView 布局
                                 initData();
 

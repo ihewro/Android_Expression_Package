@@ -50,6 +50,7 @@ import static java.lang.Thread.sleep;
  *     time   : 2018/07/05
  *     desc   : 对下载图片进行封装
  *     version: 1.0
+ *     TODO: 下载部分可以重用#addExpressionRecord函数
  * </pre>
  */
 public class DownloadImageTask  {

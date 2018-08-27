@@ -41,6 +41,10 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
         this.isRepeat = isRepeat;
     }
 
+    public GetExpDesTask(boolean isRepeat) {
+        this.isRepeat = isRepeat;
+    }
+
     @Override
     protected Void doInBackground(Expression... expressions) {
         final Expression expression = expressions[0];
@@ -77,7 +81,7 @@ public class GetExpDesTask extends AsyncTask<Expression,Void,Void> {
                     ALog.d(error.getMessage());
                     //Toasty.info(activity,expression.getName()+"表情的描述自动获取失败，你可以稍后手动识别描述").show();
                     if (isRepeat){
-                        new GetExpDesTask(activity,isRepeat).execute(expression);
+                        new GetExpDesTask(isRepeat).execute(expression);
                     }
                     count ++;
                     ALog.d("获取文字" + count + "次");

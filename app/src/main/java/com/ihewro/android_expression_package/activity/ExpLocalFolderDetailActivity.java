@@ -55,8 +55,6 @@ import org.litepal.LitePal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -92,6 +90,8 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     TextView exitSelect;
     @BindView(R.id.to_move)
     TextView toMove;
+    @BindView(R.id.to_copy)
+    TextView toCopy;
 
 
     private ExpImageDialog expressionDialog;
@@ -222,9 +222,35 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
                     @Override
                     public void onFinish(Object result) {
                         //执行添加的任务
-                        new MoveExpTask(expressionList,checkList, (String) result,ExpLocalFolderDetailActivity.this).execute();
+                        new MoveExpTask(expressionList, checkList, (String) result, ExpLocalFolderDetailActivity.this, false, new TaskListener() {
+                            @Override
+                            public void onFinish(Object result) {
+                                if ((Boolean) result){
+                                    Toasty.success(ExpLocalFolderDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                                    for (int i = 0; i < checkList.size(); i++) {
+                                        adapter.remove(Integer.parseInt(checkList.get(i)));
+                                    }
+                                    setContraryCheck();
+                                }
+                            }
+                        }).execute();
                     }
-                },ExpLocalFolderDetailActivity.this,"",false).execute();
+                }, ExpLocalFolderDetailActivity.this, "", false).execute();
+
+            }
+        });
+
+        toCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //执行批量复制操作
+                new ShowAllExpFolderTask(new TaskListener() {
+                    @Override
+                    public void onFinish(Object result) {
+                        //执行添加的任务
+                        new MoveExpTask(expressionList, checkList, (String) result, ExpLocalFolderDetailActivity.this, true,null).execute();
+                    }
+                }, ExpLocalFolderDetailActivity.this, "", false).execute();
 
             }
         });
@@ -232,7 +258,7 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 //执行删除操作
-                new DeleteImageTask(false, expressionList,checkList, dirName, ExpLocalFolderDetailActivity.this,new TaskListener() {
+                new DeleteImageTask(false, expressionList, checkList, dirName, ExpLocalFolderDetailActivity.this, new TaskListener() {
                     @Override
                     public void onFinish(Object result) {
                         Toasty.success(ExpLocalFolderDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
