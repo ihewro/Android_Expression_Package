@@ -1,9 +1,8 @@
 package com.ihewro.android_expression_package.activity;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,23 +21,33 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.ALog;
-import com.chad.library.adapter.base.animation.BaseAnimation;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
-import com.ihewro.android_expression_package.GlobalConfig;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
+import com.ihewro.android_expression_package.MyDataBase;
+import com.ihewro.android_expression_package.MySharePreference;
 import com.ihewro.android_expression_package.R;
 import com.ihewro.android_expression_package.adapter.ExpMyRecyclerViewAdapter;
 import com.ihewro.android_expression_package.bean.EventMessage;
+import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.bean.ExpressionFolder;
+import com.ihewro.android_expression_package.bean.UserPreference;
+import com.ihewro.android_expression_package.callback.TaskListener;
 import com.ihewro.android_expression_package.callback.UpdateDatabaseListener;
+import com.ihewro.android_expression_package.task.AddExpListToExpFolderTask;
+import com.ihewro.android_expression_package.task.ShowAllExpFolderTask;
 import com.ihewro.android_expression_package.task.UpdateDatabaseTask;
+import com.ihewro.android_expression_package.util.APKVersionCodeUtils;
 import com.ihewro.android_expression_package.util.CheckPermissionUtils;
-import com.ihewro.android_expression_package.util.DataUtil;
 import com.ihewro.android_expression_package.util.DateUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
+import com.ihewro.android_expression_package.view.MyGlideEngine;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,7 +56,6 @@ import org.litepal.LitePal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -113,11 +122,16 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
 
         EventBus.getDefault().register(this);
 
+
         initView();
 
         initListener();
 
         refreshLayout.autoRefresh();
+
+        initTapView();
+
+
     }
 
 
@@ -140,6 +154,35 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         adapter.setOnItemDragListener(onItemDragListener);
 
         recyclerView.setAdapter(adapter);
+    }
+
+
+    private void initTapView(){
+        if (MySharePreference.getUserUsedStatus("isAddNew") == 0){
+            toolbar.inflateMenu(R.menu.menu_my);
+            TapTargetView.showFor(this, TapTarget.forToolbarMenuItem(toolbar,R.id.re_add,"新建表情包","这里，可以新建一个表情包目录。\n 每个表情包目录就像是有意义的一组的表情包集合")
+                    .cancelable(false)
+                    .drawShadow(true)
+                    .titleTextColor(R.color.text_primary_dark)
+                    .descriptionTextColor(R.color.text_secondary_dark)
+                    .tintTarget(false), new TapTargetView.Listener() {
+                @Override
+                public void onTargetClick(TapTargetView view) {
+                    super.onTargetClick(view);
+                }
+
+                @Override
+                public void onOuterCircleClick(TapTargetView view) {
+                    super.onOuterCircleClick(view);
+                    Toast.makeText(view.getContext(), "You clicked the outer circle!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                    Log.d("TapTargetViewSample", "You dismissed me :(");
+                }
+            });
+        }
     }
 
 
@@ -202,6 +245,12 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     }
 
     @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        return super.onMenuOpened(featureId, menu);
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.re_update){
             //重新同步数据库
@@ -236,6 +285,27 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                             EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
                         }
                     }).show();
+        }else if (item.getItemId() == R.id.arrange_local_exp){//整理本地表情
+            new MaterialDialog.Builder(this)
+                    .title("整理表情")
+                    .content("进入该功能，会显示本机所有的图片列表。\n\n 你可以选择一组有关联的图片加入到表情包文件夹中")
+                    .positiveText("进入")
+                    .negativeText("取消")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            Matisse.from(MyActivity.this)
+                                    .choose(MimeType.ofAll(), false)
+                                    .countable(true)
+                                    .maxSelectable(90)
+                                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                                    .thumbnailScale(0.85f)
+                                    .theme(R.style.Matisse_Dracula)
+                                    .imageEngine(new MyGlideEngine())
+                                    .forResult(1999);
+                        }
+                    })
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -324,6 +394,29 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // 权限被拒绝
         Toast.makeText(UIUtil.getContext(), "权限没有被通过，该软件运行过程中可能会闪退，请留意", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1998) {
+            if (data != null) {
+                //显示所有的表情包目录列表
+                new ShowAllExpFolderTask(new TaskListener() {
+                    @Override
+                    public void onFinish(Object result) {
+                        List<String> addExpList = Matisse.obtainPathResult(data);
+                        new AddExpListToExpFolderTask(MyActivity.this, addExpList, (String) result, new TaskListener() {
+                            @Override
+                            public void onFinish(Object result) {
+                                refreshLayout.setEnableRefresh(true);
+                                refreshLayout.autoRefresh();
+                            }
+                        }).execute();
+                    }
+                },MyActivity.this,"",false).execute();
+            }
+        }
     }
 
 }

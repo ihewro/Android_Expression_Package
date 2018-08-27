@@ -22,4 +22,8 @@ public class GlobalConfig {
     public static final String getDirDetailUrl = serverUrl + "expFolderDetail.php";
     public static final String appShareOrSavePath = appDirPath + "应用默认文件夹/";//文件夹名称为
 
+
+
+    //错误常量
+    public static final String ERROR_FILE_LIMIT = "ERROR_FILE_LIMIT";
 }

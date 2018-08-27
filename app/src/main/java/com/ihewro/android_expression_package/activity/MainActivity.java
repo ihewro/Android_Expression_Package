@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -49,6 +50,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.MySharePreference;
@@ -205,6 +208,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         //获取百度文字识别的认证
         initAccessTokenWithAkSk();
+
+        initTapView();
 
     }
 
@@ -472,6 +477,24 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
+    private void initTapView(){
+        TapTargetView.showFor(this,                 // `this` is an Activity
+                TapTarget.forView(findViewById(R.id.fab_search), "搜索让一切变得有规律", "这里，你可以搜索你的本地所有表情包\n\n 当然你必须给表情包填写相应的描述")
+                        .textTypeface(Typeface.SANS_SERIF) // Specify a typeface for the text
+                        .drawShadow(true)
+                        .tintTarget(true)
+                        .icon(getResources().getDrawable(R.drawable.ic_search_black_24dp))
+                        .targetCircleColor(android.R.color.black)
+                        .dimColor(android.R.color.black)
+                        .titleTextColor(R.color.text_primary_dark)
+                        .descriptionTextColor(R.color.text_secondary_dark),
+                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                    @Override
+                    public void onTargetClick(TapTargetView view) {
+                        super.onTargetClick(view);      // This call is optional
+                    }
+                });
+    }
     private void initGuideView() {
         View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);
         guideRefreshView = GuideView.Builder

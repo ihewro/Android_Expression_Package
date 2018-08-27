@@ -10,6 +10,10 @@
     <item
         android:id="@+id/re_update"
         android:title="重新同步"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
+    <item
+        android:id="@+id/arrange_local_exp"
+        android:title="整理表情"
+        app:showAsAction="never" />
 </menu>

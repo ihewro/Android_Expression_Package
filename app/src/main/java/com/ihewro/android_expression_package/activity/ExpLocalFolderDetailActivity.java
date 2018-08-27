@@ -32,6 +32,7 @@ import com.ihewro.android_expression_package.bean.ExpressionFolder;
 import com.ihewro.android_expression_package.callback.GetExpListListener;
 import com.ihewro.android_expression_package.callback.SaveImageToGalleryListener;
 import com.ihewro.android_expression_package.callback.TaskListener;
+import com.ihewro.android_expression_package.task.AddExpListToExpFolderTask;
 import com.ihewro.android_expression_package.task.DeleteExpFolderTask;
 import com.ihewro.android_expression_package.task.DeleteImageTask;
 import com.ihewro.android_expression_package.task.EditExpFolderNameTask;
@@ -477,38 +478,18 @@ public class ExpLocalFolderDetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1998) {
-            //把图片加入到图库中
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (data != null) {
-                        List<String> addExpList = Matisse.obtainPathResult(data);
-                        for (int i = 0; i < addExpList.size(); i++) {
-                            File tempFile = new File(addExpList.get(i));
-                            String fileName = tempFile.getName();
-                            final Expression expression = new Expression(1, fileName, "", dirName);
-                            if (!MyDataBase.addExpressionRecord(expression, tempFile)) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toasty.info(UIUtil.getContext(), expression.getName() + "文件大小太大，将不会存储").show();
-                                    }
-                                });
-                            }
-                        }
-                        UIUtil.autoBackUpWhenItIsNecessary();
-                        EventBus.getDefault().post(new EventMessage(EventMessage.DATABASE));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshLayout.setEnableRefresh(true);
-                                refreshLayout.autoRefresh();
-                            }
-                        });
-                    }
 
-                }
-            }).start();
+            //把图片加入到图库中
+            if (data != null) {
+                List<String> addExpList = Matisse.obtainPathResult(data);
+                new AddExpListToExpFolderTask(ExpLocalFolderDetailActivity.this, addExpList, dirName, new TaskListener() {
+                    @Override
+                    public void onFinish(Object result) {
+                        refreshLayout.setEnableRefresh(true);
+                        refreshLayout.autoRefresh();
+                    }
+                }).execute();
+            }
         }
     }
 }

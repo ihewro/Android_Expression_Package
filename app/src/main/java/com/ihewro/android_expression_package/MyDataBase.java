@@ -119,13 +119,13 @@ public class MyDataBase {
         ExpressionFolder nowExpFolder;
         if (nowExpressionFolderList.size() <=0){
             //目录不存在，不可能的
-            nowExpFolder = new ExpressionFolder(1,0,expression.getFolderName(),null,null, DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),-1);
+            nowExpFolder = new ExpressionFolder(1,0,targetFolderName,null,null, DateUtil.getNowDateStr(),null,new ArrayList<Expression>(),-1);
             nowExpFolder.save();
             ALog.d("目录和表情都没有的");
         }else {
             nowExpFolder  = nowExpressionFolderList.get(0);
         }
-        List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),expression.getFolderName());
+        List<Expression> expressionList = queryExpListByNameAndFolderName(false,expression.getName(),targetFolderName);
         if (expressionList.size() > 0){//已经存在了该名称，修改一下图片内容即可
             expression.delete();//因为是移动，所有删除旧的表情包该表情
             expressionList.get(0).setImage(expression.getImage());

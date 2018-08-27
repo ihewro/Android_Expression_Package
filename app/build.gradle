@@ -136,5 +136,9 @@ dependencies {
     //图片压缩
     compile 'id.zelory:compressor:2.1.0'
 
+    //引导
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.12.0'
+
+
 
 }
