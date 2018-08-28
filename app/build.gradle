@@ -6,8 +6,8 @@ android {
         applicationId "com.ihewro.android_expression_package"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 201808101
-        versionName "3.2"
+        versionCode 201808281
+        versionName "3.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +24,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,7 +49,6 @@ import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
-import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
 import com.ihewro.android_expression_package.MySharePreference;
@@ -83,7 +79,6 @@ import com.ihewro.android_expression_package.util.ToastUtil;
 import com.ihewro.android_expression_package.util.UIUtil;
 import com.ihewro.android_expression_package.view.CustomImageView;
 import com.ihewro.android_expression_package.view.ExpImageDialog;
-import com.ihewro.android_expression_package.view.GuideView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -138,8 +133,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     AppBarLayout appbar;
     @BindView(R.id.search_input)
     EditText searchInput;
-    private GuideView guideRefreshView;
-    private GuideView guideAddView;
 
 
     private Drawer result;
@@ -161,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private SecondaryDrawerItem removeCache;
     private CheckUpdateTask checkUpdateTask;
 
-    private boolean isFirst;//是否是首次打开app
     private boolean isSearching;//是否打开了搜索功能
 
     /**
@@ -200,9 +192,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //监听器
         initListener();
 
-        if (!isFirst) {
-            getOne(refreshItem);
-        }
+        getOne(refreshItem);
 
         //获取缓存大小
         setCacheSize();
@@ -220,10 +210,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * 这个表情包是内置在apk中，用户无需下载即可直接使用
      */
     private void initData() {
-
-        //TODO: 读取sharePreference查看是否是首次进入app
-        isFirst = MySharePreference.getIsFirstEnter(this);
-
 
     }
 
@@ -539,61 +525,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     .start();
         }
     }
-    private void initGuideView() {
-        View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);
-        guideRefreshView = GuideView.Builder
-                .newInstance(this)
-                .setTargetView(refreshItem.getActionView())//设置目标
-                .setCustomGuideView(customView)
-                .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setShape(GuideView.MyShape.CIRCULAR)   // 设置圆形显示区域，
-                .setBgColor(getResources().getColor(R.color.shadow))
-                .setOnclickListener(new GuideView.OnClickCallback() {
-                    @Override
-                    public void onClickedGuideView() {
-                        getOne(refreshItem);
-                        guideRefreshView.hide();
-                        initGuideAddView();
-                    }
-                })
-                .build();
-
-        guideRefreshView.show();
-    }
-
-
-    private void initGuideAddView() {
-
-        result.getRecyclerView().post(new Runnable() {
-            @Override
-            public void run() {
-                View customView = LayoutInflater.from(MainActivity.this).inflate(R.layout.guide_view, null);
-                ((TextView) customView.findViewById(R.id.textView5)).setText("点击可以下载网络上热门表情包，不断更新！");
-                guideAddView = GuideView.Builder
-                        .newInstance(MainActivity.this)
-                        .setTargetView(addExp)//设置目标
-                        .setCustomGuideView(customView)
-                        .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                        .setShape(GuideView.MyShape.CIRCULAR)   // 设置圆形显示区域，
-                        .setBgColor(getResources().getColor(R.color.shadow))
-                        .setOnclickListener(new GuideView.OnClickCallback() {
-                            @Override
-                            public void onClickedGuideView() {
-                                guideAddView.hide();
-                                Toasty.info(MainActivity.this, "侧边栏还有一些更多有趣的功能入口，程序还有一些彩蛋等你发现", Toast.LENGTH_SHORT).show();
-                                result.openDrawer();
-                            }
-                        })
-                        .build();
-
-                guideAddView.show();
-            }
-        });
-
-        MySharePreference.setIsFistEnter(this);
-
-    }
-
 
     private void initListener() {
 
@@ -828,9 +759,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         getMenuInflater().inflate(R.menu.menu_main, menu);
         refreshItem = menu.findItem(R.id.refresh);
         showRefreshAnimation(refreshItem);
-        if (isFirst) {
-            initGuideView();
-        }
         return true;
     }
 

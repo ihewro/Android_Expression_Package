@@ -27,18 +27,6 @@ import java.util.List;
  */
 public class MySharePreference {
 
-    public static boolean setIsFistEnter(Context context){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("baby", false);
-        editor.apply();
-        return true;
-    }
-
-    public static boolean getIsFirstEnter(Context context){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getBoolean("baby", true);
-    }
 
     /**
      * 返回用户使用某种新功能的情况，1表示已经用过了，0表示没用过
