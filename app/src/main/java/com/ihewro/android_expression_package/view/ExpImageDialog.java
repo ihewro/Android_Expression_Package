@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -23,9 +24,15 @@ import com.baidu.ocr.sdk.model.GeneralBasicParams;
 import com.baidu.ocr.sdk.model.GeneralResult;
 import com.baidu.ocr.sdk.model.WordSimple;
 import com.blankj.ALog;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
+import com.ihewro.android_expression_package.MySharePreference;
 import com.ihewro.android_expression_package.R;
+import com.ihewro.android_expression_package.activity.MainActivity;
+import com.ihewro.android_expression_package.activity.ShopActivity;
 import com.ihewro.android_expression_package.bean.EventMessage;
 import com.ihewro.android_expression_package.bean.Expression;
 import com.ihewro.android_expression_package.callback.GetExpImageListener;
@@ -43,6 +50,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -151,6 +159,123 @@ public class ExpImageDialog extends MaterialDialog{
         updateUI();
         super.show();
 
+        initTapView();
+
+    }
+
+    private void initTapView(){
+        int leftButton;
+        String title;
+        String des;
+        if (new File(GlobalConfig.appDirPath + expression.getFolderName() + "/" + expression.getName()).exists()){
+            leftButton = R.id.delete_image;
+            title = "删除图片";
+            des = "点击删除该图片在本地的文件\n\n但你仍然可以离线使用";
+        }else {
+            leftButton = R.id.save_image;
+            title = "保存到本地";
+            des = "点击保存到本地以文件形式存储";
+        }
+
+        List<TapTarget> tapTargets = new ArrayList<>();
+
+        TapTarget imageDesTarget;
+        if (expression.getStatus() == 2){//网络图片
+            imageDesTarget = null;
+        }else {
+            imageDesTarget = TapTarget.forView(findViewById(R.id.input_view), "图片描述区", "填写图片描述可以帮助你更快的搜索到相应表情\n\n你可以使用自动识别功能自动识别图片中的文字")
+                    .textTypeface(Typeface.SANS_SERIF) //指定字体
+                    .drawShadow(true)
+                    .cancelable(false)
+                    .transparentTarget(true)
+                    .targetCircleColor(android.R.color.black)//内圈的颜色
+                    .titleTextColor(R.color.text_primary_dark)
+                    .descriptionTextColor(R.color.text_secondary_dark).id(3);
+        }
+
+        if (MySharePreference.getUserUsedStatus("isOpenTheImageDialog") == 0) {
+            TapTarget leftButtonTarget = TapTarget.forView(findViewById(leftButton), title, des)
+                    .textTypeface(Typeface.SANS_SERIF) //指定字体
+                    .drawShadow(true).cancelable(false).tintTarget(true)//
+                    .tintTarget(true)
+                    .targetCircleColor(android.R.color.black)//内圈的颜色
+                    .titleTextColor(R.color.text_primary_dark)
+                    .descriptionTextColor(R.color.text_secondary_dark).id(1);
+
+            TapTarget shareTarget = TapTarget.forView(findViewById(R.id.share_function), "分享工具栏", "轻松分享到微信、QQ、Tim社交平台\n\n使用系统内置分享功能甚至可以分享到任何地方")
+                    .textTypeface(Typeface.SANS_SERIF) //指定字体
+                    .drawShadow(true)
+                    .cancelable(false)
+                    .tintTarget(true)
+                    .targetCircleColor(android.R.color.black)//内圈的颜色
+                    .titleTextColor(R.color.text_primary_dark)
+                    .descriptionTextColor(R.color.text_secondary_dark).id(2);
+
+            tapTargets.add(leftButtonTarget);
+            tapTargets.add(shareTarget);
+            if (leftButton == R.id.delete_image){
+                MySharePreference.getUserUsedStatus("isDeleteImage");
+            }else {
+                MySharePreference.getUserUsedStatus("isSaveImage");
+            }
+
+            if (imageDesTarget != null){
+                tapTargets.add(imageDesTarget);
+                MySharePreference.getUserUsedStatus("isImageDes");
+            }
+
+            new TapTargetSequence(this)
+                    .targets(tapTargets)
+                    .listener(new TapTargetSequence.Listener() {
+                        @Override
+                        public void onSequenceFinish() {
+
+                        }
+
+                        @Override
+                        public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+                            switch (lastTarget.id()){
+                                case 1:
+                                    break;
+                                case 2:
+                                    break;
+                                case 3:
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public void onSequenceCanceled(TapTarget lastTarget) {
+
+                        }
+                    })
+                    .start();
+        }else {//已经不是第一次打开图片弹窗，但是删除按钮或者保存按钮是第一次使用
+            tapTargets.clear();
+            if (MySharePreference.getUserUsedStatus("isSaveImage") == 0 || MySharePreference.getUserUsedStatus("isDeleteImage") == 0){
+                TapTarget buttonTarget = TapTarget.forView(findViewById(leftButton), title, des)
+                        .textTypeface(Typeface.SANS_SERIF) //指定字体
+                        .drawShadow(true).cancelable(false).tintTarget(true)//
+                        .tintTarget(true)
+                        .targetCircleColor(android.R.color.black)//内圈的颜色
+                        .titleTextColor(R.color.text_primary_dark)
+                        .descriptionTextColor(R.color.text_secondary_dark).id(1);
+                tapTargets.add(buttonTarget);
+
+            }
+            if (imageDesTarget != null){
+                if (MySharePreference.getUserUsedStatus("isImageDes") == 0){
+                    tapTargets.add(imageDesTarget);
+                }
+            }
+
+
+            if (tapTargets.size() > 0){
+                new TapTargetSequence(this).targets(tapTargets).start();
+            }
+
+
+        }
     }
 
     private void initView(){

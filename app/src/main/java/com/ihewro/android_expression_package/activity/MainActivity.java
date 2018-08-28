@@ -51,6 +51,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.canking.minipay.Config;
 import com.canking.minipay.MiniPayUtils;
 import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.ihewro.android_expression_package.GlobalConfig;
 import com.ihewro.android_expression_package.MyDataBase;
@@ -478,22 +479,65 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
     private void initTapView(){
-        TapTargetView.showFor(this,                 // `this` is an Activity
-                TapTarget.forView(findViewById(R.id.fab_search), "搜索让一切变得有规律", "这里，你可以搜索你的本地所有表情包\n\n 当然你必须给表情包填写相应的描述")
-                        .textTypeface(Typeface.SANS_SERIF) // Specify a typeface for the text
-                        .drawShadow(true)
-                        .tintTarget(true)
-                        .icon(getResources().getDrawable(R.drawable.ic_search_black_24dp))
-                        .targetCircleColor(android.R.color.black)
-                        .dimColor(android.R.color.black)
-                        .titleTextColor(R.color.text_primary_dark)
-                        .descriptionTextColor(R.color.text_secondary_dark),
-                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                    @Override
-                    public void onTargetClick(TapTargetView view) {
-                        super.onTargetClick(view);      // This call is optional
-                    }
-                });
+        if (MySharePreference.getUserUsedStatus("isFirstEnter") == 0) {
+            toolbar.inflateMenu(R.menu.menu_main);
+            new TapTargetSequence(this)
+                    .targets(TapTarget.forToolbarMenuItem(toolbar,R.id.refresh,"来自 一个・one","点击刷新，每天早6点自动更新来自one接口的数据\n\n如果喜欢可以分享给别人")
+                                    .cancelable(false)
+                                    .drawShadow(true)
+                                    .titleTextColor(R.color.text_primary_dark)
+                                    .descriptionTextColor(R.color.text_secondary_dark)
+                                    .tintTarget(true)
+                                    .targetCircleColor(android.R.color.black)//内圈的颜色
+                                    .id(1),
+
+                            TapTarget.forView(findViewById(R.id.fab_search), "搜索让一切变得有规律", "这里，你可以搜索你的本地所有表情包\n\n当然你必须给表情包填写相应的描述")
+                            .textTypeface(Typeface.SANS_SERIF) //指定字体
+                            .drawShadow(true).cancelable(false).tintTarget(true)//
+                            .icon(getResources().getDrawable(R.drawable.ic_search_black_24dp))//指定target图标
+                            .targetCircleColor(android.R.color.black)//内圈的颜色
+                            .titleTextColor(R.color.text_primary_dark)
+                            .descriptionTextColor(R.color.text_secondary_dark).id(2),
+
+                            TapTarget.forView(findViewById(R.id.add_exp), "丰富的表情商店", "进入这里，你可以下载你需要的表情包\n\n你可以选择下载部分或者下载全套")
+                                    .textTypeface(Typeface.SANS_SERIF) //指定字体
+                                    .drawShadow(true)
+                                    .cancelable(false)
+                                    .tintTarget(true)//
+                                    .icon(getResources().getDrawable(R.drawable.ic_add_black_24dp))//指定target图标
+                                    .targetCircleColor(android.R.color.black)//内圈的颜色
+                                    .titleTextColor(R.color.text_primary_dark)
+                                    .descriptionTextColor(R.color.text_secondary_dark).id(3)
+
+                            )
+                    .listener(new TapTargetSequence.Listener() {
+                        @Override
+                        public void onSequenceFinish() {
+
+                        }
+
+                        @Override
+                        public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+                            switch (lastTarget.id()){
+                                case 1:
+                                    getOne(refreshItem);
+                                    break;
+                                case 2:
+                                    fabSearch.performClick();
+                                    break;
+                                case 3:
+                                    ShopActivity.actionStart(MainActivity.this);
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public void onSequenceCanceled(TapTarget lastTarget) {
+
+                        }
+                    })
+                    .start();
+        }
     }
     private void initGuideView() {
         View customView = LayoutInflater.from(this).inflate(R.layout.guide_view, null);

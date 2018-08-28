@@ -160,12 +160,13 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     private void initTapView(){
         if (MySharePreference.getUserUsedStatus("isAddNew") == 0){
             toolbar.inflateMenu(R.menu.menu_my);
-            TapTargetView.showFor(this, TapTarget.forToolbarMenuItem(toolbar,R.id.re_add,"新建表情包","这里，可以新建一个表情包目录。\n 每个表情包目录就像是有意义的一组的表情包集合")
+            TapTargetView.showFor(this, TapTarget.forToolbarMenuItem(toolbar,R.id.re_add,"新建表情包","这里，可以新建一个表情包目录。\n\n每个表情包目录就像是有意义的一组的表情包集合")
                     .cancelable(false)
                     .drawShadow(true)
+                    .tintTarget(true).targetCircleColor(android.R.color.black)//内圈的颜色
                     .titleTextColor(R.color.text_primary_dark)
                     .descriptionTextColor(R.color.text_secondary_dark)
-                    .tintTarget(false), new TapTargetView.Listener() {
+                    , new TapTargetView.Listener() {
                 @Override
                 public void onTargetClick(TapTargetView view) {
                     super.onTargetClick(view);
@@ -174,12 +175,11 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                 @Override
                 public void onOuterCircleClick(TapTargetView view) {
                     super.onOuterCircleClick(view);
-                    Toast.makeText(view.getContext(), "You clicked the outer circle!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(view.getContext(), "You clicked the outer circle!", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
-                    Log.d("TapTargetViewSample", "You dismissed me :(");
                 }
             });
         }
@@ -288,7 +288,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
         }else if (item.getItemId() == R.id.arrange_local_exp){//整理本地表情
             new MaterialDialog.Builder(this)
                     .title("整理表情")
-                    .content("进入该功能，会显示本机所有的图片列表。\n\n 你可以选择一组有关联的图片加入到表情包文件夹中")
+                    .content("进入该功能，会显示本机所有的图片列表。\n\n你可以选择一组有关联的图片加入到表情包文件夹中")
                     .positiveText("进入")
                     .negativeText("取消")
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -314,8 +314,8 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void refreshUI(EventMessage eventBusMessage){
         if (Objects.equals(eventBusMessage.getType(), EventMessage.DATABASE)){
-            ALog.d("更新首页布局");
-            initData();
+            refreshLayout.setEnableRefresh(true);
+            refreshLayout.autoRefresh();
         }
     }
 
@@ -399,7 +399,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1998) {
+        if (requestCode == 1999) {
             if (data != null) {
                 //显示所有的表情包目录列表
                 new ShowAllExpFolderTask(new TaskListener() {
@@ -409,8 +409,7 @@ public class MyActivity extends BaseActivity implements EasyPermissions.Permissi
                         new AddExpListToExpFolderTask(MyActivity.this, addExpList, (String) result, new TaskListener() {
                             @Override
                             public void onFinish(Object result) {
-                                refreshLayout.setEnableRefresh(true);
-                                refreshLayout.autoRefresh();
+
                             }
                         }).execute();
                     }

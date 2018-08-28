@@ -13,10 +13,13 @@ import org.litepal.crud.LitePalSupport;
  * </pre>
  */
 public class UserPreference  extends LitePalSupport {
-
+    private int id;//主键
     private int isFirstEnter;//首次进入该应用，0表示是
     private int isAddNew;//是否已经点击过新建表情包
     private int isOpenTheImageDialog;//是否打开过表情弹窗
+    private int isSaveImage;//显示图片按钮
+    private int isDeleteImage;//删除图片按钮
+    private int isImageDes;//图片描述区域
 
     public UserPreference() {
     }
@@ -52,5 +55,37 @@ public class UserPreference  extends LitePalSupport {
 
     public void setIsOpenTheImageDialog(int isOpenTheImageDialog) {
         this.isOpenTheImageDialog = isOpenTheImageDialog;
+    }
+
+    public int getIsSaveImage() {
+        return isSaveImage;
+    }
+
+    public void setIsSaveImage(int isSaveImage) {
+        this.isSaveImage = isSaveImage;
+    }
+
+    public int getIsDeleteImage() {
+        return isDeleteImage;
+    }
+
+    public void setIsDeleteImage(int isDeleteImage) {
+        this.isDeleteImage = isDeleteImage;
+    }
+
+    public int getIsImageDes() {
+        return isImageDes;
+    }
+
+    public void setIsImageDes(int isImageDes) {
+        this.isImageDes = isImageDes;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
