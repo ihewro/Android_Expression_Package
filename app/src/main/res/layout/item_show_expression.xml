@@ -34,7 +34,7 @@
             android:maxHeight="300dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="fitCenter"
-            android:src="@drawable/test"/>
+            android:src="@drawable/loading"/>
 
         <!--图片的工具菜单栏-->
         <RelativeLayout

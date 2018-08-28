@@ -54,7 +54,7 @@
                     android:id="@+id/download_time_tip"
                     android:layout_centerVertical="true"
                     android:layout_alignParentLeft="true"
-                    android:text="下载时间"
+                    android:text="添加时间"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 

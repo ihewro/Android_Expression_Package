@@ -130,7 +130,7 @@
                     android:text="确认添加"
                     android:clickable="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:textColor="@color/blue_trans"/>
+                    android:textColor="@color/primaryColor"/>
             </RelativeLayout>
         </FrameLayout>
     </RelativeLayout>
