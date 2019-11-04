@@ -628,16 +628,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                     //存储新的数据
                     final OneDetailList oneDetailList = response.body();
-                    assert oneDetailList != null;
-                    oneDetailList.save();
+                    if (oneDetailList != null){
+                        oneDetailList.save();
 
-                    for (int i = 0; i < oneDetailList.getCount(); i++) {
-                        OneDetail oneDetail = oneDetailList.getOneDetailList().get(i);
-                        oneDetail.setOneDetailList(oneDetailList);
-                        oneDetail.save();
+                        for (int i = 0; i < oneDetailList.getCount(); i++) {
+                            OneDetail oneDetail = oneDetailList.getOneDetailList().get(i);
+                            oneDetail.setOneDetailList(oneDetailList);
+                            oneDetail.save();
+                        }
+
+                        setOneUI(oneDetailList);
                     }
-
-                    setOneUI(oneDetailList);
                 }
 
                 @Override
